@@ -10,6 +10,7 @@
 
 namespace ASF {
 
+
     class RVM_AbstractSwitchFabric {
         ASF_ContainerPorts<ASF_PortData> *portsDO;
         ASF_ContainerPorts<ASF_PortAPE> *portsAPE;
