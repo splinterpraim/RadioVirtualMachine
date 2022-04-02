@@ -5,6 +5,7 @@ namespace rvm{
     class ControlUnit;
     class DataObject;
     class AbstractProcessingElement;
+    class AbstractSwitchFabric;
 
 }
 #endif // RVM_CLASS_DEFINITION_H

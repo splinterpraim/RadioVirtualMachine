@@ -6,6 +6,10 @@
 #include "rvm_structs.h"
 #include "DO/data_object.h"
 #include "APE/abstract_processing_element.h"
+#include "ASF/abstract_switch_fabric.h"
+
+#include "log_manager.h"
+
 
 /* Radio Library */
 #include "radiolib/functions.h"
@@ -19,8 +23,16 @@ namespace rvm
     class ControlUnit
     {
     public:
+
+        /* Destructor */
+        ~ControlUnit();
+
+        
+        /* Configuring */
         int configuringDataObjects();
         int configuringAbstractProcessingElements();
+        int configuringAbstractSwitchFabric();
+
 
         void showStatus(){}
         void sendStatusFromDataObject(const StatusFromDataObject &statusDO);
@@ -30,6 +42,7 @@ namespace rvm
     private:
         DataObject *dataObjects;
         AbstractProcessingElement *abstractProcessingElements;
+        AbstractSwitchFabric *abstractSwitchFabric; 
         size_t dataObjects_size = 10;
         size_t abstractProcessingElements_size = 10;
 

@@ -7,15 +7,14 @@ int radiolib::sum(uint8_t argc, ...)
 
     std::va_list factor;
     va_start(factor, argc);
-    for (int i = 0; i < argc - 1; i++)
+    for (int i = 0; i < argc; i++)
     {
         currParam = va_arg(factor, int);
         result += currParam;
-        std::cout << currParam << " ";
     }
-    std::cout << std::endl;
-    std::cout << "res = " << result << std::endl;
-    int realResult= va_arg(factor, int&);
+
+    int *realResult= va_arg(factor, int *);
+    *realResult = result;
 
     va_end(factor);
     return 0;

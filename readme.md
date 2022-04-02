@@ -1,6 +1,8 @@
 
 TODO:
-    - finish set APE
-    - do init APE
+    ? finish set APE (? у каждого порта cost/time)
+    + do init APE 
     - do other func APE
-    - think about DO ports 
+    - think about DO ports
+
+    - set/init AbstractSwitchFabric 

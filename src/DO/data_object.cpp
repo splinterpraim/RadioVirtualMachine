@@ -5,10 +5,12 @@
 rvm::DataObject::DataObject()
 {
 }
+
 rvm::DataObject::~DataObject()
 {
     delete[] data;
 }
+
 int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t &accessTime)
 {
     if (size == 0)
@@ -20,97 +22,68 @@ int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t
     this->size = size;
     this->accessTime = accessTime;
 
-    // allocate mem;
+    /* Allocate mem */
     data = new uint8_t[size];
-    // filling zeros
+
+    /* Filling zeros */
     for (size_t i = 0; i < size; i++)
     {
         data[i] = 0;
     }
 
-    // set status
+    /* Set status */
     status.id = id;
-    status.state = empty;
 
+    //! need to confirm to CU?
     // cu->sendStatusFromDataObject(status);
     return 0;
 }
+
 int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
 {
-
-    // Error size
+    //! in init set exception if Error size
+    /*  Error size */
     if ((length > size) && (length != 255))
     {
         throw std::string("Error DO_" + std::to_string(id) + ": in init(), length > size");
     }
 
+    /* Read non-empty data */
     if (length != 0)
     {
-        // Data from file
+        /* Read data from file */
         if (length == 255)
         {
-            // convert_to_string(initData)
-            std::string filename;
-            char symbol = ' ';
-            for (size_t i = 0; i < 255; i++)
-            {
-                symbol = static_cast<char>((&initData)[i]);
-                if (symbol == '\n')
-                {
-                    break;
-                }
-                filename += symbol;
-            }
-
-            // read Data from file
-            std::ifstream infile(filename);
-            if (!infile.is_open())
-            {
-                throw std::string("Error DO_" + std::to_string(id) + ": in init(), file can't open");
-            }
-            std::string dataFromFile;
-            std::string symbolDataFromFile;
-
-            for (size_t i = 0; (i < size) && (!infile.eof()); i++)
-            {
-                
-                infile >> symbolDataFromFile;
-                if(symbolDataFromFile == ""){
-                    break;
-                }
-                data[i] = symbolDataFromFile[0] - 48;
-
-                symbolDataFromFile = "";
-            }
-
-            infile.close();
-
-            std::cout << dataFromFile << std::endl;
+            std::string filename = convertToFilename(initData);
+            readDataFromFile(filename);
         }
 
-        // Data from initData, not empty
+        /* Read data from initData */
         else
         {
-            for (size_t i = 0; i < length; i++)
-            {
-                data[i] = (&initData)[i];
-            }
+            readDataFromMemory(initData, length);
         }
         status.state = full;
     }
 
+    //! need to confirm to CU?
     cu->sendStatusFromDataObject(status);
-    showData();
     return 0;
 }
 
-// void DataObject::setSendStatusFunction(int (*sendStatus)(ControlUnit &cu, StatusFromDataObject statusDO))
-// {
-//     this->sendStatus = sendStatus;
-// }
 void rvm::DataObject::setSendControlUnit(ControlUnit &cu)
 {
     this->cu = &cu;
+}
+
+std::string rvm::DataObject::to_str()
+{
+    std::string result_str = "id " + std::to_string(id) + ", " +
+                             "size " + std::to_string(size) + ", " +
+                             "accessTime " + std::to_string(accessTime) + "\n" +
+                             "status: " + status.to_str() + "\n" +
+                             "data: " + to_strData();
+    return result_str;
 }
 
 int rvm::DataObject::checkCallBack()
@@ -125,11 +98,63 @@ int rvm::DataObject::checkCallBack()
     return 0;
 }
 
-void rvm::DataObject::showData()
+std::string rvm::DataObject::to_strData()
 {
+    std::string result_str;
+
     for (size_t i = 0; i < size; i++)
     {
-        std::cout << static_cast<int>(data[i]) << " ";
+        result_str += std::to_string(data[i]) + " ";
     }
-    std::cout << std::endl;
+    result_str += '\n';
+    return result_str;
+}
+
+/* Other functions */
+std::string rvm::DataObject::convertToFilename(const uint8_t &initData)
+{
+    std::string filename;
+    char symbol = ' ';
+    for (size_t i = 0; i < 255; i++)
+    {
+        symbol = static_cast<char>((&initData)[i]);
+        if (symbol == '\n')
+        {
+            break;
+        }
+        filename += symbol;
+    }
+    return filename;
+}
+
+int rvm::DataObject::readDataFromMemory(const uint8_t &data, uint32_t length)
+{
+    for (size_t i = 0; i < length; i++)
+    {
+        this->data[i] = (&data)[i];
+    }
+}
+
+int rvm::DataObject::readDataFromFile(std::string filename)
+{
+    /* Open file */
+    std::ifstream infile(filename);
+    if (!infile.is_open())
+    {
+        throw std::string("Error DO_" + std::to_string(id) + ": in init(), file can't open");
+    }
+
+    /* Read Data */
+    std::string symbolDataFromFile;
+    for (size_t i = 0; (i < size) && (!infile.eof()); i++)
+    {
+        infile >> symbolDataFromFile;
+        if (symbolDataFromFile == "")
+        {
+            break;
+        }
+        data[i] = std::stoi(symbolDataFromFile);
+        symbolDataFromFile = "";
+    }
+    infile.close();
 }

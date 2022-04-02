@@ -3,6 +3,7 @@
 #define RVM_STRUCTS_H
 
 #include <iostream>
+#include <string>
 
 enum
 {
@@ -15,37 +16,50 @@ enum
     inactive,
     active
 };
+
+namespace at
+{
+    enum
+    {
+        read,
+        write,
+        readErase
+    };
+
+}
 struct StatusFromDataObject
 {
-    unsigned id : 8;
-    unsigned state : 1;      // 0 - empty, 1 - full
-    unsigned accessType : 1; // 0 - read,  1 - write
-    unsigned exception : 2;
+    uint8_t id : 8;
+    uint8_t state : 1;      // 0 - empty, 1 - full
+    uint8_t accessType : 2; // 0 - at::read,  1 - at::write, 2 - at::readErase
+    uint8_t exception : 2;
 
-    StatusFromDataObject() : id(0), state(empty), accessType(0), exception(0){}
+    StatusFromDataObject() : id(0), state(empty), accessType(0), exception(0) {}
 
-    void show() const
+    std::string to_str() const
     {
-        std::cout << "id = " << id << std::endl;
-        std::cout << "state = " << state << std::endl;
-        std::cout << "accessType = " << accessType << std::endl;
-        std::cout << "exception = " << exception << std::endl;
+        std::string result_str = "id " + std::to_string(id) + ", " +
+                                 "state " + std::to_string(state) + ", " +
+                                 "accessType " + std::to_string(accessType) + ", " +
+                                 "exception " + std::to_string(exception);
+        return result_str;
     }
 };
 
 struct StatusFromAbstractProcessingElement
 {
-    unsigned id : 8;
-    unsigned state : 1; /* 0 - inactive, 1 - active */
-    unsigned exception : 2;
+    uint16_t id : 16;
+    uint8_t state : 1; /* 0 - inactive, 1 - active */
+    uint8_t exception : 2;
 
     StatusFromAbstractProcessingElement() : id(0), state(inactive), exception(0) {}
-    
-    void show() const
+
+    std::string to_str() const
     {
-        std::cout << "id = " << id << std::endl;
-        std::cout << "state = " << state << std::endl;
-        std::cout << "exception = " << exception << std::endl;
+        std::string result_str = "id " + std::to_string(id) + ", " +
+                                 "state " + std::to_string(state) + ", " +
+                                 "exception " + std::to_string(exception);
+        return result_str;
     }
 };
 #endif // RVM_STRUCTS_H

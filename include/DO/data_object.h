@@ -15,16 +15,24 @@ namespace rvm
     {
 
     public:
+        /* Constructor */
         DataObject();
+
+        /* Destructor */
         ~DataObject();
         
+        /* Sets DO id, size and access time */
         int set(const uint8_t &id, const uint32_t &size, const uint32_t &accessTime);
+
+        /* Initializes DO of a specific data */
         int init(const uint8_t &initData, uint8_t length);
 
+        /* Sets a pointer to the associated Control Unit */
         void setSendControlUnit(ControlUnit &cu);
-        void setID(int id) { this->id = id; }
+        
 
-        //
+        /* Other functions */
+        std::string to_str();
         int checkCallBack();
 
     private:
@@ -38,7 +46,14 @@ namespace rvm
 
         StatusFromDataObject status;
 
-        void showData();
+        
+
+
+        /* Other functions */
+        std::string to_strData();
+        std::string convertToFilename(const uint8_t &initData);
+        int readDataFromMemory(const uint8_t &data, uint32_t length);
+        int readDataFromFile(std::string filename);
     };
 };
 #endif // RVM_DATA_OBJECT_CLASS

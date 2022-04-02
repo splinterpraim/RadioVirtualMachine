@@ -2,7 +2,7 @@ root_include_dir    := include
 root_source_dir     := src
 source_subdirs      := . APE ASF CU DO radiolib
 compile_flags       := -Wall -MD -pipe
-link_flags          := -s -pipe
+link_flags          :=  #-s -pipe
 # libraries           := -ldl
 std_flag            := -std=c++11 
  
@@ -34,5 +34,8 @@ VPATH := ../../
  
 clean :
 	rm -rf bin obj
+
+clean-logs:
+	rm -rf *.log
  
 include $(wildcard $(addsuffix /*.d, $(objects_dirs)))

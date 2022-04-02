@@ -1,15 +1,10 @@
 #ifndef RVM_RADIOLIB_FUNCTIONS_H
 #define RVM_RADIOLIB_FUNCTIONS_H
 #include <iostream>
-// #include <cstdarg>
+#include <cstdarg>
 
 namespace radiolib
 {
-    class InArgs{
-        
-
-
-    }
-    int sum(uint8_t argc, inArgs, outArgs);
+    int sum(uint8_t argc, ...);
 }
 #endif // RVM_RADIOLIB_FUNCTIONS_H

@@ -2,6 +2,7 @@
 #include <string>
 #include "CU/control_unit.h"
 #include "DO/data_object.h"
+#include "log_manager.h"
 
 using namespace std;
 
@@ -9,11 +10,10 @@ int main()
 {
     try
     {
-
         // struct StatusFromDataObject s;
         rvm::ControlUnit mainCU, slaveCU;
-        // mainCU.configuringDataObjects();
-        mainCU.configuringAbstractProcessingElements();
+        mainCU.configuringDataObjects();
+        // mainCU.configuringAbstractProcessingElements();
 
         /// -->>>>>>>>>>>>>>>>>
 
