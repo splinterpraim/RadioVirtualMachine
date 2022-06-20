@@ -1,19 +1,28 @@
 
 build_dir := build
 
+includes := ../include
+
+source_dir := ../src
+
 gtest_dir := ./gtest_lib
 
 gtest_cc := $(gtest_dir)/gtest-all.cc
 
 outfile_name := unittest
 
-tests_file := first_test.cpp
+tests_file := tests.cpp
 
-source := tested_file.cpp 
 
+sources := /DO/fake_data_object.cpp 
+
+sources_with_full_path := $(addprefix $(source_dir), $(sources))
 
 all: mkdir-build
-	g++ -o $(build_dir)/$(outfile_name) $(source) $(tests_file)  -I$(gtest_dir)  $(gtest_cc) -pthread
+	g++ -o $(build_dir)/$(outfile_name) $(sources_with_full_path) $(tests_file) -I$(includes) -I$(gtest_dir)  $(gtest_cc) -pthread
+
+
+
 
 mkdir-build:
 	mkdir -p $(build_dir)

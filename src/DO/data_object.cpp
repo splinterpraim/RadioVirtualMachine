@@ -13,61 +13,98 @@ rvm::DataObject::~DataObject()
 
 int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t &accessTime)
 {
-    if (size == 0)
+    /* Throw exceptions */
     {
-        throw std::string("Error DO_" + std::to_string(id) + ": in set(), size == 0");
+        /* Invalid argument */
+        if (size == 0)
+        {
+            throw std::invalid_argument("Setting DataObject failed, argument size = 0!");
+        }
+
+        /* Double function call */
+        if (data != nullptr)
+        {
+            throw std::runtime_error("Setting DataObject failed, Double set function call!");
+        }
     }
 
-    this->id = id;
-    this->size = size;
-    this->accessTime = accessTime;
-
-    /* Allocate mem */
-    data = new uint8_t[size];
-
-    /* Filling zeros */
-    for (size_t i = 0; i < size; i++)
+    /* Exception Handle */
     {
-        data[i] = 0;
+
+        /* Allocate mem */
+        try
+        {
+            data = new uint8_t[size];
+            std::fill(data, data + size, 0);
+
+            this->id = id;
+            this->size = size;
+            this->accessTime = accessTime;
+           
+            /* Set status */
+            status.id = id;
+        }
+        catch (const std::bad_alloc &e)
+        {
+            std::cerr << "Bad_alloc: Setting DataObject failed, Memory allocation error " << std::endl;
+            return -1;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "Exception: Setting DataObject failed, error during function execution!" << std::endl;
+            return -1;
+        }
     }
 
-    /* Set status */
-    status.id = id;
-
-    //! need to confirm to CU?
-    // cu->sendStatusFromDataObject(status);
     return 0;
 }
 
 int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
 {
-    //! in init set exception if Error size
-    /*  Error size */
-    if ((length > size) && (length != 255))
+    /* Throw exceptions */
     {
-        throw std::string("Error DO_" + std::to_string(id) + ": in init(), length > size");
+        /*  Error size */
+        if ((length > size) && (length != 255))
+        {
+            throw std::invalid_argument("Initialization DataObject failed, argument length > allocated size!");
+        }
+        if (cu == nullptr)
+        {
+            throw std::runtime_error("Initialization DataObject failed, Data Object is not related to  Control Unit!");
+        }
     }
 
-    /* Read non-empty data */
-    if (length != 0)
+    /* Exception Handle */
     {
-        /* Read data from file */
-        if (length == 255)
+        try
         {
-            std::string filename = convertToFilename(initData);
-            readDataFromFile(filename);
-        }
+            /* Read non-empty data */
+            if (length != 0)
+            {
+                /* Read data from file */
+                if (length == 255)
+                {
+                    std::string filename = convertToFilename(initData);
+                    readDataFromFile(filename);
+                }
 
-        /* Read data from initData */
-        else
-        {
-            readDataFromMemory(initData, length);
+                /* Read data from memory */
+                else
+                {
+                    readDataFromMemory(initData, length);
+                }
+                status.state = full;
+            }
+
+            cu->sendStatusFromDataObject(status);
         }
-        status.state = full;
+        catch (const std::exception &e)
+        {
+            std::cerr << "Exception: Initialization DataObject failed, error during function execution!" << std::endl;
+            return -1;
+        }
     }
 
-    //! need to confirm to CU?
-    cu->sendStatusFromDataObject(status);
     return 0;
 }
 
@@ -86,17 +123,7 @@ std::string rvm::DataObject::to_str()
     return result_str;
 }
 
-int rvm::DataObject::checkCallBack()
-{
-    std::cout << "d" << std::endl;
-    status.id = id;
-    status.state = empty;
-    status.accessType = 1;
-    status.exception = 0;
-    // sendStatus(*this->cu, status);
-    // cu->sendStatusFromDataObject(status);
-    return 0;
-}
+
 
 std::string rvm::DataObject::to_strData()
 {
@@ -127,18 +154,19 @@ std::string rvm::DataObject::convertToFilename(const uint8_t &initData)
     return filename;
 }
 
-int rvm::DataObject::readDataFromMemory(const uint8_t &data, uint32_t length)
+int rvm::DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t length)
 {
     for (size_t i = 0; i < length; i++)
     {
-        this->data[i] = (&data)[i];
+        this->data[i] = (&dataFromMem)[i];
     }
+    return 0;
 }
 
-int rvm::DataObject::readDataFromFile(std::string filename)
+int rvm::DataObject::readDataFromFile(std::string fileName)
 {
     /* Open file */
-    std::ifstream infile(filename);
+    std::ifstream infile(fileName);
     if (!infile.is_open())
     {
         throw std::string("Error DO_" + std::to_string(id) + ": in init(), file can't open");
@@ -153,8 +181,10 @@ int rvm::DataObject::readDataFromFile(std::string filename)
         {
             break;
         }
-        data[i] = std::stoi(symbolDataFromFile);
+        data[i] = std::stoi(symbolDataFromFile); //! ex stoi (if symbol is not a integer)
         symbolDataFromFile = "";
     }
+
     infile.close();
+    return 0;
 }

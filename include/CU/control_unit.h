@@ -1,12 +1,17 @@
 #ifndef RVM_CONTROL_UNIT_CLASS
 #define RVM_CONTROL_UNIT_CLASS
 
+/* C++ Headers */
 #include <iostream>
+
+/* Project Headers */
 #include "class_definition.h"
 #include "rvm_structs.h"
 #include "DO/data_object.h"
 #include "APE/abstract_processing_element.h"
 #include "ASF/abstract_switch_fabric.h"
+
+#include "configCodeStructure.h"
 
 #include "log_manager.h"
 
@@ -40,13 +45,20 @@ namespace rvm
 
 
     private:
-        DataObject *dataObjects;
-        AbstractProcessingElement *abstractProcessingElements;
-        AbstractSwitchFabric *abstractSwitchFabric; 
-        size_t dataObjects_size = 10;
-        size_t abstractProcessingElements_size = 10;
+        DataObject *dataObjects = nullptr;
+        AbstractProcessingElement *abstractProcessingElements = nullptr;
+        AbstractSwitchFabric *abstractSwitchFabric = nullptr; 
+        size_t dataObjects_size = 0; 
+        size_t abstractProcessingElements_size = 0; 
 
 
     };
 };
+
+///plugs
+int countPortsAllAPE();
+int countPortsAllDO();
+struct ASF_Config readASFconfig(int index);
+int getDirectionFromAPE(uint8_t APE_number, uint8_t port_number);
+
 #endif // RVM_CONTROL_UNIT_CLASS

@@ -30,17 +30,25 @@ namespace rvm
         /* Destructor */
         ~AbstractSwitchFabric();
 
+        /* Set  number of DataPorts and ProcessingPort  and creat them */
+        void set(int numPortsDO, int  numPortsAPE);
+
         /* Create ports */
         void createDataPorts(uint8_t numberPorts);
         void createProcessingPorts(uint32_t numberPorts);
+
+        /* Create connectors */
+        void allocConnectors(int numConnectors);
+
+        void createConnector(int DataPortsId, int ProcessingPortsId, int dir);
 
         /* Set part */
         void createPortDO(int id_DO, int numAPE);
         void createPortAPE(int id_DO, int APE_info);
 
         /* Init part */
-        associateDataPort(int dataPortId, uint8_t *DO);
-        associateProccessingPort(int processingPortId, uint8_t *APE);
+        void associateDataPort(int dataPortId, uint8_t *DO);
+        void associateProccessingPort(int processingPortId, uint8_t *APE);
 
         void init(int);
 

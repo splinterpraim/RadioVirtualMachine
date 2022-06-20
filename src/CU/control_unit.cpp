@@ -71,60 +71,65 @@ int rvm::ControlUnit::configuringAbstractSwitchFabric()
     abstractSwitchFabric = new AbstractSwitchFabric;
 
     /* Counting the total number of all ports APE */
-    int numPortsAPE = countPortsAllAPE();
+    int numPortsAPE = countPortsAllAPE(); // plugs countPortsAllAPE()
+    int numPortsDO = countPortsAllDO();   // plugs countPortsAllAPE()
 
     /* Set ASF */
     {
         /* Create data and processing ports (empty) */
-        abstractSwitchFabric.set(dataObjects_size, numPortsAPE);
+        abstractSwitchFabric->set(numPortsDO, numPortsAPE);
 
         /* Create connectors loop */
-        for (range DO_N : i)
+        for (int i = 0; i < numPortsDO; i++)
         {
             /* Read current ASF config */
-            record = readASFconfig(i);
+            struct ASF_Config record = readASFconfig(i);
 
             /* Range on related APE */
-            for (range record.N : j)
+            for (int j = 0; j < record.N; j++)
             {
-                dir = getDirectionFromAPE(APE_ID = record.APE_part[j].ape_id, portNum = record.APE_part[j].port_num);
+                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number,record.APE_KP[j].port_number);
 
                 /* Create connectors between data ports (dataId) and next available processing ports  */
-                abstractSwitchFabric.createConnector(dataId = i, dir);
+                abstractSwitchFabric->createConnector(i, (i + j), dir); // other approach to identify connectors without i , i + j
             }
+            //************************************************************************************************
+             delete [] record.APE_KP;
+            //************************************************************************************************
         }
     }
 
     /* Init ASF */
-    {
-        /* Associate DO and data ports*/
-        {
-            for (range DO_N : i)
-            {
-                abstractSwitchFabric.associateDataPort(dataPortId = i, DO = &dataObjects[i]);
-            }
-        }
+    // {
+    //     /* Associate DO and data ports*/
+    //     {
+    //         for (range DO_N : i)
+    //         {
+    //             abstractSwitchFabric.associateDataPort(dataPortId = i, DO = &dataObjects[i]);
+    //         }
+    //     }
 
-        /* Associate APE and processing ports*/
-        {
-            counterAPEPort = 0;
-            
-            for (range DO_N : i)
-            {
-                /* Read current ASF config */
-                record = readASFconfig(i);
+    //     /* Associate APE and processing ports*/
+    //     {
+    //         counterAPEPort = 0;
 
-                /* Range on related APE */
-                for (range record.N : j)
-                {
-                    /* Create connectors between data ports (dataId) and next available processing ports  */
-                    abstractSwitchFabric.associateProccessingPort(processingPortId = counterAPEPort, APE = &record.APE_part[j].ape_id);
-                    counterAPEPort++;
-                }
-                
-            }
-        }
-    }
+    //         for (range DO_N : i)
+    //         {
+    //             /* Read current ASF config */
+    //             record = readASFconfig(i);
+
+    //             /* Range on related APE */
+    //             for (range record.N : j)
+    //             {
+    //                 /* Create connectors between data ports (dataId) and next available processing ports  */
+    //                 abstractSwitchFabric.associateProccessingPort(processingPortId = counterAPEPort, APE = &record.APE_part[j].ape_id);
+    //                 counterAPEPort++;
+    //             }
+
+    //         }
+    //     }
+    // }
+    return 0;
 }
 
 void rvm::ControlUnit::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
@@ -155,3 +160,134 @@ void rvm::ControlUnit::sendStatusFromAbstractProcessingElement(const StatusFromA
 // namespace rvm{
 
 // }
+
+/// plugs
+int countPortsAllAPE()
+{
+    return 9;
+}
+
+int countPortsAllDO()
+{
+    return 7;
+}
+
+struct ASF_Config readASFconfig(int index)
+{
+    struct ASF_Config asfConfig;
+
+    /* DO =  d1 */
+    if (index == 0)
+    {
+        asfConfig.DO = 0;
+        asfConfig.N = 1;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 0;
+            asfConfig.APE_KP[0].port_number = 0;
+        }
+    }
+
+    /* DO =  d2 */
+    if (index == 1)
+    {
+        asfConfig.DO = 1;
+        asfConfig.N = 1;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 0;
+            asfConfig.APE_KP[0].port_number = 1;
+        }
+    }
+
+    /* DO =  d3 */
+    if (index == 2)
+    {
+        asfConfig.DO = 2;
+        asfConfig.N = 1;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 1;
+            asfConfig.APE_KP[0].port_number = 0;
+        }
+    }
+
+    /* DO =  d4 */
+    if (index == 3)
+    {
+        asfConfig.DO = 3;
+        asfConfig.N = 1;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 1;
+            asfConfig.APE_KP[0].port_number = 1;
+        }
+    }
+
+    /* DO =  d5 */
+    if (index == 4)
+    {
+        asfConfig.DO = 4;
+        asfConfig.N = 2;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 0;
+            asfConfig.APE_KP[0].port_number = 2;
+            asfConfig.APE_KP[1].APE_number = 2;
+            asfConfig.APE_KP[1].port_number = 0;
+        }
+    }
+
+    /* DO =  d6 */
+    if (index == 5)
+    {
+        asfConfig.DO = 5;
+        asfConfig.N = 2;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 1;
+            asfConfig.APE_KP[0].port_number = 2;
+            asfConfig.APE_KP[1].APE_number = 2;
+            asfConfig.APE_KP[1].port_number = 1;
+        }
+    }
+
+    /* DO =  d7 */
+    if (index == 6)
+    {
+        asfConfig.DO = 5;
+        asfConfig.N = 1;
+        /* ASF_variable_part */
+        {
+            asfConfig.APE_KP = new struct ASF_variable_part[asfConfig.N];
+            asfConfig.APE_KP[0].APE_number = 2;
+            asfConfig.APE_KP[0].port_number = 2;
+        }
+    }
+
+    return asfConfig;
+}
+
+int getDirectionFromAPE(uint8_t APE_number, uint8_t port_number)
+{
+    /* return - 0 - from data port to processing port,
+                                   1 - from processing port to data port */
+    if ((APE_number == 0) || (APE_number == 1) ||  (APE_number == 2))
+    {
+        if((port_number == 0) || (port_number == 1))
+        {
+            return 0; 
+        }
+        else if(port_number == 2)
+        {
+            return 1; 
+        }
+    }
+
+}

@@ -10,16 +10,19 @@ int main()
 {
     try
     {
+
+        rvm::DataObject do1;
+        do1.set(1, 10, 1);
+        do1.set(1, 10, 1);
+        std::cout << do1.to_str() << std::endl;
+
         // struct StatusFromDataObject s;
-        rvm::ControlUnit mainCU, slaveCU;
-        mainCU.configuringDataObjects();
+        // rvm::ControlUnit mainCU, slaveCU;
+        // mainCU.configuringDataObjects();
         // mainCU.configuringAbstractProcessingElements();
+        // mainCU.configuringAbstractSwitchFabric();
 
         /// -->>>>>>>>>>>>>>>>>
-
-     
-        
-
 
         // mainCU.setStatus(s);
         // slaveCU.setStatus(s);
@@ -39,13 +42,21 @@ int main()
 
         // mainCU.configuringDataObjects();
     }
-    catch (const char *ex)
+    catch (const std::invalid_argument &e)
     {
-        cout << ex << endl;
+        cout << "Invalid_argument: " << e.what() << endl;
     }
-    catch (string ex)
+    catch (const std::runtime_error &e)
     {
-        cout << ex << endl;
+        cout << "Runtime_error: " << e.what() << endl;
+    }
+    catch (std::exception &e)
+    {
+        cout << "Exception: " << e.what() << endl;
+    }
+    catch (...)
+    {
+        cout << "Exception" << endl;
     }
     return 0;
 }
