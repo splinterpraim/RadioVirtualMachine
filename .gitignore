@@ -1,4 +1,12 @@
-.log
+
+# Build dirctory
+build/
+
+# Logfiles
+*.log
+
 bin 
 obj
-.vscode
+
+# Visual Studio Code
+.vscode/
