@@ -1,9 +1,17 @@
+$(info START ROOT MAKEFILE)
+ROOT_DIR := .
+BUILD_DIR := $(ROOT_DIR)/build
+RVM_DIR := $(ROOT_DIR)/rvm
 
-ROOT_DIR := ./
 
-
-
-MAIN_ARGS := ROOT_DIR=ROOT_DIR
+MAIN_ARGS := ROOT_DIR=ROOT_DIR BUILD_DIR=BUILD_DIR 
 
 rvm: 
-	make -f rvm/Makefile $(MAIN_ARGS)
+	make -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR)
+
+test:
+	ls
+
+
+.PHONY: rvm
+$(info FINISH ROOT MAKEFILE)
