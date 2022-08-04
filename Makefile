@@ -1,17 +1,38 @@
 $(info START ROOT MAKEFILE)
 ROOT_DIR := .
 BUILD_DIR := $(ROOT_DIR)/build
+BIN_DIR := $(ROOT_DIR)/$(BUILD_DIR)/bin
+INC_DIR := $(ROOT_DIR)/$(BUILD_DIR)/include
+LIB_DIR := $(ROOT_DIR)/$(BUILD_DIR)/lib
+OBJ_DIR := $(ROOT_DIR)/$(BUILD_DIR)/obj
+SHARE_DIR := $(ROOT_DIR)/$(BUILD_DIR)/share
+
+
+# RVM 
 RVM_DIR := $(ROOT_DIR)/rvm
+RVM_dep := 
+
+#FC
 
 
-MAIN_ARGS := ROOT_DIR=ROOT_DIR BUILD_DIR=BUILD_DIR 
+MKDIR_BUILD := $(BUILD_DIR) 
 
-rvm: 
+MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_DIR=$(INC_DIR) LIB_DIR=$(LIB_DIR) OBJ_DIR=$(OBJ_DIR) SHARE_DIR=$(SHARE_DIR)
+
+.DEFUALT = main
+PHONY := main
+main: $(MKDIR_BUILD) rvm test
+
+
+
+PHONY += rvm
+rvm: $(RVM_dep)
 	make -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR)
 
+PHONY += test
 test:
 	ls
 
 
-.PHONY: rvm
+.PHONY: $(PHONY)
 $(info FINISH ROOT MAKEFILE)
