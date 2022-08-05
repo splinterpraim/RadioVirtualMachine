@@ -1,11 +1,11 @@
 $(info START ROOT MAKEFILE)
 ROOT_DIR := .
 BUILD_DIR := $(ROOT_DIR)/build
-BIN_DIR := $(ROOT_DIR)/$(BUILD_DIR)/bin
-INC_DIR := $(ROOT_DIR)/$(BUILD_DIR)/include
-LIB_DIR := $(ROOT_DIR)/$(BUILD_DIR)/lib
-OBJ_DIR := $(ROOT_DIR)/$(BUILD_DIR)/obj
-SHARE_DIR := $(ROOT_DIR)/$(BUILD_DIR)/share
+BIN_DIR := $(BUILD_DIR)/bin
+INC_DIR := $(BUILD_DIR)/include
+LIB_DIR := $(BUILD_DIR)/lib
+OBJ_DIR := $(BUILD_DIR)/obj
+SHARE_DIR := $(BUILD_DIR)/share
 
 
 # RVM 
@@ -16,7 +16,7 @@ RVM_dep :=
 
 
 # MKDIR
-MKDIR_BUILD := $(BUILD_DIR) 
+MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_DIR)
 
 MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_DIR=$(INC_DIR) LIB_DIR=$(LIB_DIR) OBJ_DIR=$(OBJ_DIR) SHARE_DIR=$(SHARE_DIR)
 
@@ -39,5 +39,24 @@ test:
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+$(INC_DIR):
+	mkdir -p $(INC_DIR)
+
+$(LIB_DIR):
+	mkdir -p $(LIB_DIR)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(SHARE_DIR):
+	mkdir -p $(SHARE_DIR)
+
+
+# CLEAN
+clean:
+	rm -rf $(BUILD_DIR)
 .PHONY: $(PHONY)
 $(info FINISH ROOT MAKEFILE)
