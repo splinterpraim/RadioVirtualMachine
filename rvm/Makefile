@@ -42,8 +42,8 @@ ECHO_RVM_BUILD := echo-build-rvm
 MKDIR_BUILD := $(RVM_OBJ_DIR) $(RVM_INC_DIR)
 CP_INC  := copy-include
 
-PHONY += rvm_build
-rvm_build: $(ECHO_RVM_BUILD) $(MKDIR_BUILD) $(CP_INC) $(RVM_BIN)
+PHONY += rvm-build
+rvm-build: $(ECHO_RVM_BUILD) $(MKDIR_BUILD) $(CP_INC) $(RVM_BIN)
 	@echo "$(YELLOW)END BUILD RVM$(RESET)"
 
 $(RVM_BIN):  $(RVM_OBJ)
@@ -58,11 +58,14 @@ $(RVM_OBJ_DIR)/%.o: $(RVM_SRC)/%.cpp
 $(ECHO_RVM_BUILD):
 	@echo "$(YELLOW)BUILD RVM$(RESET)"
 
-
+rvm-clean:
+	@echo "$(YELLOW)CLEAN RVM$(RESET)"
+	@echo -n "$(RED)[DL]$(RESET) "
+	rm -rf $(RVM_BIN) $(RVM_INC_DIR) $(RVM_OBJ_DIR)
 
 # MKDIR 
 $(RVM_OBJ_DIR):
-	@mkdir -p $(RVM_OBJ_DIR)
+	@mkdir -p $(RVM_OBJ_DIR) 
 
 $(RVM_INC_DIR):
 	@mkdir -p $(RVM_INC_DIR)

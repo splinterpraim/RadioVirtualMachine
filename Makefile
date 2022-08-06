@@ -46,6 +46,8 @@ PHONY += rvm
 rvm: $(RVM_dep) 
 	@make -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
+rvm-clean:
+	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
 
 
