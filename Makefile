@@ -1,15 +1,23 @@
 # $(info START ROOT MAKEFILE)
 
-.DEFUALT = main
 
+.DEFUALT = main
 # CONSTANTS ###################################
-ROOT_DIR := .
+ROOT_MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+ROOT_DIR := $(patsubst %/,%,$(dir $(ROOT_MAKEFILE_PATH)))
 BUILD_DIR := $(ROOT_DIR)/build
 BIN_DIR := $(BUILD_DIR)/bin
 INC_DIR := $(BUILD_DIR)/include
 LIB_DIR := $(BUILD_DIR)/lib
 OBJ_DIR := $(BUILD_DIR)/obj
 SHARE_DIR := $(BUILD_DIR)/share
+CONF_DIR := $(ROOT_DIR)/config
+
+
+# INCLUDES ###################################
+include $(CONF_DIR)/Makefile.colors
+
+#--------------------------------------------------------
 
 
 # RVM 
@@ -24,8 +32,10 @@ RVM_dep :=
 ##################################### CONSTANTS
 
 
+
+
 # PARAMS ###################################
-MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_DIR=$(INC_DIR) LIB_DIR=$(LIB_DIR) OBJ_DIR=$(OBJ_DIR) SHARE_DIR=$(SHARE_DIR)
+MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_DIR=$(INC_DIR) LIB_DIR=$(LIB_DIR) OBJ_DIR=$(OBJ_DIR) SHARE_DIR=$(SHARE_DIR) CONF_DIR=$(CONF_DIR)
 #####################################
 ##################################### PARAMS
 
@@ -44,10 +54,10 @@ main: $(MKDIR_BUILD) rvm
 
 PHONY += rvm
 rvm: $(RVM_dep) 
-	@make -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
+	@make  -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(RVM_DIR) --no-print-directory
 
 rvm-clean:
-	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
+	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  $(CONFIG_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
 
 
@@ -75,6 +85,7 @@ $(SHARE_DIR):
 
 # CLEAN
 clean:
+	@echo -n "$(RED)[DL]$(RESET) "
 	rm -rf $(BUILD_DIR)
 .PHONY: $(PHONY)
 
@@ -82,3 +93,7 @@ clean:
 ##################################### TARGETS
 
 # $(info FINISH ROOT MAKEFILE)
+
+
+test:
+	@echo $(ROOT_DIR)

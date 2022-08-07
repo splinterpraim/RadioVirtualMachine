@@ -49,11 +49,11 @@ int rvm::ControlUnit::configuringAbstractProcessingElements()
     for (size_t i = 0; i < abstractProcessingElements_size; i++)
     {
         abstractProcessingElements[i].setSendControlUnit(*this);
-        abstractProcessingElements[i].setID(i + 1, 2);
-        for (size_t j = 0; j < 2; j++)
-        {
-            abstractProcessingElements[i].set(j, 0, 1, 1);
-        }
+        // abstractProcessingElements[i].setID(i + 1, 2);
+        // for (size_t j = 0; j < 2; j++)
+        // {
+        //     abstractProcessingElements[i].set(j, 0, 1, 1);
+        // }
     }
     abstractProcessingElements[0].init(0, radiolib::sum);
     for (size_t i = 0; i < abstractProcessingElements_size; i++)
@@ -289,5 +289,6 @@ int getDirectionFromAPE(uint8_t APE_number, uint8_t port_number)
             return 1; 
         }
     }
+    return -1;
 
 }

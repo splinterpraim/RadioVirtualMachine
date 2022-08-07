@@ -1,26 +1,7 @@
 
 # .DEFUALT=rvm_build
-ifneq (,$(findstring xterm,${TERM}))
-	BLACK        := $(shell tput -Txterm setaf 0)
-	RED          := $(shell tput -Txterm setaf 1)
-	GREEN        := $(shell tput -Txterm setaf 2)
-	YELLOW       := $(shell tput -Txterm setaf 3)
-	LIGHTPURPLE  := $(shell tput -Txterm setaf 4)
-	PURPLE       := $(shell tput -Txterm setaf 5)
-	BLUE         := $(shell tput -Txterm setaf 6)
-	WHITE        := $(shell tput -Txterm setaf 7)
-	RESET := $(shell tput -Txterm sgr0)
-else
-	BLACK        := ""
-	RED          := ""
-	GREEN        := ""
-	YELLOW       := ""
-	LIGHTPURPLE  := ""
-	PURPLE       := ""
-	BLUE         := ""
-	WHITE        := ""
-	RESET        := ""
-endif
+
+
 
 PHONY :=
 # CONSTANTS ###################################
@@ -30,12 +11,25 @@ RVM_INC := $(CUR_DIR)/include
 RVM_TESTS := $(CUR_DIR)/tests
 RVM_INC_DIR := $(INC_DIR)/rvm
 RVM_OBJ_DIR := $(OBJ_DIR)/rvm
-RVM_OBJ := main.o test1.o test2.o
-RVM_OBJ := $(addprefix $(RVM_OBJ_DIR)/,$(RVM_OBJ))
 RVM_CXXFLAGS := -I$(RVM_INC_DIR)
 
+RVM_TEMPLATE_FIND_CPP := $(RVM_SRC)/*.cpp $(RVM_SRC)/*/*.cpp
+RVM_ALL_CPP := $(wildcard $(RVM_TEMPLATE_FIND_CPP))
+RVM_ALL_CPP_DIRS = $(subst $(RVM_SRC)/, ,$(dir $(RVM_ALL_CPP)))
+RVM_ALL_CPP_WITH_DIRS = $(subst $(RVM_SRC)/, ,$(RVM_ALL_CPP))
+RVM_CREATE_OBJ_SUBDIR := $(foreach d,$(RVM_ALL_CPP_DIRS),$(shell mkdir -p $(RVM_OBJ_DIR)/$(d)))
+RVM_OBJ := $(patsubst %.cpp,%.o,$(RVM_ALL_CPP_WITH_DIRS))
+RVM_OBJ := $(addprefix $(RVM_OBJ_DIR)/,$(RVM_OBJ))
 #####################################
 ##################################### CONSTANTS
+
+# INCLUDES ###################################
+include $(CONF_DIR)/Makefile.colors
+
+#--------------------------------------------------------
+
+
+
 ECHO_RVM_BUILD := echo-build-rvm
 
 # TARGETS ###################################
@@ -58,6 +52,7 @@ $(RVM_OBJ_DIR)/%.o: $(RVM_SRC)/%.cpp
 $(ECHO_RVM_BUILD):
 	@echo "$(YELLOW)BUILD RVM$(RESET)"
 
+PHONY += rvm-clean
 rvm-clean:
 	@echo "$(YELLOW)CLEAN RVM$(RESET)"
 	@echo -n "$(RED)[DL]$(RESET) "
@@ -71,13 +66,14 @@ $(RVM_INC_DIR):
 	@mkdir -p $(RVM_INC_DIR)
 
 # COPY
+PHONY += copy-include
 copy-include:
 	@cp -r $(RVM_INC)/* $(RVM_INC_DIR)/
 
+PHONY += ech
 ech:
-	@echo $(RVM_OBJ_DIR)
 	@echo $(RVM_OBJ)
-	@echo $(RVM_TESTS)
+
 
 .PHONY: $(PHONY)
 #####################################
