@@ -25,7 +25,8 @@ RVM_DIR := $(ROOT_DIR)/rvm
 RVM_dep := 
 
 #FC
-
+FC_DIR := $(ROOT_DIR)/fc
+FC_dep := 
 
 
 #####################################
@@ -48,7 +49,7 @@ MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_
 MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_DIR)
 
 PHONY := main
-main: $(MKDIR_BUILD) rvm 
+main: $(MKDIR_BUILD) rvm fc
 
 
 
@@ -57,10 +58,15 @@ rvm: $(RVM_dep)
 	@make  -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(RVM_DIR) --no-print-directory
 
 rvm-clean:
-	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  $(CONFIG_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
+	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
 
+PHONY += fc
+fc: $(FC_dep) 
+	@make  -C $(ROOT_DIR) -f $(FC_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(FC_DIR) --no-print-directory
 
+fc-clean:
+	@make fc-clean -C $(ROOT_DIR) -f $(FC_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(FC_DIR) --no-print-directory
 
 
 #MKDIR

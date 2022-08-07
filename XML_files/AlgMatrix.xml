@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<program name ="vector-matrix multiplication Terminal">
+  <operator id="mult1" type ="Terminal">
+    <data id="a1" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="b1" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="p1" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+
+  <operator id="mult2" type ="Terminal">
+    <data id="a1" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="b3" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="p2" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+
+  <operator id="mult3" type ="Terminal">
+    <data id="a2" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="b2" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="p3" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+
+  <operator id="mult4" type ="Terminal">
+    <data id="a2" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="b4" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="p4" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+
+  <operator id="add1" type ="Terminal">
+    <data id="p1" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="p3" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="c1" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+
+  <operator id="add2" type ="Terminal">
+    <data id="p2" type ="float" connect_type ="input" order ="1" access_time ="10"/>
+    <data id="p4" type ="float" connect_type ="input" order ="2" access_time ="10"/>
+    <data id="c2" type ="float" connect_type ="output" order ="1" access_time ="10"/>
+  </operator>
+</program>
