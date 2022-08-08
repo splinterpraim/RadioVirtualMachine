@@ -6,7 +6,15 @@
 
 using namespace std;
 
+int test();
+
 int main()
+{
+	test();
+}
+
+
+int test();
 {
     try
     {

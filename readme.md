@@ -1,8 +1,26 @@
+Project tree:
 
-TODO:
-    ? finish set APE (? у каждого порта cost/time)
-    + do init APE 
-    - do other func APE
-    - think about DO ports
+|rvm/
+| - |include/
+| - |src/
+| - |tests/
+| - |Makefile
+|fc/
+| - |include/
+| - |src/
+| - |tests/
+| - |Makefile
+|config/
+| - |Makefile.colors
+|Makefile
 
-    - set/init AbstractSwitchFabric 
+
+Build rvm and fc
+> make
+
+Run rvm
+> ./build/bin/rvm
+
+Remove building
+> clean
+
