@@ -3,6 +3,8 @@
 //
 #include "frontend_compiler.h"
 
+
+// todo: complex operator processing in while
 struct IrObjects parseSWIR(const std::string &fileNameSWIR){
     /* Declaration IrObjects */
     struct IrObjects irObjects;
@@ -13,25 +15,35 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR){
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
-
+    pugi::xml_node curNode = program.first_child();
+    
+// curNode = doc.child("program");
     /* Parse tag inside */
-    for (auto el: program) {
-
-        /* Add current operator in Ir vector */
-        IrOperator currOp = convertToIrOperator(el);
-        irObjects.operators.push_back(currOp);
+    while ( true  ) 
+    {
+        pugi::xml_node  curOperator =  curNode.next_sibling();
+        if(curOperator.type() == pugi::node_null)
+            break;
 
         /* Take input/output data from operator tag */
-        auto inputData = takeIrData(el, "input");
-        auto outputData = takeIrData(el, "output");
-
-        /* Create link objects from input/output data */
-        createLinksFromVectorData(irObjects.links, inputData, currOp, 0);
-        createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
+        auto inputData = takeIrData(curOperator, "input");
+        auto outputData = takeIrData(curOperator, "output");
 
         /* Add input/output data in Ir vector */
         addIrDataToVector(irObjects.data, inputData);
         addIrDataToVector(irObjects.data, outputData);
+
+
+        // if terminal
+        /* Add current operator in Ir vector */
+        IrOperator currOp = convertToIrOperator(curOperator);
+        irObjects.operators.push_back(currOp);
+        /* Create link objects from input/output data */
+        createLinksFromVectorData(irObjects.links, inputData, currOp, 0);
+        createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
+
+
+        curNode = curOperator;
     }
     return irObjects;
 }
@@ -122,6 +134,7 @@ std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml) {
 
 void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData) {
     for (auto el: newData) {
+        /* If not exist */
         if (std::find(data.begin(), data.end(), el.second) == data.end()) {
             data.push_back(el.second);
         }

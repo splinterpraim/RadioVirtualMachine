@@ -14,23 +14,25 @@
 #include "frontend_compiler.h"
 // #include "../tests/include/test_ir_objects.h"
 
-
 void create_xml_file(std::string file_name = "output.xml");
 
 ///******************************
-int main(int argc, char *argv[]) {
-    std::cout << "Hello, world" << std::endl; 
+int main(int argc, char *argv[])
+{
     // testIrData();
     // testIrOperator();
     // testIrLink();
-
-//    std::string file_name = "../XML_files/AlgScalar2.xml";
-//    struct IrObjects irObjects = parseSWIR(file_name);
-//    showIrObjects(irObjects);
+    std::string file_name = "./XML_files/AlgScalar2.xml";
+    if (argc == 2){
+        file_name = argv[1];
+    }
+    struct IrObjects irObjects = parseSWIR(file_name);
+    showIrObjects(irObjects);
     return 0;
 }
 
-void create_xml_file(std::string file_name) {
+void create_xml_file(std::string file_name)
+{
 
     pugi::xml_document doc;
     pugi::xml_node program = doc.append_child("program");
@@ -44,18 +46,20 @@ void create_xml_file(std::string file_name) {
     pugi::xml_node op1_data[3];
     pugi::xml_node op2_data[3];
     pugi::xml_node op3_data[3];
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         op1_data[i] = op1.append_child("data");
     }
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         op2_data[i] = op2.append_child("data");
     }
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         op3_data[i] = op3.append_child("data");
     }
-
 
     /* Filling attribute operators */
     op1.append_attribute("id") = "mult1";
@@ -83,11 +87,5 @@ void create_xml_file(std::string file_name) {
     op3_data[1].append_attribute("dir") = "input";
     op3_data[2].append_attribute("dir") = "output";
 
-
     doc.save_file(file_name.c_str());
 }
-
-
-
-
-
