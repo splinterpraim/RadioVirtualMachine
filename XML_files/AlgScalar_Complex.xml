@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <program name="inner product Complex">
-  <data id="x1" type="float" path="number1.txt" connect_type="input" order="1" access_time="10" value="3.8" />
-  <data id="y1" type="float" path="number2.txt" connect_type="input" order="2" access_time="10" value="5.2" />
-  <data id="x2" type="float" path="number3.txt" connect_type="input" order="3" access_time="10" value="5.2" />
-  <data id="y2" type="float" path="number4.txt" connect_type="input" order="4" access_time="10" value="5.2" />
-  
+
   <operator id="multiplier2" type="Complex">
     <data id="x1" type="float" path="number1.txt" connect_type="input" order="1" access_time="10" value="3.8" />
     <data id="y1" type="float" path="number2.txt" connect_type="input" order="2" access_time="10" value="5.2" />

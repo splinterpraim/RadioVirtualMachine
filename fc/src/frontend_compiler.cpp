@@ -2,10 +2,38 @@
 // Created by Елена on 15.05.2022.
 //
 #include "frontend_compiler.h"
+#include <map>
+#include <algorithm>
 
 
-// todo: complex operator processing in while
-struct IrObjects parseSWIR(const std::string &fileNameSWIR){
+/* ######## Help functions*/
+/* Convert function */
+IrOperator convertToIrOperator(pugi::xml_node &op_xml);
+IrData convertToIrData(pugi::xml_node &data_xml);
+
+/* Show functions */
+
+void showIrOperators(const std::vector<IrOperator> &operators);
+
+void showIrData(const std::vector<IrData> &data);
+
+void showIrLinks(const std::vector<IrLink> &links);
+
+/* Take data */
+std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType);
+
+std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml);
+
+/* Add data to vector */
+void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData);
+
+/* Create link */
+void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
+
+
+
+struct IrObjects parseSWIR(const std::string &fileNameSWIR)
+{
     /* Declaration IrObjects */
     struct IrObjects irObjects;
 
@@ -15,43 +43,67 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR){
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
-    pugi::xml_node curNode = program.first_child();
-    
-// curNode = doc.child("program");
-    /* Parse tag inside */
-    while ( true  ) 
-    {
-        pugi::xml_node  curOperator =  curNode.next_sibling();
-        if(curOperator.type() == pugi::node_null)
-            break;
+    pugi::xml_node curOperator = program.first_child();
 
+    /* Parse tag inside */
+    while (true)
+    {
         /* Take input/output data from operator tag */
         auto inputData = takeIrData(curOperator, "input");
         auto outputData = takeIrData(curOperator, "output");
 
-        /* Add input/output data in Ir vector */
+        /* Add input/output Ir data in Ir objects  */
         addIrDataToVector(irObjects.data, inputData);
         addIrDataToVector(irObjects.data, outputData);
 
+        
+        std::string operatorType = curOperator.attribute("type").as_string();
+        /* If Complex */
+        if ( operatorType.compare("Complex") == 0 )
+        {
+            curOperator = curOperator.child("operator");
+        }
+        /* If terminal */
+        else
+        {
+            IrOperator currOp = convertToIrOperator(curOperator);
 
-        // if terminal
-        /* Add current operator in Ir vector */
-        IrOperator currOp = convertToIrOperator(curOperator);
-        irObjects.operators.push_back(currOp);
-        /* Create link objects from input/output data */
-        createLinksFromVectorData(irObjects.links, inputData, currOp, 0);
-        createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
+            /* Add current operator in Ir vector */
+            irObjects.operators.push_back(currOp);
 
+            /* Create link objects from input/output IR data and IR operator */
+            createLinksFromVectorData(irObjects.links, inputData, currOp, 0);
+            createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
 
-        curNode = curOperator;
+            auto xmlNodeType = curOperator.next_sibling().type();
+            
+            /* Check end of sibling operator list */
+            if (xmlNodeType== pugi::node_null)
+            {
+                curOperator = curOperator.parent();
+                std::string xmlNodeName = curOperator.name();
+
+                /* Check end of xml operator list */
+                if (xmlNodeName.compare("program") == 0)
+                {
+                    break;
+                }
+            }
+            curOperator = curOperator.next_sibling();
+        }
     }
     return irObjects;
 }
 
 
 
+
+
+
+
 /* ######## Help functions*/
-IrOperator convertToIrOperator(pugi::xml_node &op_xml) {
+IrOperator convertToIrOperator(pugi::xml_node &op_xml)
+{
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
@@ -59,7 +111,8 @@ IrOperator convertToIrOperator(pugi::xml_node &op_xml) {
     return op;
 }
 
-IrData convertToIrData(pugi::xml_node &data_xml) {
+IrData convertToIrData(pugi::xml_node &data_xml)
+{
     IrData data;
     data.setId(data_xml.attribute("id").as_string());
     data.setType(data_xml.attribute("type").as_string());
@@ -70,8 +123,8 @@ IrData convertToIrData(pugi::xml_node &data_xml) {
     return data;
 }
 
-
-void showIrObjects(const struct IrObjects &irObjects) {
+void showIrObjects(const struct IrObjects &irObjects)
+{
     /* Show result Ir objects */
     std::cout << "Operators" << std::endl;
     showIrOperators(irObjects.operators);
@@ -84,34 +137,44 @@ void showIrObjects(const struct IrObjects &irObjects) {
     std::cout << " - " << std::endl;
 }
 
-void showIrOperators(const std::vector<IrOperator> &operators) {
-    for (auto el: operators) {
-        std::cout << "id = " << el.getId() << ", " << "type = " << el.getType() << std::endl;
+void showIrOperators(const std::vector<IrOperator> &operators)
+{
+    for (auto el : operators)
+    {
+        std::cout << "id = " << el.getId() << ", "
+                  << "type = " << el.getType() << std::endl;
     }
 }
 
-void showIrData(const std::vector<IrData> &data) {
-    for (auto el: data) {
-        std::cout <<"id = " << el.getId() << ", ";
-        std::cout <<"type = " << el.getType() << ", ";
-        std::cout <<"path = " << el.getPath() << ", ";
-        std::cout <<"access_time = " << el.getAccessTime() << ", ";
-        std::cout <<"value = " << el.getValue() << std::endl;
+void showIrData(const std::vector<IrData> &data)
+{
+    for (auto el : data)
+    {
+        std::cout << "id = " << el.getId() << ", ";
+        std::cout << "type = " << el.getType() << ", ";
+        std::cout << "path = " << el.getPath() << ", ";
+        std::cout << "access_time = " << el.getAccessTime() << ", ";
+        std::cout << "value = " << el.getValue() << std::endl;
     }
 }
 
-void showIrLinks(const std::vector<IrLink> &links) {
-    for (auto el: links) {
+void showIrLinks(const std::vector<IrLink> &links)
+{
+    for (auto el : links)
+    {
         std::cout << el.to_str() << std::endl;
     }
 }
 
-std::map<int,IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType) {
-//    std::vector<IrData> dataResult;
-    std::map<int,IrData> dataResult;
-    for (auto data: op_xml) {
+std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType)
+{
+    //    std::vector<IrData> dataResult;
+    std::map<int, IrData> dataResult;
+    for (auto data : op_xml)
+    {
         std::string dataConnectType = data.attribute("connect_type").as_string();
-        if (dataConnectType == connectType) {
+        if (dataConnectType == connectType)
+        {
             IrData currData = convertToIrData(data);
             int order = data.attribute("order").as_int();
             dataResult[order] = currData;
@@ -120,11 +183,14 @@ std::map<int,IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conne
     return dataResult;
 }
 
-std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml) {
+std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml)
+{
     std::vector<IrData> dataResult;
-    for (auto data: op_xml) {
+    for (auto data : op_xml)
+    {
         std::string connect_type = data.attribute("connect_type").value();
-        if (connect_type == "output") {
+        if (connect_type == "output")
+        {
             IrData currData = convertToIrData(data);
             dataResult.push_back(currData);
         }
@@ -132,19 +198,22 @@ std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml) {
     return dataResult;
 }
 
-void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData) {
-    for (auto el: newData) {
+void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData)
+{
+    for (auto el : newData)
+    {
         /* If not exist */
-        if (std::find(data.begin(), data.end(), el.second) == data.end()) {
+        if (std::find(data.begin(), data.end(), el.second) == data.end())
+        {
             data.push_back(el.second);
         }
     }
 }
 
-
-void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir) {
-    for (auto el: data) {
+void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir)
+{
+    for (auto el : data)
+    {
         links.push_back(IrLink(el.second.getId(), op.getId(), dir, el.first));
     }
 }
-
