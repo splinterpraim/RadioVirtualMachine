@@ -5,7 +5,6 @@
 #include <map>
 #include <algorithm>
 
-
 /* ######## Help functions*/
 /* Convert function */
 IrOperator convertToIrOperator(pugi::xml_node &op_xml);
@@ -30,8 +29,6 @@ void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData
 /* Create link */
 void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
 
-
-
 struct IrObjects parseSWIR(const std::string &fileNameSWIR)
 {
     /* Declaration IrObjects */
@@ -48,24 +45,23 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR)
     /* Parse tag inside */
     while (true)
     {
-        /* Take input/output data from operator tag */
-        auto inputData = takeIrData(curOperator, "input");
-        auto outputData = takeIrData(curOperator, "output");
-
-        /* Add input/output Ir data in Ir objects  */
-        addIrDataToVector(irObjects.data, inputData);
-        addIrDataToVector(irObjects.data, outputData);
-
-        
         std::string operatorType = curOperator.attribute("type").as_string();
         /* If Complex */
-        if ( operatorType.compare("Complex") == 0 )
+        if (operatorType.compare("Complex") == 0)
         {
             curOperator = curOperator.child("operator");
         }
         /* If terminal */
         else
         {
+            /* Take input/output data from operator tag */
+            auto inputData = takeIrData(curOperator, "input");
+            auto outputData = takeIrData(curOperator, "output");
+
+            /* Add input/output Ir data in Ir objects  */
+            addIrDataToVector(irObjects.data, inputData);
+            addIrDataToVector(irObjects.data, outputData);
+
             IrOperator currOp = convertToIrOperator(curOperator);
 
             /* Add current operator in Ir vector */
@@ -76,9 +72,9 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR)
             createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
 
             auto xmlNodeType = curOperator.next_sibling().type();
-            
+
             /* Check end of sibling operator list */
-            if (xmlNodeType== pugi::node_null)
+            if (xmlNodeType == pugi::node_null)
             {
                 curOperator = curOperator.parent();
                 std::string xmlNodeName = curOperator.name();
@@ -94,12 +90,6 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR)
     }
     return irObjects;
 }
-
-
-
-
-
-
 
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)

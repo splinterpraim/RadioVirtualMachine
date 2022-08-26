@@ -2,8 +2,8 @@
 // Created by Елена on 15.05.2022.
 //
 
-#ifndef FRONT_END_RVM_COMPILER_FRONTEND_COMPILER_H
-#define FRONT_END_RVM_COMPILER_FRONTEND_COMPILER_H
+#ifndef FC_FRONTEND_COMPILER_H
+#define FC_FRONTEND_COMPILER_H
 
 /* C++ headers */
 #include <iostream>
@@ -34,4 +34,4 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR);
 
 void showIrObjects(const struct IrObjects &irObjects);
 
-#endif // FRONT_END_RVM_COMPILER_FRONTEND_COMPILER_H
+#endif // FC_FRONTEND_COMPILER_H
