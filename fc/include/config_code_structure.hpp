@@ -16,6 +16,8 @@ struct ControlSection {
     uint16_t Developer_ID; //15 bits
     uint16_t Creation_Date; //17 bits
 };
+using ControlSection = struct ControlSection;
+
 struct DO_Config{
     uint8_t DO_ID;
     uint32_t size;
@@ -23,21 +25,27 @@ struct DO_Config{
     uint8_t length;
     uint8_t *data;
 };
+using DO_Config = struct DO_Config;
+
 struct ASF_variable_part{
     uint8_t APE_number;
     uint8_t port_number;
 };
+using ASF_variable_part = struct ASF_variable_part;
+
 struct ASF_Config{
     uint8_t DO;
     uint8_t N;
-    struct ASF_variable_part *APE_KP ;
+    ASF_variable_part *APE_KP ;
 };
+using ASF_Config = struct ASF_Config;
 
 struct DO_Section {
     uint8_t N_DO; //number of DO
-    struct DO_Config *DOs;
-    struct ASF_Config *ASFs;
+    DO_Config *DOs;
+    ASF_Config *ASFs;
 };
+using DO_Section = struct DO_Section;
 
 struct APE_Config{
     uint16_t APE_ID;
@@ -48,9 +56,20 @@ struct APE_Config{
     uint16_t time;
     uint8_t  *access_type;
 };
+using APE_Config = struct APE_Config;
+
 struct APE_Section{
     uint16_t N_APE;
-    struct APE_Config *APEs;
+    APE_Config *APEs;
 };
+using APE_Section = struct APE_Section;
+
+struct ConfigObjects{
+    ControlSection controlSection;
+    DO_Section doSection;
+    APE_Section apeSection;
+};
+using ConfigObjects = struct ConfigObjects;
+
 #endif //FC_CONFIG_CODE_STRUCTURE_HPP
 

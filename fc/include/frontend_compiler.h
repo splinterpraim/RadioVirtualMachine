@@ -17,6 +17,7 @@
 #include "ir_data.h"
 #include "ir_operator.h"
 #include "ir_link.h"
+#include "config_code_structure.hpp"
 
 struct IrObjects
 {
@@ -24,14 +25,17 @@ struct IrObjects
     std::vector<IrData> data;
     std::vector<IrLink> links;
 };
+using IrObjects = struct IrObjects;
 
 
+// todo: continue filling of config structure
 // todo: doxygen comment style
-struct IrObjects parseSWIR(const std::string &fileNameSWIR);
+IrObjects parseSWIR(const std::string &fileNameSWIR);
 // Convert to RVM IR (structs)
+ConfigObjects convert2rvmIr(IrObjects &irObjects); 
 // Create RVM Input
 
 
-void showIrObjects(const struct IrObjects &irObjects);
+void showIrObjects(const IrObjects &irObjects);
 
 #endif // FC_FRONTEND_COMPILER_H

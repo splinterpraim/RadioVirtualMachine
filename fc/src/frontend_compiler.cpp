@@ -29,10 +29,10 @@ void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData
 /* Create link */
 void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
 
-struct IrObjects parseSWIR(const std::string &fileNameSWIR)
+IrObjects parseSWIR(const std::string &fileNameSWIR)
 {
     /* Declaration IrObjects */
-    struct IrObjects irObjects;
+    IrObjects irObjects;
 
     /* Load xml file */
     pugi::xml_document doc;
@@ -89,6 +89,106 @@ struct IrObjects parseSWIR(const std::string &fileNameSWIR)
         }
     }
     return irObjects;
+}
+
+int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects);
+int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects);
+int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects);
+
+ConfigObjects convert2rvmIr(IrObjects &irObjects)
+{
+    ConfigObjects configObjects;
+    fillControlSection(configObjects, irObjects);
+    fillDoSection(configObjects, irObjects);
+    fillApeSection(configObjects, irObjects);
+    return configObjects;
+}
+
+int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
+{
+    ControlSection &ctrlSec = configObjects.controlSection;
+    ctrlSec.LCF = 1; // means that this is the last Configcode in the task
+    ctrlSec.NAF = 0; //
+    ctrlSec.Task_ID = 1;
+    ctrlSec.RPI_version = 1;  // version number of supported general radio programming interface
+    ctrlSec.Reference_ID = 1; // identifier of the reference Radio Library
+    ctrlSec.Implementation_version = 1;
+    ctrlSec.Developer_ID = 1;
+    ctrlSec.Creation_Date = 2022;
+    return 0;
+}
+
+DO_Config *getDoConfig(IrObjects &irObjects);
+ASF_Config *getAsfConfig(IrObjects &irObjects);
+
+int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
+{
+    DO_Section &doSec = configObjects.doSection;
+
+    doSec.N_DO = irObjects.data.size();
+    // doSec.DOs = getDoConfig(irObjects);
+    // doSec.ASFs = getAsfConfig(irObjects);
+    return 0;
+}
+int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
+{
+    return 0;
+}
+DO_Config *getDoConfig(IrObjects &irObjects)
+{
+    DO_Config * doConfigRes = new DO_Config[irObjects.data.size()];
+    #ifdef xxx
+    do_section.DOs = new struct DO_Config[do_section.N_DO];
+    int i = 0;
+    for (auto &elem : DataHeap)
+    {
+        do_section.DOs[i].DO_ID = i;
+        do_section.DOs[i].access_time = stoi(elem.getAccessTime());
+        if (elem.getType() == "float")
+        {
+            do_section.DOs[i].size = sizeof(float);
+        }
+        if (elem.getPath() == "")
+        {
+            if (elem.getValue() != "")
+            {
+                if (elem.getType() == "float")
+                {
+                    do_section.DOs[i].length = sizeof(float);
+                    //***********************
+                    // convert float to bin (union)
+                    do_section.DOs[i].data = new uint8_t[sizeof(float)];
+                    auto bufData = stof(elem.getValue());
+                    memcpy(do_section.DOs[i].data, &bufData, sizeof(float));
+                }
+            }
+        }
+        else
+        {
+            do_section.DOs[i].length = elem.getPath().size();
+            do_section.DOs[i].data = new uint8_t[elem.getPath().size()];
+            auto bufData = elem.getPath().c_str();
+            memcpy(do_section.DOs[i].data, &bufData, elem.getPath().size());
+        }
+        i++;
+    }
+    #endif 
+}
+ASF_Config *getAsfConfig(IrObjects &irObjects)
+{
+}
+
+void filligControlSections(struct ControlSection &controlSection)
+{
+
+    controlSection.LCF = 1; // means that this is the last Configcode in the task
+    controlSection.NAF = 0; //
+    controlSection.Task_ID = 1;
+    controlSection.RPI_version = 1;  // version number of supported general radio programming interface
+    controlSection.Reference_ID = 1; // identifier of the reference Radio Library
+    controlSection.Implementation_version = 1;
+    controlSection.Developer_ID = 1;
+    controlSection.Creation_Date = 2022;
 }
 
 /* ######## Help functions*/

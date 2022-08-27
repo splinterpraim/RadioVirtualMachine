@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
         file_name = argv[1];
     }
     struct IrObjects irObjects = parseSWIR(file_name);
+    ConfigObjects configObjects = convert2rvmIr(irObjects);
     showIrObjects(irObjects);
     return 0;
 }
