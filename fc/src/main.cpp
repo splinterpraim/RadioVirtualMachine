@@ -1,3 +1,5 @@
+#define FC_LOG(s) std::cout << s << std::endl
+
 /* C++ headers */
 #include <iostream>
 #include <string>
@@ -26,9 +28,13 @@ int main(int argc, char *argv[])
     if (argc == 2){
         file_name = argv[1];
     }
+    FC_LOG("----- parseSWIR");
     struct IrObjects irObjects = parseSWIR(file_name);
-    ConfigObjects configObjects = convert2rvmIr(irObjects);
     showIrObjects(irObjects);
+
+    FC_LOG("----- convert2rvmIr");
+    ConfigObjects configObjects = convert2rvmIr(irObjects);
+    clearConfigObjects(configObjects);
     return 0;
 }
 

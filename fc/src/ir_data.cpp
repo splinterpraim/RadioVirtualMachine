@@ -34,14 +34,14 @@ string IrData::getPath() {
 }
 
 
-void IrData::setAccessTime(const int &accessTime) {
-    if (accessTime < 0)
-        throw std::invalid_argument("setAccessTime function failed, argument 'accessTime' is negative");
+void IrData::setAccessTime(const string &accessTime) {
+    // if (accessTime < 0)
+    //     throw std::invalid_argument("setAccessTime function failed, argument 'accessTime' is negative");
 
     this->accessTime = accessTime;
 }
 
-int IrData::getAccessTime() {
+string IrData::getAccessTime() {
     return accessTime;
 }
 

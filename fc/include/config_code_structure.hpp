@@ -19,11 +19,11 @@ struct ControlSection {
 using ControlSection = struct ControlSection;
 
 struct DO_Config{
-    uint8_t DO_ID;
-    uint32_t size;
-    uint32_t access_time;
-    uint8_t length;
-    uint8_t *data;
+    uint8_t DO_ID;          //* Identificator of data
+    uint32_t size;          //* Maximum data size in bytes
+    uint32_t access_time;   //* Access time in ns
+    uint8_t length;         //* Current size of data (max 256 bytes of data)
+    uint8_t *data;          //* Pointer to data
 };
 using DO_Config = struct DO_Config;
 

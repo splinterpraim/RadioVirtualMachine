@@ -14,26 +14,42 @@
 #include "pugixml/pugixml.hpp"
 
 /* Project headers */
+#include "ir_objects.hpp"
 #include "ir_data.h"
 #include "ir_operator.h"
 #include "ir_link.h"
 #include "config_code_structure.hpp"
 
-struct IrObjects
-{
-    std::vector<IrOperator> operators;
-    std::vector<IrData> data;
-    std::vector<IrLink> links;
-};
-using IrObjects = struct IrObjects;
+
 
 
 // todo: continue filling of config structure
 // todo: doxygen comment style
+/**
+ * @brief Parse XML file to Intermediate representation
+ * 
+ * @param fileNameSWIR File name where store xml algorithm
+ * @return IrObjects 
+ */
 IrObjects parseSWIR(const std::string &fileNameSWIR);
-// Convert to RVM IR (structs)
+
+/**
+ * @brief Convert from Ir Objects to RVM IR (config structs) 
+ * 
+ * @param irObjects IR Objects
+ * @return ConfigObjects 
+ */
 ConfigObjects convert2rvmIr(IrObjects &irObjects); 
 // Create RVM Input
+
+
+/**
+ * @brief Clear Config Objects
+ * 
+ * @param cfgObj Reference to Config Objects
+ * @retval 0
+ */
+int clearConfigObjects(ConfigObjects & cfgObj);
 
 
 void showIrObjects(const IrObjects &irObjects);

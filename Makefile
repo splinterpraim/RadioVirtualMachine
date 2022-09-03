@@ -18,15 +18,15 @@ CONF_DIR := $(ROOT_DIR)/config
 include $(CONF_DIR)/Makefile.colors
 
 #--------------------------------------------------------
-
+MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_DIR)
 
 # RVM 
 RVM_DIR := $(ROOT_DIR)/rvm
-RVM_dep := 
+RVM_dep := $(MKDIR_BUILD)
 
 #FC
 FC_DIR := $(ROOT_DIR)/fc
-FC_dep := 
+FC_dep := $(MKDIR_BUILD)
 
 
 #####################################
@@ -46,7 +46,7 @@ MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_
 
 
 # TARGETS ###################################
-MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_DIR)
+
 
 PHONY := main
 main: $(MKDIR_BUILD) rvm fc

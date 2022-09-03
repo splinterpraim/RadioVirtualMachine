@@ -21,8 +21,8 @@ public:
     void setPath(const string &path);
     string getPath();
 
-    void setAccessTime(const int &accessTime);
-    int getAccessTime();
+    void setAccessTime(const string &accessTime);
+    string getAccessTime();
 
     void setValue(const string &value);
     string getValue();
@@ -36,7 +36,7 @@ private:
 	string id = "";
 	string type = "";
 	string path = "";
-    int accessTime = 0;
+    string accessTime = "";
     string value = "";
 
 
