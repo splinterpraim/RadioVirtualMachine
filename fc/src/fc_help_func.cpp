@@ -133,11 +133,9 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     int i = 0;
     for (auto &elem : irObjects.data)
     {
-        (doConfigRes + i)->DO_ID = i;
-        (doConfigRes + i)->access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
-        auto &doCfgSize = (doConfigRes + i)->size;
-        auto &doCfgLen = (doConfigRes + i)->length;
-        (doConfigRes + i)->data = getDoConfig_sizeLenData(elem, doCfgSize, doCfgLen);
+        doConfigRes[i].DO_ID = i;
+        doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
+        doConfigRes[i].data = getDoConfig_sizeLenData(elem, doConfigRes[i].size, doConfigRes[i].length);
 
 #ifdef xxx
 

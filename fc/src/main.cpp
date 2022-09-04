@@ -21,13 +21,11 @@ void create_xml_file(std::string file_name = "output.xml");
 ///******************************
 int main(int argc, char *argv[])
 {
-    // testIrData();
-    // testIrOperator();
-    // testIrLink();
     std::string file_name = "./XML_files/AlgScalar2.xml";
     if (argc == 2){
         file_name = argv[1];
     }
+    
     FC_LOG("----- parseSWIR");
     struct IrObjects irObjects = parseSWIR(file_name);
     showIrObjects(irObjects);
@@ -37,6 +35,11 @@ int main(int argc, char *argv[])
     clearConfigObjects(configObjects);
     return 0;
 }
+
+
+
+
+
 
 void create_xml_file(std::string file_name)
 {
@@ -96,3 +99,7 @@ void create_xml_file(std::string file_name)
 
     doc.save_file(file_name.c_str());
 }
+
+   // testIrData();
+    // testIrOperator();
+    // testIrLink();
