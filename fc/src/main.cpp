@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 
     FC_LOG("----- convert2rvmIr");
     ConfigObjects configObjects = convert2rvmIr(irObjects);
+    showConfigObjects(configObjects);
     clearConfigObjects(configObjects);
     return 0;
 }

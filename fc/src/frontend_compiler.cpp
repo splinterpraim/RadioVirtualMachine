@@ -131,6 +131,20 @@ IrObjects parseSWIR(const std::string &fileNameSWIR)
     return irObjects;
 }
 
+void showIrObjects(const struct IrObjects &irObjects)
+{
+    /* Show result Ir objects */
+    std::cout << "Operators" << std::endl;
+    showIrOperators(irObjects.operators);
+    std::cout << " - " << std::endl;
+    std::cout << "Data" << std::endl;
+    showIrData(irObjects.data);
+    std::cout << " - " << std::endl;
+    std::cout << "link" << std::endl;
+    showIrLinks(irObjects.links);
+    std::cout << " - " << std::endl;
+}
+
 ConfigObjects convert2rvmIr(IrObjects &irObjects)
 {
     ConfigObjects configObjects;
@@ -139,6 +153,14 @@ ConfigObjects convert2rvmIr(IrObjects &irObjects)
     fillApeSection(configObjects, irObjects);
     return configObjects;
 }
+
+void showConfigObjects(ConfigObjects & cfgObj)
+{
+    std::cout << "Control Section: " << std::endl;
+    showControlSection(cfgObj.controlSection);
+    std::cout << "DO Section: " << std::endl;
+    showDoSection(cfgObj.doSection);
+} 
 
 int clearConfigObjects(ConfigObjects &cfgObj)
 {

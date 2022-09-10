@@ -45,10 +45,15 @@ void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData>
 
 /* ######## Help functions*/
 /* ************************** convert2rvmIr */
+void showControlSection(ControlSection &ctrlSec);
+void showDoSection(DO_Section &doSec);
+void showDO_Config(DO_Config &doCfg, uint8_t N_DO);
+
 
 
 /* Get config */
 DO_Config *getDoConfig(IrObjects &irObjects);
+uint32_t getDoConfig_size(IrData &irData);
 uint8_t *getDoConfig_sizeLenData(class IrData &irData, uint32_t &doCfgSize, uint8_t &doCfgLen);
 ASF_Config *getAsfConfig(IrObjects &irObjects);
 

@@ -4,7 +4,6 @@
 #define XML_TYPE_FLOAT "float"
 #define XML_TYPE_STRING "string"
 
-
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
 {
@@ -25,20 +24,6 @@ IrData convertToIrData(pugi::xml_node &data_xml)
     data.setValue(data_xml.attribute("value").as_string());
 
     return data;
-}
-
-void showIrObjects(const struct IrObjects &irObjects)
-{
-    /* Show result Ir objects */
-    std::cout << "Operators" << std::endl;
-    showIrOperators(irObjects.operators);
-    std::cout << " - " << std::endl;
-    std::cout << "Data" << std::endl;
-    showIrData(irObjects.data);
-    std::cout << " - " << std::endl;
-    std::cout << "link" << std::endl;
-    showIrLinks(irObjects.links);
-    std::cout << " - " << std::endl;
 }
 
 void showIrOperators(const std::vector<IrOperator> &operators)
@@ -122,10 +107,33 @@ void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData>
     }
 }
 
-
-
 /* ######## Help functions*/
 /* ************************** convert2rvmIr */
+void showControlSection(ControlSection &ctrlSec)
+{
+    std::string space = "  ";
+    std::cout << space << "LCF: " << (int)ctrlSec.LCF << ", NAF: " << (int)ctrlSec.NAF << ", Task_ID: " << (int)ctrlSec.Task_ID << ", RPI_version: " << (int)ctrlSec.RPI_version << ", Reference_ID: " << (int)ctrlSec.Reference_ID << ", Impl_version: " << (int)ctrlSec.Implementation_version << ", Developer_ID: " << (unsigned int)ctrlSec.Developer_ID << ", Creation_Date: " << (unsigned int)ctrlSec.Creation_Date << std::endl;
+}
+
+void showDoSection(DO_Section &doSec)
+{
+    std::string space = "  ";
+    std::cout << space << "N_DO: " << (int)doSec.N_DO << std::endl;
+    std::cout << space << "DO_Config: " << std::endl;
+    showDO_Config(*doSec.DOs, doSec.N_DO);
+}
+
+void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
+{
+    std::string space4 = "    ";
+    DO_Config *ptrDoCfg = &doCfg;
+    for (uint8_t i = 0; i < N_DO; i++)
+    {
+        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length <<
+            //  ", data: "<< (int) ptrDoCfg[i].data <<
+            std::endl;
+    }
+}
 
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
@@ -135,7 +143,9 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     {
         doConfigRes[i].DO_ID = i;
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
-        doConfigRes[i].data = getDoConfig_sizeLenData(elem, doConfigRes[i].size, doConfigRes[i].length);
+        doConfigRes[i].size = getDoConfig_size(elem);
+        doConfigRes[i].length = getDoConfig_length(elem);
+        // doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
 #ifdef xxx
 
@@ -170,7 +180,59 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     }
     return doConfigRes;
 }
-uint8_t *getDoConfig_sizeLenData(class IrData &irData, uint32_t &doCfgSize, uint8_t &doCfgLen)
+
+uint32_t getDoConfig_size(IrData &irData)
+{
+    uint32_t res = 0;
+    if (irData.getType() == XML_TYPE_INT)
+    {
+        res = sizeof(int);
+    }
+    else if (irData.getType() == XML_TYPE_FLOAT)
+    {
+        res = sizeof(float);
+    }
+    else if (irData.getType() == XML_TYPE_STRING)
+    {
+        res = irData.getValue().size();
+    }
+    else
+    {
+        std::cout << "Error: Mismatch of type!" << std::endl;
+    }
+    return res;
+}
+
+uint8_t getDoConfig_length(IrData &irData)
+{
+    uint8_t res = 0;
+    if (irData.getValue() != "")
+    {
+        if (irData.getType() == XML_TYPE_INT)
+        {
+            res = sizeof(int);
+        }
+        else if (irData.getType() == XML_TYPE_FLOAT)
+        {
+            res = sizeof(float);
+        }
+        else if (irData.getType() == XML_TYPE_STRING)
+        {
+            res = irData.getValue().size();
+        }
+        else
+        {
+            std::cout << "Error: Mismatch of type!" << std::endl;
+        }
+    }
+    else if (irData.getPath() != "")
+    {
+        res 
+    }
+    return res;
+}
+
+uint8_t *getDoConfig_sizeLenData(IrData &irData, uint32_t &doCfgSize, uint8_t &doCfgLen)
 {
     if (irData.getType() == XML_TYPE_INT)
     {

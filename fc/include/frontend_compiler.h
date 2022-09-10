@@ -33,6 +33,8 @@
  */
 IrObjects parseSWIR(const std::string &fileNameSWIR);
 
+void showIrObjects(const IrObjects &irObjects);
+
 /**
  * @brief Convert from Ir Objects to RVM IR (config structs) 
  * 
@@ -42,6 +44,7 @@ IrObjects parseSWIR(const std::string &fileNameSWIR);
 ConfigObjects convert2rvmIr(IrObjects &irObjects); 
 // Create RVM Input
 
+void showConfigObjects(ConfigObjects & cfgObj); 
 
 /**
  * @brief Clear Config Objects
@@ -52,6 +55,6 @@ ConfigObjects convert2rvmIr(IrObjects &irObjects);
 int clearConfigObjects(ConfigObjects & cfgObj);
 
 
-void showIrObjects(const IrObjects &irObjects);
+
 
 #endif // FC_FRONTEND_COMPILER_H
