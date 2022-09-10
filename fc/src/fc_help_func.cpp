@@ -4,6 +4,8 @@
 #define XML_TYPE_FLOAT "float"
 #define XML_TYPE_STRING "string"
 
+#define DO_CFG_LEN_FOR_FILE 255
+
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
 {
@@ -227,7 +229,7 @@ uint8_t getDoConfig_length(IrData &irData)
     }
     else if (irData.getPath() != "")
     {
-        res 
+        res = DO_CFG_LEN_FOR_FILE;
     }
     return res;
 }
