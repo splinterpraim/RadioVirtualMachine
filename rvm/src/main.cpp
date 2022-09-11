@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
+#include "rvm_program_mem.hpp"
 #include "CU/control_unit.h"
 #include "DO/data_object.h"
 #include "log_manager.h"
+
+// #include "config_code_structure.hpp"
+rvm_ProgramMemory progMem;
 
 using namespace std;
 
@@ -10,11 +14,12 @@ int test();
 
 int main()
 {
-	test();
+    progMem.init(10);
+	// test();
 }
 
 
-int test();
+int test()
 {
     try
     {

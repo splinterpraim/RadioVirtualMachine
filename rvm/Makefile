@@ -11,7 +11,7 @@ RVM_INC := $(CUR_DIR)/include
 RVM_TESTS := $(CUR_DIR)/tests
 RVM_INC_DIR := $(INC_DIR)/rvm
 RVM_OBJ_DIR := $(OBJ_DIR)/rvm
-RVM_CXXFLAGS := -std=c++14 -I$(RVM_INC_DIR)
+RVM_CXXFLAGS := -std=c++14 -I$(INC_DIR)/common -I$(RVM_INC_DIR) 
 
 RVM_TEMPLATE_FIND_CPP := $(RVM_SRC)/*.cpp $(RVM_SRC)/*/*.cpp
 RVM_ALL_CPP := $(wildcard $(RVM_TEMPLATE_FIND_CPP))

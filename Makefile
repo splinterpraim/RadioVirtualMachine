@@ -24,9 +24,13 @@ MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_
 RVM_DIR := $(ROOT_DIR)/rvm
 RVM_dep := $(MKDIR_BUILD)
 
-#FC
+# FC
 FC_DIR := $(ROOT_DIR)/fc
 FC_dep := $(MKDIR_BUILD)
+
+# CMN
+CMN_DIR := $(ROOT_DIR)/common
+CMN_dep := $(MKDIR_BUILD)
 
 
 #####################################
@@ -49,7 +53,7 @@ MAIN_ARGS := ROOT_DIR=$(ROOT_DIR) BUILD_DIR=$(BUILD_DIR) BIN_DIR=$(BIN_DIR) INC_
 
 
 PHONY := main
-main: $(MKDIR_BUILD) rvm fc
+main: $(MKDIR_BUILD) cmn rvm fc
 
 
 
@@ -67,6 +71,14 @@ fc: $(FC_dep)
 
 fc-clean:
 	@make fc-clean -C $(ROOT_DIR) -f $(FC_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(FC_DIR) --no-print-directory
+
+
+PHONY += cmn
+cmn: $(CMN_dep) 
+	@make  -C $(ROOT_DIR) -f $(CMN_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(CMN_DIR) --no-print-directory
+
+cmn-clean:
+	@make cmn-clean -C $(ROOT_DIR) -f $(CMN_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(CMN_DIR) --no-print-directory
 
 
 #MKDIR

@@ -11,7 +11,7 @@
 #include "APE/abstract_processing_element.h"
 #include "ASF/abstract_switch_fabric.h"
 
-#include "configCodeStructure.h"
+#include "config_code_structure.hpp"
 
 #include "log_manager.h"
 
