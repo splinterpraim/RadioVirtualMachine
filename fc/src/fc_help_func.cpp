@@ -139,6 +139,10 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
 
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
+    //todo: 1. type of file is not txt - it's binary.
+    //todo: 2. error - if there are full value and path .
+    //todo: 3. mb get data from file immediately
+
     DO_Config *doConfigRes = new DO_Config[irObjects.data.size()];
     int i = 0;
     for (auto &elem : irObjects.data)
