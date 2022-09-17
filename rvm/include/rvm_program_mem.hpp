@@ -27,11 +27,23 @@ public:
      */
     uint64_t load(std::string fileName);
 
+    /**
+     * @brief Returns the value (Byte) at the specified address
+     * 
+     * @param addr Address in memory
+     * @return value  
+     */
     uint8_t get(uint64_t addr);
 
 private:
-    uint64_t _size;
-    uint8_t *mem;
+    uint64_t _size = 0;
+    uint64_t _capacity = 0;
+    uint8_t *mem = nullptr;
+
+
+    uint8_t * getPtrOnFreeSpace(uint64_t size);
+    bool hasFreeSpace(uint64_t size);
+    uint8_t * reallocateMem(uint64_t size);
 };
 
 #endif // RVM_PROGRAM_MEM_CLASS

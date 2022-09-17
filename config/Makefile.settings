@@ -1,0 +1,8 @@
+
+DEBUG := 1
+DEBUG_FLAGS :=
+
+
+ifeq ($(DEBUG),1)
+DEBUG_FLAGS := -Wall -g
+endif

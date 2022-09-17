@@ -1,6 +1,7 @@
 # $(info START ROOT MAKEFILE)
 
 
+
 .DEFUALT = main
 # CONSTANTS ###################################
 ROOT_MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -16,22 +17,22 @@ CONF_DIR := $(ROOT_DIR)/config
 
 # INCLUDES ###################################
 include $(CONF_DIR)/Makefile.colors
-
+include $(CONF_DIR)/Makefile.settings
 #--------------------------------------------------------
+
 MKDIR_BUILD := $(BUILD_DIR) $(BIN_DIR) $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) $(SHARE_DIR)
 
 # RVM 
 RVM_DIR := $(ROOT_DIR)/rvm
-RVM_dep := $(MKDIR_BUILD)
+RVM_dep := $(MKDIR_BUILD) cmn
 
 # FC
 FC_DIR := $(ROOT_DIR)/fc
-FC_dep := $(MKDIR_BUILD)
+FC_dep := $(MKDIR_BUILD) cmn
 
 # CMN
 CMN_DIR := $(ROOT_DIR)/common
 CMN_dep := $(MKDIR_BUILD)
-
 
 #####################################
 ##################################### CONSTANTS
@@ -56,23 +57,35 @@ PHONY := main
 main: $(MKDIR_BUILD) cmn rvm fc
 
 
-
+# RVM
 PHONY += rvm
 rvm: $(RVM_dep) 
 	@make  -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(RVM_DIR) --no-print-directory
 
+PHONY += rvm-test
+rvm-test: $(RVM_dep) 
+	@make  rvm-build-test -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(RVM_DIR) --no-print-directory
+
+PHONY += rvm-clean
 rvm-clean:
 	@make rvm-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
+PHONY += rvm-test-clean
+rvm-test-clean:
+	@make rvm-test-clean -C $(ROOT_DIR) -f $(RVM_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(RVM_DIR) --no-print-directory
 
+
+#  FC
 PHONY += fc
 fc: $(FC_dep) 
 	@make  -C $(ROOT_DIR) -f $(FC_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(FC_DIR) --no-print-directory
 
+PHONY += fc-clean
 fc-clean:
 	@make fc-clean -C $(ROOT_DIR) -f $(FC_DIR)/Makefile $(MAIN_ARGS) CUR_DIR=$(FC_DIR) --no-print-directory
 
 
+# CMN
 PHONY += cmn
 cmn: $(CMN_dep) 
 	@make  -C $(ROOT_DIR) -f $(CMN_DIR)/Makefile $(MAIN_ARGS)  CUR_DIR=$(CMN_DIR) --no-print-directory

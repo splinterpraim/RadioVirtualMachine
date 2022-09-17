@@ -36,8 +36,8 @@ ECHO_CMN_BUILD := echo-build-cmn
 MKDIR_BUILD := $(CMN_OBJ_DIR) $(CMN_INC_DIR)
 CP_INC  := copy-include
 
-PHONY += rvm-build
-rvm-build: $(ECHO_CMN_BUILD) $(MKDIR_BUILD) $(CP_INC) 
+PHONY += cmn-build
+cmn-build: $(ECHO_CMN_BUILD) $(MKDIR_BUILD) $(CP_INC) 
 	@echo "$(YELLOW)END BUILD COMMON$(RESET)"
 
 # $(RVM_BIN):  $(RVM_OBJ)

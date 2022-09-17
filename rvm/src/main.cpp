@@ -1,23 +1,38 @@
 #include <iostream>
 #include <string>
+#include <exception>
+#include <stdexcept>
+
 #include "rvm_program_mem.hpp"
 #include "CU/control_unit.h"
 #include "DO/data_object.h"
 #include "log_manager.h"
 
-// #include "config_code_structure.hpp"
-rvm_ProgramMemory progMem;
+#include "rvm_glob_define.h"
 
-using namespace std;
+// #include "config_code_structure.hpp"
+// rvm_ProgramMemory progMem;
+
 
 int test();
 
-int main()
+int main(int argc, char *argv[])
 {
-    progMem.init(10);
-	// test();
-}
+    try
+    {
+        progMem.init(10);
+        progMem.load("/home/xivvxx/buff/cfgfile");
+        // progMem.load("/home/xivvxx/buff/cfgfile2");
+        // progMem.load("/home/xivvxx/buff/cfgfile3");
+        std::cout << progMem.get(0) << std::endl;
 
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    // test();
+}
 
 int test()
 {
@@ -57,19 +72,19 @@ int test()
     }
     catch (const std::invalid_argument &e)
     {
-        cout << "Invalid_argument: " << e.what() << endl;
+        std::cout << "Invalid_argument: " << e.what() << std::endl;
     }
     catch (const std::runtime_error &e)
     {
-        cout << "Runtime_error: " << e.what() << endl;
+        std::cout << "Runtime_error: " << e.what() << std::endl;
     }
     catch (std::exception &e)
     {
-        cout << "Exception: " << e.what() << endl;
+        std::cout << "Exception: " << e.what() << std::endl;
     }
     catch (...)
     {
-        cout << "Exception" << endl;
+        std::cout << "Exception" << std::endl;
     }
     return 0;
 }
