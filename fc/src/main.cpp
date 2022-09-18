@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <exception>
 
 /* XML lib headers*/
 #include "pugixml/pugixml.hpp"
@@ -21,26 +22,30 @@ void create_xml_file(std::string file_name = "output.xml");
 ///******************************
 int main(int argc, char *argv[])
 {
-    std::string file_name = "./XML_files/AlgScalar2.xml";
-    if (argc == 2){
-        file_name = argv[1];
-    }
-    
-    FC_LOG("----- parseSWIR");
-    struct IrObjects irObjects = parseSWIR(file_name);
-    showIrObjects(irObjects);
+    try
+    {
+        std::string file_name = "./XML_files/AlgScalar2.xml";
+        if (argc == 2)
+        {
+            file_name = argv[1];
+        }
 
-    FC_LOG("----- convert2rvmIr");
-    ConfigObjects configObjects = convert2rvmIr(irObjects);
-    showConfigObjects(configObjects);
-    clearConfigObjects(configObjects);
+        FC_LOG("----- parseSWIR");
+        struct IrObjects irObjects = parseSWIR(file_name);
+        showIrObjects(irObjects);
+
+        FC_LOG("----- convert2rvmIr");
+        ConfigObjects configObjects = convert2rvmIr(irObjects);
+        showConfigObjects(configObjects);
+        clearConfigObjects(configObjects);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
     return 0;
 }
-
-
-
-
-
 
 void create_xml_file(std::string file_name)
 {
@@ -101,6 +106,6 @@ void create_xml_file(std::string file_name)
     doc.save_file(file_name.c_str());
 }
 
-   // testIrData();
-    // testIrOperator();
-    // testIrLink();
+// testIrData();
+// testIrOperator();
+// testIrLink();

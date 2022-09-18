@@ -1,4 +1,10 @@
 #include "fc_help_func.hpp"
+#include "common.hpp"
+
+#include <fstream>
+#include <cstring>
+#include <exception>
+#include <stdexcept>
 
 #define XML_TYPE_INT "int"
 #define XML_TYPE_FLOAT "float"
@@ -139,9 +145,9 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
 
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
-    //todo: 1. type of file is not txt - it's binary.
-    //todo: 2. error - if there are full value and path .
-    //todo: 3. mb get data from file immediately
+    //+todo: 1. type of file is not txt - it's binary.
+    //+todo: 2. error - if there are full value and path
+    //+todo: 3. mb get data from file immediately
 
     DO_Config *doConfigRes = new DO_Config[irObjects.data.size()];
     int i = 0;
@@ -151,7 +157,7 @@ DO_Config *getDoConfig(IrObjects &irObjects)
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
         doConfigRes[i].size = getDoConfig_size(elem);
         doConfigRes[i].length = getDoConfig_length(elem);
-        // doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
+        doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
 #ifdef xxx
 
@@ -212,7 +218,17 @@ uint32_t getDoConfig_size(IrData &irData)
 uint8_t getDoConfig_length(IrData &irData)
 {
     uint8_t res = 0;
-    if (irData.getValue() != "")
+    std::string doVal = irData.getValue();
+    std::string doPath = irData.getPath();
+
+    /* Filled both value and path */
+    if ((doVal.length() != 0) && (doPath.length() != 0))
+    {
+        throw std::runtime_error(FC_ERR_STR("Filled both value and path!"));
+    }
+    
+    /* Filled value */
+    if (doVal.length() != 0)
     {
         if (irData.getType() == XML_TYPE_INT)
         {
@@ -228,12 +244,13 @@ uint8_t getDoConfig_length(IrData &irData)
         }
         else
         {
-            std::cout << "Error: Mismatch of type!" << std::endl;
+            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
         }
     }
-    else if (irData.getPath() != "")
+    /* Filled path */
+    else if (doPath.length() != 0)
     {
-        res = DO_CFG_LEN_FOR_FILE;
+        res = getFileLen(doPath);
     }
     return res;
 }
@@ -259,7 +276,66 @@ uint8_t *getDoConfig_sizeLenData(IrData &irData, uint32_t &doCfgSize, uint8_t &d
     }
     return 0;
 }
+
+uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
+{
+    uint8_t* res = nullptr;
+    std::string doVal = irData.getValue();
+    std::string doPath = irData.getPath();
+
+    //!seqf
+    if (doVal.length() != 0)
+    {
+            std::cout << "d1"<< std::endl;
+        if (irData.getType() == XML_TYPE_INT)
+        {
+            int intVal = std::stoi(doVal);
+            size_t intValLen = sizeof(intVal);
+
+            res = new uint8_t[len];
+            std::memcpy((void *) res, (const void*) &intVal, len);
+        }
+        else if (irData.getType() == XML_TYPE_FLOAT)
+        {
+            // res = sizeof(float);
+        }
+        else if (irData.getType() == XML_TYPE_STRING)
+        {
+            // res = irData.getValue().size();
+        }
+        else
+        {
+            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
+        }
+    }
+
+    std::cout << "d0: "<< doVal << ")"<< std::endl;
+
+    for (size_t i = 0; i < sizeof(int); ++i)
+        std::cout << (int)res[i] << " ";
+    std::cout << std::endl;
+    std::cout << "d0: "<< doVal << ")"<< std::endl;
+
+    return res;
+}
+
 ASF_Config *getAsfConfig(IrObjects &irObjects)
 {
     return NULL;
+}
+
+
+
+size_t getFileLen(std::string fileName)
+{
+    size_t res = 0;
+    std::ifstream dataFile;
+    dataFile.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!dataFile.is_open())
+    {
+        throw std::runtime_error(FC_ERR_STR("File " + fileName + " does not open"));
+    }
+    res = dataFile.tellg();
+
+    return res;
 }

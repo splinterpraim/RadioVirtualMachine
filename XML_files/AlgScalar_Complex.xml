@@ -3,22 +3,22 @@
 <program name="inner product Complex">
 
   <operator id="multiplier2" type="Complex">
-    <data id="x1" type="float" path="number1.txt" connect_type="input" order="1" access_time="10" value="" />
-    <data id="y1" type="float" path="number2.txt" connect_type="input" order="2" access_time="10" value="5.2" />
-    <data id="x2" type="float" path="number3.txt" connect_type="input" order="3" access_time="10" value="5.2" />
-    <data id="y2" type="float" path="number4.txt" connect_type="input" order="4" access_time="10" value="5.2" />
+    <data id="x1" type="int" path="" connect_type="input" order="1" access_time="10" value="256" />
+    <data id="y1" type="float" path="XML_files/data1.bin" connect_type="input" order="2" access_time="10" value="" />
+    <data id="x2" type="float" path="XML_files/data1.bin" connect_type="input" order="3" access_time="10" value="" />
+    <data id="y2" type="float" path="XML_files/data1.bin" connect_type="input" order="4" access_time="10" value="" />
     <data id="c1" type="float" path="" connect_type="output" order="1" access_time="10" value="" />
     <data id="c2" type="float" path="" connect_type="output" order="2" access_time="10" value="" />
 
     <operator id="mult1" type="Terminal">
-      <data id="x1" type="float" path="number1.txt" connect_type="input" order="1" access_time="10" value="" />
-      <data id="y1" type="float" path="number2.txt" connect_type="input" order="2" access_time="10" value="5.2" />
+      <data id="x1" type="int" path="" connect_type="input" order="1" access_time="10" value="256" />
+      <data id="y1" type="float" path="XML_files/data1.bin" connect_type="input" order="2" access_time="10" value="" />
       <data id="c1" type="float" path="" connect_type="output" order="1" access_time="10" value="" />
     </operator>
 
     <operator id="mult2" type="Terminal">
-      <data id="x2" type="float" path="number3.txt" connect_type="input" order="1" access_time="10" value="5.2" />
-      <data id="y2" type="float" path="number4.txt" connect_type="input" order="2" access_time="10" value="5.2" />
+      <data id="x2" type="float" path="" connect_type="XML_files/data1.bin" order="1" access_time="10" value="" />
+      <data id="y2" type="float" path="XML_files/data1.bin" connect_type="input" order="2" access_time="10" value="" />
       <data id="c2" type="float" path="" connect_type="output" order="1" access_time="10" value="" />
     </operator>
   </operator>
