@@ -15,15 +15,26 @@
 #include "ir_operator.h"
 #include "ir_link.h"
 #include "frontend_compiler.h"
+
+#include "fc_glob.hpp"
+#include "fc_glob_func.hpp"
+
 // #include "../tests/include/test_ir_objects.h"
+fc_glob_t fc_glob;
 
 void create_xml_file(std::string file_name = "output.xml");
 
 ///******************************
 int main(int argc, char *argv[])
 {
+
     try
     {
+
+        /* Set global var */
+        fc_glob_set();
+
+
         std::string file_name = "./XML_files/AlgScalar2.xml";
         if (argc == 2)
         {

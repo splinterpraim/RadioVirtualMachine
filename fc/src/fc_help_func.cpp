@@ -1,5 +1,7 @@
 #include "fc_help_func.hpp"
 #include "common.hpp"
+#include "fc_glob.hpp"
+#include "fc_system.hpp"
 
 #include <fstream>
 #include <cstring>
@@ -11,6 +13,8 @@
 #define XML_TYPE_STRING "string"
 
 #define DO_CFG_LEN_FOR_FILE 255
+
+extern fc_glob_t fc_glob;
 
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
@@ -226,7 +230,7 @@ uint8_t getDoConfig_length(IrData &irData)
     {
         throw std::runtime_error(FC_ERR_STR("Filled both value and path!"));
     }
-    
+
     /* Filled value */
     if (doVal.length() != 0)
     {
@@ -279,25 +283,45 @@ uint8_t *getDoConfig_sizeLenData(IrData &irData, uint32_t &doCfgSize, uint8_t &d
 
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
 {
-    uint8_t* res = nullptr;
+    uint8_t *res = nullptr;
     std::string doVal = irData.getValue();
     std::string doPath = irData.getPath();
 
-    //!seqf
+    /* Filled both value and path */
+    if ((doVal.length() != 0) && (doPath.length() != 0))
+    {
+        throw std::runtime_error(FC_ERR_STR("Filled both value and path!"));
+    }
+
+    //! seqf
+    /* Filled value */
     if (doVal.length() != 0)
     {
-            std::cout << "d1"<< std::endl;
+        std::cout << "d1" << std::endl;
         if (irData.getType() == XML_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
+            if (fc_glob.endian == CMN_BIG_ENDIAN)
+            {
+                intVal = convertToLittleEndian(intVal);
+            }
             size_t intValLen = sizeof(intVal);
 
             res = new uint8_t[len];
-            std::memcpy((void *) res, (const void*) &intVal, len);
+            std::memcpy((void *)res, (const void *)&intVal, len);
         }
         else if (irData.getType() == XML_TYPE_FLOAT)
         {
-            // res = sizeof(float);
+            int fltVal = std::stof(doVal);
+            //! need convert to endians
+            // if (fc_glob.endian == CMN_BIG_ENDIAN)
+            // {
+            //     fltVal = convertToLittleEndian(fltVal);
+            // }
+            size_t intValLen = sizeof(fltVal);
+
+            res = new uint8_t[len];
+            std::memcpy((void *)res, (const void *)&fltVal, len);
         }
         else if (irData.getType() == XML_TYPE_STRING)
         {
@@ -308,13 +332,24 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
         }
     }
+    /* Filled path */
+    else if (doPath.length() != 0)
+    {
+        // open file
+        // read info
+        // check size
+        std::cout << "p1" << std::endl;
+        res = getFileData(doPath);
+    }
 
-    std::cout << "d0: "<< doVal << ")"<< std::endl;
+    // todo: show data
+    // todo: delete data mem
+    std::cout << "d0: " << doVal << ")" << " len = " << (int)len << std::endl;
 
-    for (size_t i = 0; i < sizeof(int); ++i)
+    for (size_t i = 0; i < len; ++i)
         std::cout << (int)res[i] << " ";
     std::cout << std::endl;
-    std::cout << "d0: "<< doVal << ")"<< std::endl;
+    std::cout << "d_end: " << doVal << ")" << std::endl;
 
     return res;
 }
@@ -323,8 +358,6 @@ ASF_Config *getAsfConfig(IrObjects &irObjects)
 {
     return NULL;
 }
-
-
 
 size_t getFileLen(std::string fileName)
 {
@@ -336,6 +369,30 @@ size_t getFileLen(std::string fileName)
         throw std::runtime_error(FC_ERR_STR("File " + fileName + " does not open"));
     }
     res = dataFile.tellg();
+
+    return res;
+}
+
+uint8_t* getFileData(std::string fileName)
+{
+    uint8_t * res = nullptr;
+    size_t fSize = 0;
+
+    std::ifstream dataFile;
+    dataFile.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!dataFile.is_open())
+    {
+        throw std::runtime_error(FC_ERR_STR("File " + fileName + " does not open"));
+    }
+
+    fSize = dataFile.tellg();
+    if (fSize != 0)
+    {
+        res = new uint8_t[fSize];
+        dataFile.seekg(0, std::ios::beg);
+        dataFile.read((char *)res, fSize);
+        dataFile.close();
+    }
 
     return res;
 }

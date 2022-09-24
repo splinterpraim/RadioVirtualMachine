@@ -20,6 +20,9 @@
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
+#define CMN_LITTLE_ENDIAN 1
+#define CMN_BIG_ENDIAN 0
+
 #define STR(x) #x
 // #define ADD_LINE_FILE(m,l,f) m " (line " STR(l) " in file "  STR(f) ")"
 #define ADD_LINE_FILE(m,l,f) m " (in file " f ":" STR(l) ")"

@@ -63,5 +63,7 @@ ASF_Config *getAsfConfig(IrObjects &irObjects);
 
 /*  */
 size_t getFileLen(std::string fileName);
+uint8_t* getFileData(std::string fileName);
+
 
 #endif // FC_HELP_FUNC_HPP
