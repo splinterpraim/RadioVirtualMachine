@@ -1,5 +1,8 @@
 
 # .DEFUALT=fc_build
+# INCLUDES ###################################
+include $(CONF_DIR)/Makefile.colors
+include $(CONF_DIR)/Makefile.settings
 
 
 
@@ -11,7 +14,7 @@ FC_INC := $(CUR_DIR)/include
 FC_TESTS := $(CUR_DIR)/tests
 FC_INC_DIR := $(INC_DIR)/fc
 FC_OBJ_DIR := $(OBJ_DIR)/fc
-FC_CXXFLAGS := -std=c++14 -I$(FC_INC_DIR)
+FC_CXXFLAGS := $(DEBUG_FLAGS) -std=c++14 -I$(INC_DIR)/common -I$(FC_INC_DIR)
 
 FC_TEMPLATE_FIND_CPP := $(FC_SRC)/*.cpp $(FC_SRC)/*/*.cpp
 FC_ALL_CPP := $(wildcard $(FC_TEMPLATE_FIND_CPP))
@@ -23,8 +26,6 @@ FC_OBJ := $(addprefix $(FC_OBJ_DIR)/,$(FC_OBJ))
 #####################################
 ##################################### CONSTANTS
 
-# INCLUDES ###################################
-include $(CONF_DIR)/Makefile.colors
 
 #--------------------------------------------------------
 
