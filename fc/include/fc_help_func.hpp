@@ -56,7 +56,6 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO);
 DO_Config *getDoConfig(IrObjects &irObjects);
 uint32_t getDoConfig_size(IrData &irData);
 uint8_t getDoConfig_length(IrData &irData);
-uint8_t *getDoConfig_sizeLenData(class IrData &irData, uint32_t &doCfgSize, uint8_t &doCfgLen);
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len);
 ASF_Config *getAsfConfig(IrObjects &irObjects);
 

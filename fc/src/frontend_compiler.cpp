@@ -164,6 +164,7 @@ void showConfigObjects(ConfigObjects & cfgObj)
 
 int clearConfigObjects(ConfigObjects &cfgObj)
 {
+    delete[] cfgObj.doSection.DOs->data;
     delete[] cfgObj.doSection.DOs;
     return 0;
 }

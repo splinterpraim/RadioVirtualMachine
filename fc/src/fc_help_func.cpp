@@ -141,9 +141,15 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
     DO_Config *ptrDoCfg = &doCfg;
     for (uint8_t i = 0; i < N_DO; i++)
     {
-        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length <<
-            //  ", data: "<< (int) ptrDoCfg[i].data <<
-            std::endl;
+        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID <<
+                            ", size: " << (int)ptrDoCfg[i].size << 
+                            ", access_time: " << (int)ptrDoCfg[i].access_time << 
+                            ", length: " << (int)ptrDoCfg[i].length <<
+                            ", data: ";
+                            for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
+                                std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
+                            std::cout << std::dec;
+        std::cout << std::endl;
     }
 }
 
@@ -259,27 +265,7 @@ uint8_t getDoConfig_length(IrData &irData)
     return res;
 }
 
-uint8_t *getDoConfig_sizeLenData(IrData &irData, uint32_t &doCfgSize, uint8_t &doCfgLen)
-{
-    if (irData.getType() == XML_TYPE_INT)
-    {
-        doCfgSize = sizeof(int);
-        // len / data (file/value)
-    }
-    else if (irData.getType() == XML_TYPE_FLOAT)
-    {
-        doCfgSize = sizeof(float);
-    }
-    else if (irData.getType() == XML_TYPE_STRING)
-    {
-        doCfgSize = irData.getValue().size();
-    }
-    else
-    {
-        // error
-    }
-    return 0;
-}
+
 
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
 {
@@ -293,11 +279,10 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         throw std::runtime_error(FC_ERR_STR("Filled both value and path!"));
     }
 
-    //! seqf
+    //! segf
     /* Filled value */
     if (doVal.length() != 0)
     {
-        std::cout << "d1" << std::endl;
         if (irData.getType() == XML_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
@@ -305,20 +290,18 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             {
                 intVal = convertToLittleEndian(intVal);
             }
-            size_t intValLen = sizeof(intVal);
 
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&intVal, len);
         }
         else if (irData.getType() == XML_TYPE_FLOAT)
         {
-            int fltVal = std::stof(doVal);
+            float fltVal = std::stof(doVal);
             //! need convert to endians
             // if (fc_glob.endian == CMN_BIG_ENDIAN)
             // {
             //     fltVal = convertToLittleEndian(fltVal);
             // }
-            size_t intValLen = sizeof(fltVal);
 
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&fltVal, len);
@@ -338,18 +321,16 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         // open file
         // read info
         // check size
-        std::cout << "p1" << std::endl;
+        // std::cout << "p1" << std::endl;
         res = getFileData(doPath);
     }
 
-    // todo: show data
-    // todo: delete data mem
-    std::cout << "d0: " << doVal << ")" << " len = " << (int)len << std::endl;
+    // std::cout << "d0: " << doVal << ")" << " len = " << (int)len << std::endl;
 
-    for (size_t i = 0; i < len; ++i)
-        std::cout << (int)res[i] << " ";
-    std::cout << std::endl;
-    std::cout << "d_end: " << doVal << ")" << std::endl;
+    // for (size_t i = 0; i < len; ++i)
+    //     std::cout <<std::hex << (int)res[i] << " ";
+    // std::cout << std::endl;
+    // std::cout << "d_end: " << doVal << ")" << std::endl;
 
     return res;
 }
