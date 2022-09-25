@@ -35,6 +35,13 @@ public:
      */
     uint8_t get(uint64_t addr);
 
+    /**
+     * @brief Get the size of program memory
+     * 
+     * @return size of program memory
+     */
+    uint64_t getSize();
+
 private:
     uint64_t _size = 0;
     uint64_t _capacity = 0;

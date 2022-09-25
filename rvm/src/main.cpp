@@ -5,6 +5,7 @@
 
 #include "rvm_program_mem.hpp"
 #include "CU/control_unit.h"
+#include "CU/rvm_cfg_code_fetcher.hpp"
 #include "DO/data_object.h"
 #include "log_manager.h"
 
@@ -22,9 +23,9 @@ int main(int argc, char *argv[])
     {
         progMem.init(10);
         progMem.load("/home/xivvxx/buff/cfgfile");
-        // progMem.load("/home/xivvxx/buff/cfgfile2");
-        // progMem.load("/home/xivvxx/buff/cfgfile3");
-        std::cout << progMem.get(0) << std::endl;
+        rvm_cfgCodeFetcher cfgFe;
+        cfgFe.fetch(0);
+        
 
     }
     catch (const std::exception& e)

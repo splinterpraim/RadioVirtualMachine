@@ -29,5 +29,8 @@
 #define RVM_ERR_STR(m)  "RVM: " ERR_STR(m)
 #define FC_ERR_STR(m)  "FC: " ERR_STR(m) 
 
+#define SET_GREEN(m) GN m RT
+#define SET_RED(m) RD m RT
+
 
 #endif //COMMON_HPP

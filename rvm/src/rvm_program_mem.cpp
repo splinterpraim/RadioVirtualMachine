@@ -50,14 +50,15 @@ uint64_t rvm_ProgramMemory::load(std::string fileName)
 {
     uint64_t cntByte = 0;
 
+    /* Open config file */
     std::ifstream cfgFile;
     cfgFile.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
-
     if (!cfgFile.is_open())
     {
         throw std::runtime_error(RVM_ERR_STR("file " + fileName + " does not open"));
     }
 
+    /* Read data from config file to program memory */
     cntByte = cfgFile.tellg();
     if (cntByte != 0)
     {
@@ -74,12 +75,17 @@ uint64_t rvm_ProgramMemory::load(std::string fileName)
 uint8_t rvm_ProgramMemory::get(uint64_t addr)
 {
     /* Check out of range */
-    if (addr > _size)
+    if (addr >= _size)
     {
         throw std::out_of_range(RVM_ERR_STR("аccessing an element out of Program memory"));
     }
-    
+
     return mem[addr];
+}
+
+uint64_t rvm_ProgramMemory::getSize()
+{
+    return _size;
 }
 
 /* Private */
