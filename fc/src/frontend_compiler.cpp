@@ -37,7 +37,7 @@ int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
 
     doSec.N_DO = irObjects.data.size();
     doSec.DOs = getDoConfig(irObjects);
-    // doSec.ASFs = getAsfConfig(irObjects);
+    doSec.ASFs = getAsfConfig(irObjects);
     return 0;
 }
 

@@ -3,6 +3,8 @@
 #include "fc_glob.hpp"
 #include "fc_system.hpp"
 
+#include "radio_library.hpp"
+
 #include <fstream>
 #include <cstring>
 #include <exception>
@@ -15,6 +17,7 @@
 #define DO_CFG_LEN_FOR_FILE 255
 
 extern fc_glob_t fc_glob;
+extern RadioLibrary radioLib;
 
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
@@ -133,6 +136,8 @@ void showDoSection(DO_Section &doSec)
     std::cout << space << "N_DO: " << (int)doSec.N_DO << std::endl;
     std::cout << space << "DO_Config: " << std::endl;
     showDO_Config(*doSec.DOs, doSec.N_DO);
+    std::cout << space << "ASF_Config: " << std::endl;
+    showASF_config(*doSec.ASFs, doSec.N_DO);
 }
 
 void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
@@ -141,15 +146,30 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
     DO_Config *ptrDoCfg = &doCfg;
     for (uint8_t i = 0; i < N_DO; i++)
     {
-        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID <<
-                            ", size: " << (int)ptrDoCfg[i].size << 
-                            ", access_time: " << (int)ptrDoCfg[i].access_time << 
-                            ", length: " << (int)ptrDoCfg[i].length <<
-                            ", data: ";
-                            for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
-                                std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
-                            std::cout << std::dec;
+        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length << ", data: ";
+        for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
+            std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
+        std::cout << std::dec;
         std::cout << std::endl;
+    }
+}
+
+void showASF_config(ASF_Config &asfCfg, uint8_t N_DO)
+{
+    std::string space4 = "    ";
+    ASF_Config *ptrAsfCfg = &asfCfg;
+    for (uint8_t i = 0; i < N_DO; i++)
+    {
+        std::cout << space4 << "DO_ID: " << (int)ptrAsfCfg[i].DO << ", Number of APEs connected with DO: " << (int)ptrAsfCfg[i].N << ", APE_KP (APE:PORT) = [ ";
+        for (int j = 0; j < ptrAsfCfg[i].N; ++j)
+        {
+            std::cout << (int)ptrAsfCfg[i].APE_KP[j].APE_number << ":" << (int)ptrAsfCfg[i].APE_KP[j].port_number; 
+            if ((j + 1) != ptrAsfCfg[i].N)
+            {
+                std::cout<< ", ";
+            }
+        }
+        std::cout << " ]" << std::endl;
     }
 }
 
@@ -169,35 +189,6 @@ DO_Config *getDoConfig(IrObjects &irObjects)
         doConfigRes[i].length = getDoConfig_length(elem);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
-#ifdef xxx
-
-        if (elem.getType() == "float")
-        {
-            do_section.DOs[i].size = sizeof(float);
-        }
-        if (elem.getPath() == "")
-        {
-            if (elem.getValue() != "")
-            {
-                if (elem.getType() == "float")
-                {
-                    do_section.DOs[i].length = sizeof(float);
-                    //***********************
-                    // convert float to bin (union)
-                    do_section.DOs[i].data = new uint8_t[sizeof(float)];
-                    auto bufData = stof(elem.getValue());
-                    memcpy(do_section.DOs[i].data, &bufData, sizeof(float));
-                }
-            }
-        }
-        else
-        {
-            do_section.DOs[i].length = elem.getPath().size();
-            do_section.DOs[i].data = new uint8_t[elem.getPath().size()];
-            auto bufData = elem.getPath().c_str();
-            memcpy(do_section.DOs[i].data, &bufData, elem.getPath().size());
-        }
-#endif
         i++;
     }
     return doConfigRes;
@@ -265,8 +256,6 @@ uint8_t getDoConfig_length(IrData &irData)
     return res;
 }
 
-
-
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
 {
     uint8_t *res = nullptr;
@@ -308,6 +297,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         }
         else if (irData.getType() == XML_TYPE_STRING)
         {
+            // todo: get data for string
             // res = irData.getValue().size();
         }
         else
@@ -318,26 +308,81 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     /* Filled path */
     else if (doPath.length() != 0)
     {
-        // open file
-        // read info
-        // check size
-        // std::cout << "p1" << std::endl;
         res = getFileData(doPath);
     }
-
-    // std::cout << "d0: " << doVal << ")" << " len = " << (int)len << std::endl;
-
-    // for (size_t i = 0; i < len; ++i)
-    //     std::cout <<std::hex << (int)res[i] << " ";
-    // std::cout << std::endl;
-    // std::cout << "d_end: " << doVal << ")" << std::endl;
 
     return res;
 }
 
 ASF_Config *getAsfConfig(IrObjects &irObjects)
 {
-    return NULL;
+    ASF_Config *asfConfigRes = new ASF_Config[irObjects.data.size()];
+    int i = 0;
+    for (auto &elem : irObjects.data)
+    {
+        asfConfigRes[i].DO = i;
+        asfConfigRes[i].N = getAsfConfig_numApe(elem, irObjects);
+        asfConfigRes[i].APE_KP = getAsfConfig_APE_KP(elem, asfConfigRes[i].N, irObjects);
+
+        i++;
+    }
+    return asfConfigRes;
+}
+
+uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects)
+{
+    uint8_t res = 0;
+    std::string dataId = irData.getId();
+
+    for (auto &elem : irObjects.links)
+    {
+        if (dataId.compare(elem.getDataId()) == 0)
+            res++;
+    }
+
+    return res;
+}
+
+ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects)
+{
+    ASF_variable_part *res = nullptr;
+    std::string dataId = irData.getId();
+
+    res = new ASF_variable_part[N];
+    int i = 0;
+    for (auto &elem : irObjects.links)
+    {
+        if (dataId.compare(elem.getDataId()) == 0)
+        {
+            res[i].APE_number = radioLib.getOpCode(elem.getOperatorId()); // associate with radio lib
+
+            /* input */
+            if (elem.getDir() == 0)
+            {
+                res[i].port_number = elem.getDataOrder();
+            }
+            /* output */
+            else
+            {
+                res[i].port_number = elem.getDataOrder() + numInputLink(elem.getOperatorId(), irObjects.links);
+            }
+            i++;
+        }
+    }
+
+    return res;
+}
+
+int numInputLink(std::string opId, std::vector<IrLink> &links)
+{
+    int res = 0;
+
+    for (auto &elem : links)
+    {
+        if ((opId.compare(elem.getOperatorId()) == 0) && (elem.getDir() == 0))
+            res++;
+    }
+    return res;
 }
 
 size_t getFileLen(std::string fileName)
@@ -354,9 +399,9 @@ size_t getFileLen(std::string fileName)
     return res;
 }
 
-uint8_t* getFileData(std::string fileName)
+uint8_t *getFileData(std::string fileName)
 {
-    uint8_t * res = nullptr;
+    uint8_t *res = nullptr;
     size_t fSize = 0;
 
     std::ifstream dataFile;

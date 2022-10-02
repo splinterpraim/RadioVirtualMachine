@@ -15,12 +15,15 @@
 #include "ir_operator.h"
 #include "ir_link.h"
 #include "frontend_compiler.h"
+#include "radio_library.hpp"
 
 #include "fc_glob.hpp"
 #include "fc_glob_func.hpp"
 
 // #include "../tests/include/test_ir_objects.h"
 fc_glob_t fc_glob;
+RadioLibrary radioLib;
+
 
 void create_xml_file(std::string file_name = "output.xml");
 
