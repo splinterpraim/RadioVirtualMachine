@@ -22,9 +22,10 @@ int main(int argc, char *argv[])
     try
     {
         progMem.init(10);
-        progMem.load("/home/xivvxx/buff/cfgfile");
+        progMem.load("./XML_files/bin/cfg1.bin");
         rvm_cfgCodeFetcher cfgFe;
         cfgFe.fetch(0);
+        cfgFe.showCfgCode();
         
 
     }

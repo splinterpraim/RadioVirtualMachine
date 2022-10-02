@@ -9,12 +9,14 @@
 
 struct ParseCfgCodeFlags_s
 {
+    uint8_t start = RESET_FLAG;
     uint8_t end = RESET_FLAG;
+    uint8_t stageCnt = RESET_FLAG;
     struct ControlSectionFlags
     {
         uint8_t LCF = RESET_FLAG;                            // 1 bit
         uint8_t NAF = RESET_FLAG;                            // 1 bit
-        uint8_t Task_ID = RESET_FLAG;                        // 8 bit
+        uint8_t Task_ID[2] = {RESET_FLAG, RESET_FLAG};       // 8 bit
         uint8_t RPI_version = RESET_FLAG;                    // 8 bit
         uint8_t Reference_ID = RESET_FLAG;                   // 8 bit
         uint8_t Implementation_version = RESET_FLAG;         // 8 bit
@@ -38,8 +40,14 @@ public:
      */
     int fetch(uint64_t cfgAddr);
 
+    /**
+     * @brief Show config code
+     * 
+     */
+    void showCfgCode();
+
 private:
-    ConfigObjects *cfgCode;
+    ConfigObjects *cfgCode = nullptr;
     ParseCfgCodeFlags parseFlags;
     int do_num;
     int ape_num;
