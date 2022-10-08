@@ -60,7 +60,13 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len);
 ASF_Config *getAsfConfig(IrObjects &irObjects);
 uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects);
 ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects);
-int numInputLink(std::string opId , std::vector<IrLink> &links);
+uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects);
+int getNumInputLink(std::string opId , std::vector<IrLink> &links);
+int getNumOutputLink(std::string opId, std::vector<IrLink> &links);
+APE_Config *getApeConfig(IrObjects &irObjects);
+uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects);
+uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects);
+
 /*  */
 size_t getFileLen(std::string fileName);
 uint8_t* getFileData(std::string fileName);

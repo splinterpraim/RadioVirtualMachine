@@ -43,21 +43,11 @@ int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
 
 int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {
+    APE_Section &apeSec = configObjects.apeSection;
+    apeSec.N_APE = irObjects.operators.size();
+    apeSec.APEs = getApeConfig(irObjects);
     return 0;
 }
-
-void filligControlSections(struct ControlSection &controlSection)
-{
-    controlSection.LCF = 1; // means that this is the last Configcode in the task
-    controlSection.NAF = 0; //
-    controlSection.Task_ID = 1;
-    controlSection.RPI_version = 1;  // version number of supported general radio programming interface
-    controlSection.Reference_ID = 1; // identifier of the reference Radio Library
-    controlSection.Implementation_version = 1;
-    controlSection.Developer_ID = 1;
-    controlSection.Creation_Date = 2022;
-}
-
 
 
 
@@ -166,6 +156,8 @@ int clearConfigObjects(ConfigObjects &cfgObj)
 {
     delete[] cfgObj.doSection.DOs->data;
     delete[] cfgObj.doSection.DOs;
+    delete[] cfgObj.doSection.ASFs->APE_KP;
+    delete[] cfgObj.doSection.ASFs;
     return 0;
 }
 

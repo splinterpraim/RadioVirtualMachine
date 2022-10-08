@@ -321,7 +321,7 @@ ASF_Config *getAsfConfig(IrObjects &irObjects)
     for (auto &elem : irObjects.data)
     {
         asfConfigRes[i].DO = i;
-        asfConfigRes[i].N = getAsfConfig_numApe(elem, irObjects);
+        asfConfigRes[i].N = getAsfConfig_numApe(elem, irObjects); //! cannot be more than 63
         asfConfigRes[i].APE_KP = getAsfConfig_APE_KP(elem, asfConfigRes[i].N, irObjects);
 
         i++;
@@ -350,21 +350,24 @@ ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irO
 
     res = new ASF_variable_part[N];
     int i = 0;
-    for (auto &elem : irObjects.links)
+
+    /* Iterations on links */
+    for (auto &link : irObjects.links)
     {
-        if (dataId.compare(elem.getDataId()) == 0)
+        /* Finds a link with a dataId field equal to IR dataId */
+        if (dataId.compare(link.getDataId()) == 0)
         {
-            res[i].APE_number = radioLib.getOpCode(elem.getOperatorId()); // associate with radio lib
+            res[i].APE_number = getApeOrderNum(link.getOperatorId(), irObjects);
 
             /* input */
-            if (elem.getDir() == 0)
+            if (link.getDir() == 0)
             {
-                res[i].port_number = elem.getDataOrder();
+                res[i].port_number = link.getDataOrder();
             }
             /* output */
             else
             {
-                res[i].port_number = elem.getDataOrder() + numInputLink(elem.getOperatorId(), irObjects.links);
+                res[i].port_number = link.getDataOrder() + getNumInputLink(link.getOperatorId(), irObjects.links);
             }
             i++;
         }
@@ -372,8 +375,24 @@ ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irO
 
     return res;
 }
+uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects)
+{
+    uint8_t apeOrderNum = 0;
+    
+    /* Iterations on operators */
+    for (auto & op : irObjects.operators)
+    {
+        /* Finds a operator */
+        if (apeId.compare(op.getId()) == 0)
+        {
+            break;
+        }
+        apeOrderNum++;
+    }
+    return apeOrderNum;
+}
 
-int numInputLink(std::string opId, std::vector<IrLink> &links)
+int getNumInputLink(std::string opId, std::vector<IrLink> &links)
 {
     int res = 0;
 
@@ -383,6 +402,76 @@ int numInputLink(std::string opId, std::vector<IrLink> &links)
             res++;
     }
     return res;
+}
+
+int getNumOutputLink(std::string opId, std::vector<IrLink> &links)
+{
+    int res = 0;
+
+    for (auto &elem : links)
+    {
+        if ((opId.compare(elem.getOperatorId()) == 0) && (elem.getDir() == 1))
+            res++;
+    }
+    return res;
+}
+
+APE_Config *getApeConfig(IrObjects &irObjects)
+{
+    APE_Config *apeConfigRes = new APE_Config[irObjects.operators.size()];
+    int i = 0;
+    for (auto &op : irObjects.operators)
+    {
+        apeConfigRes[i].APE_ID = i;
+        apeConfigRes[i].op_code = radioLib.getOpCode(op.getId()); // associate with radio lib
+        apeConfigRes[i].T = APE_T_STATIC;
+        apeConfigRes[i].NN = getApeNumPorts(op.getId(), irObjects);
+        apeConfigRes[i].cost = 10;
+        apeConfigRes[i].time = 10;
+        apeConfigRes[i].access_type = getAccessType(apeConfigRes[i].NN, op.getId(), irObjects);
+        i++;
+    }
+    return apeConfigRes;
+}
+
+uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
+{
+    //todo: check max size (3 bits available)
+    uint8_t apeNumPorts = 0;
+    
+    /* Iterations on links */
+    for (auto & link : irObjects.links)
+    {
+        /* Finds a link with a operatorId field equal to IR operatorId */
+        if (opId.compare(link.getOperatorId()) == 0)
+        {
+            apeNumPorts++;
+        }
+    }
+    return apeNumPorts;
+}
+
+uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
+{
+
+    //iterations on input -> access type = r
+    //iterations on output -> access type = w
+    uint8_t* accessType = new uint8_t[apeNumPorts];
+
+    int numInputLink = getNumInputLink(opId, irObjects.links);
+    int numOutputLink = getNumOutputLink(opId, irObjects.links);
+    
+    for (int i = 0; i < numInputLink; i++)
+    {
+        accessType[i] = APE_ACCESS_TYPE_R;
+    }
+
+    for (int i = 0; i < numOutputLink; i++)
+    {
+        accessType[i + numInputLink] = APE_ACCESS_TYPE_W;
+    }
+
+    return accessType;
 }
 
 size_t getFileLen(std::string fileName)

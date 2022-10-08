@@ -9,7 +9,7 @@ public:
 	/* Constructors */
 	IrLink(){};
 	IrLink(std::string dataId, std::string operatorId, int dir, int dataOrder)
-			:dataId(dataId), operatorId(operatorId), dir(dir), dataOrder(dataOrder)
+			:dataId(dataId), dataOrder(dataOrder), operatorId(operatorId), dir(dir) 
 			{};
 
 	/* Setters */
