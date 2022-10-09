@@ -49,8 +49,8 @@ void showControlSection(ControlSection &ctrlSec);
 void showDoSection(DO_Section &doSec);
 void showDO_Config(DO_Config &doCfg, uint8_t N_DO);
 void showASF_config(ASF_Config &asfCfg, uint8_t N_DO);
-
-
+void showApeSection(APE_Section &apeSec);
+void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE);
 
 /* Get config */
 DO_Config *getDoConfig(IrObjects &irObjects);

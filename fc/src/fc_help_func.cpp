@@ -173,6 +173,26 @@ void showASF_config(ASF_Config &asfCfg, uint8_t N_DO)
     }
 }
 
+void showApeSection(APE_Section &apeSec)
+{
+    std::string space = "  ";
+    std::cout << space << "N_APE: " << (int)apeSec.N_APE << std::endl;
+    std::cout << space << "APE_Config: " << std::endl;
+    showAPE_Config(*apeSec.APEs, apeSec.N_APE);
+}
+
+void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE)
+{
+    std::string space4 = "    ";
+    APE_Config *ptrApeCfg = &apeCfg;
+    for (uint16_t i = 0; i < N_APE; i++)
+    {
+        std::cout << space4 << "APE_ID: " << (int)ptrApeCfg[i].APE_ID << ", op code: " << (int)ptrApeCfg[i].op_code << ", T: " << (int)ptrApeCfg[i].T << ", NN: " << (int)ptrApeCfg[i].NN << ", cost: " << (int)ptrApeCfg[i].cost << ", time: " << (int)ptrApeCfg[i].time << ", access type: ";
+        for (size_t j = 0; j < ptrApeCfg[i].NN; ++j)
+            std::cout << (int)ptrApeCfg[i].access_type[j] << " ";
+        std::cout << std::endl;
+    }
+}
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
     //+todo: 1. type of file is not txt - it's binary.
@@ -453,9 +473,6 @@ uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
 
 uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
 {
-
-    //iterations on input -> access type = r
-    //iterations on output -> access type = w
     uint8_t* accessType = new uint8_t[apeNumPorts];
 
     int numInputLink = getNumInputLink(opId, irObjects.links);

@@ -150,6 +150,9 @@ void showConfigObjects(ConfigObjects & cfgObj)
     showControlSection(cfgObj.controlSection);
     std::cout << "DO Section: " << std::endl;
     showDoSection(cfgObj.doSection);
+    std::cout << "APE Section: " << std::endl;
+    showApeSection(cfgObj.apeSection);
+
 } 
 
 int clearConfigObjects(ConfigObjects &cfgObj)
