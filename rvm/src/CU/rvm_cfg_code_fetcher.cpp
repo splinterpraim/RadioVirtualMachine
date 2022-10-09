@@ -7,11 +7,35 @@
 #define PARSE_STATE_FINISH 0
 
 /* PARSE STAGES */
-#define PARSE_STAGE_ZERO 0
-#define PARSE_STAGE_ONE 1
-#define PARSE_STAGE_TWO 2
-#define PARSE_STAGE_THREE 3
-#define PARSE_STAGE_FOUR 4
+enum parseStage
+{
+    ctrlSec0 = 0,
+    ctrlSec1,
+    ctrlSec2,
+    ctrlSec3,
+    ctrlSec4,
+    ctrlSec5,
+    ctrlSec6,
+    ctrlSec7,
+    ctrlSec8,
+    doSec0,
+    doSec1
+};
+
+enum parseStageDoSec
+{
+    s0 = 0,
+    s1,
+    s2,
+    s3,
+    s4,
+    s5,
+    s6,
+    s7,
+    s8,
+    s9,
+    s10
+};
 
 /* Masks */
 #define MASK_ONE 0x01        /* 0000 0001 */
@@ -31,9 +55,6 @@ uint8_t binGetSecondBit(uint8_t byte)
 {
     return (byte >> 6) & (MASK_ONE);
 }
-
-
-
 
 rvm_cfgCodeFetcher::rvm_cfgCodeFetcher()
 {
@@ -74,17 +95,32 @@ void rvm_cfgCodeFetcher::showCfgCode()
     if (cfgCode != nullptr)
     {
         std::string space2 = "  ";
+        std::string space4 = "    ";
         /* Show controlSection */
 
         std::cout << "Control Section:" << std::endl;
-        std::cout << space2 << "LCF = " << (int) cfgCode->controlSection.LCF << std::endl;
-        std::cout << space2 << "NAF = " << (int) cfgCode->controlSection.NAF << std::endl;
-        std::cout << space2 << "Task_ID = " << (int) cfgCode->controlSection.Task_ID << std::endl;
-        std::cout << space2 << "RPI_version = " << (int) cfgCode->controlSection.RPI_version << std::endl;
-        std::cout << space2 << "Implementation_version = " << (int) cfgCode->controlSection.Implementation_version << std::endl;
+        std::cout << space2 << "LCF = " << (unsigned int)cfgCode->controlSection.LCF << std::endl;
+        std::cout << space2 << "NAF = " << (unsigned int)cfgCode->controlSection.NAF << std::endl;
+        std::cout << space2 << "Task_ID = " << (unsigned int)cfgCode->controlSection.Task_ID << std::endl;
+        std::cout << space2 << "RPI_version = " << (unsigned int)cfgCode->controlSection.RPI_version << std::endl;
+        std::cout << space2 << "Referenc_ID = " << (unsigned int)cfgCode->controlSection.Reference_ID << std::endl;
+        std::cout << space2 << "Implementation_version = " << (unsigned int)cfgCode->controlSection.Implementation_version << std::endl;
+        std::cout << space2 << "Developer_ID = " << (unsigned int)cfgCode->controlSection.Developer_ID << std::endl;
+        std::cout << space2 << "Creation_Date = " << (unsigned int)cfgCode->controlSection.Creation_Date << std::endl;
+        std::cout << std::endl;
+
+        std::cout << "DO Section:" << std::endl;
+        std::cout << space2 << "N_DO = " << (unsigned int)cfgCode->doSection.N_DO << std::endl;
+        std::cout << space2 << "DO_config:" << std::endl;
+        for (int i = 0; i < cfgCode->doSection.N_DO; ++i)
+        {
+            std::cout << space4 << "DO_ID = " << (unsigned int) cfgCode->doSection.DOs[i].DO_ID << ", ";
+            std::cout << space4 << "size = " << cfgCode->doSection.DOs[i].size << ", ";
+            std::cout << std::endl;
+        }
+        // showDoSection(cfgCode->doSection);
     }
 }
-
 
 /* private */
 int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgBin)
@@ -104,64 +140,211 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgBin)
         return 0;
     }
 
+    /* Control section parse */
+    if (parseFlags.ctrlSec != SET_FLAG)
+    {
+        /* Parse */
+        switch (parseFlags.stageCnt)
+        {
 
-    /* Parse */
-    switch (parseFlags.stageCnt)
-    {
+        case parseStage::ctrlSec0:
+        {
+            /* Fill Control Section
+                full -> LCF (+1 bit [1/1]), NAF (+1 bit [1/1])
+                partially -> Task_ID (+6 bits [6/8]) */
+            cfgCode->controlSection.LCF = binGetFirstBit(cfgBin);
+            cfgCode->controlSection.NAF = binGetSecondBit(cfgBin);
+            cfgCode->controlSection.Task_ID = (cfgBin & MASK_SIX_BITS_R) << 2; /* Get six bits from the right and shift on start left position */
+            break;
+        }
+        case parseStage::ctrlSec1:
+        {
+            /* Fill Control Section
+                full -> Task_ID (+2 bits [8/8])
+                partially -> RPI_version (+6 bits [6/8]) */
+            cfgCode->controlSection.Task_ID |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->controlSection.RPI_version = (cfgBin & MASK_SIX_BITS_R) << 2;
+            break;
+        }
+        case parseStage::ctrlSec2:
+        {
+            /* Fill Control Section
+                full -> RPI_version (+2 bits [8/8])
+                partially -> Reference_ID (+6 bits [6/8]) */
+            cfgCode->controlSection.RPI_version |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->controlSection.Reference_ID = (cfgBin & MASK_SIX_BITS_R) << 2;
+            break;
+        }
+        case parseStage::ctrlSec3:
+        {
+            /* Fill Control Section
+                full -> Reference_ID (+2 bits [8/8])
+                partially -> Implementation_version (+6 bits [6/8]) */
+            cfgCode->controlSection.Reference_ID |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->controlSection.Implementation_version = (cfgBin & MASK_SIX_BITS_R) << 2;
+            break;
+        }
+        case parseStage::ctrlSec4:
+        {
+            /* Fill Control Section
+                full -> Implementation_version (+2 bits [8/8])
+                partially -> Developer_ID (+6 bits [6/16]) */
+            cfgCode->controlSection.Implementation_version |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->controlSection.Developer_ID = (cfgBin & MASK_SIX_BITS_R) << 10;
+            break;
+        }
+        case parseStage::ctrlSec5:
+        {
+            /* Fill Control Section
+                partially -> Developer_ID (+8 bits [14/16]) */
+            cfgCode->controlSection.Developer_ID |= cfgBin << 2;
+            break;
+        }
+        case parseStage::ctrlSec6:
+        {
+            /* Fill Control Section
+                full -> Developer_ID (+2 bits [16/16])
+                partially -> Creation_date (+6 bits [6/16]) */
 
-    case PARSE_STAGE_ZERO:
-    {
-        /* Fill Control Section
-            full -> LCF (1 bit), NAF (1 bit)
-            partially -> Task_ID (6 bits) */
-        cfgCode->controlSection.LCF = binGetFirstBit(cfgBin);
-        cfgCode->controlSection.NAF = binGetSecondBit(cfgBin);
-        cfgCode->controlSection.Task_ID = (cfgBin & MASK_SIX_BITS_R) << 2; /* Get six bits from the right and shift on start left position */
-        break;
+            cfgCode->controlSection.Developer_ID |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->controlSection.Creation_Date = (cfgBin & MASK_SIX_BITS_R) << 10;
+            break;
+        }
+        case parseStage::ctrlSec7:
+        {
+            /* Fill Control Section
+                partially -> Creation_date (+8 bits [14/16]) */
+            cfgCode->controlSection.Creation_Date |= cfgBin << 2;
+            break;
+        }
+        case parseStage::ctrlSec8:
+        {
+            /* Fill Control Section
+                full -> Creation_date (+2 bits [16/16])
+                partially -> doSection.N_DO (+6 bits [6/8]) */
+            cfgCode->controlSection.Creation_Date |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
+            cfgCode->doSection.N_DO = (cfgBin & MASK_SIX_BITS_R) << 2;
+            parseFlags.ctrlSec = SET_FLAG;
+            break;
+        }
+
+        default:
+            break;
+        }
+        parseFlags.stageCnt++;
     }
 
-    case PARSE_STAGE_ONE:
+    /* DO section parse */
+    else if (parseFlags.doSec.end != SET_FLAG)
     {
-        /* Fill Control Section
-            full -> Task_ID (2 bits)
-            partially -> RPI_version (6 bits) */
-        cfgCode->controlSection.Task_ID &= ((cfgBin >> 6) & MASK_TWO_BITS_R);
-        cfgCode->controlSection.RPI_version = (cfgBin & MASK_SIX_BITS_R) << 2;
-        break;
-    }
-    case PARSE_STAGE_TWO:
-    {
-        /* Fill Control Section
-            full -> RPI_version (2 bits)
-            partially -> Reference_ID (6 bits) */
-        cfgCode->controlSection.RPI_version &= ((cfgBin >> 6) & MASK_TWO_BITS_R);
-        cfgCode->controlSection.Reference_ID = (cfgBin & MASK_SIX_BITS_R) << 2;
-        break;
-    }
-    case PARSE_STAGE_THREE:
-    {
-        /* Fill Control Section
-            full -> Reference_ID (2 bits)
-            partially -> Implementation_version (6 bits) */
-        cfgCode->controlSection.Reference_ID &= ((cfgBin >> 6) & MASK_TWO_BITS_R);
-        cfgCode->controlSection.Implementation_version = (cfgBin & MASK_SIX_BITS_R) << 2;
-        break;
-    }
-    case PARSE_STAGE_FOUR:
-    {
-        /* Fill Control Section
-            full -> Implementation_version (2 bits)
-            partially -> Developer_ID (6 bits) */
-        cfgCode->controlSection.Implementation_version &= ((cfgBin >> 6) & MASK_TWO_BITS_R);
-        cfgCode->controlSection.Developer_ID = (cfgBin & MASK_SIX_BITS_R) << 2;
-        parseState = PARSE_STATE_FINISH; //! THIS
-        break;
-    }
+        
+            /* Start DO section parse */
+            if (parseFlags.doSec.start == RESET_FLAG)
+            {
+                /* Fill DO Section
+                    full -> N_DO (+2 bits [8/8]) */
+                cfgCode->doSection.N_DO |= ((cfgBin >> 6) & MASK_TWO_BITS_R);
 
-    default:
-        break;
+                /* Create DO_configs & ASF_configs */
+                cfgCode->doSection.DOs = new DO_Config[cfgCode->doSection.N_DO];
+                cfgCode->doSection.ASFs = new ASF_Config[cfgCode->doSection.N_DO];
+                parseFlags.doSec.start = SET_FLAG;
+            }
+
+
+            /* DO_config parse */
+            if (parseFlags.doSec.doCfg.start == RESET_FLAG)
+            {
+                uint8_t index = parseFlags.doSec.Ncnt;
+
+                // DO_ID 1 byte
+                if(parseFlags.doSec.doCfg.DO_ID == RESET_FLAG)
+                {
+                    if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s0 )
+                    {
+                        cfgCode->doSection.DOs[index].DO_ID = (cfgBin & MASK_SIX_BITS_R) << 2; /* -> DO_ID (+6 bits [6/8]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+                    }
+                    else 
+                    {
+                        cfgCode->doSection.DOs[index].DO_ID |= ((cfgBin >> 6) & MASK_TWO_BITS_R); /* -> DO_ID (+2 bits [8/8]) */
+                        cfgCode->doSection.DOs[index].size = (cfgBin & MASK_SIX_BITS_R) << (32 - 6); /* -> size (+6 bits [6/32]) */
+                        
+                        parseFlags.doSec.doCfg.DO_ID = SET_FLAG;
+                        parseFlags.doSec.doCfg.stageCnt = RESET_FLAG;
+                    }
+                    
+
+                }
+                else if (parseFlags.doSec.doCfg.size == RESET_FLAG)
+                {
+                    /* Add first/second bytes to doSection.DOs[index].size  */
+                    if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s0 )
+                    {
+                        cfgCode->doSection.DOs[index].size |= cfgBin << (26 - 8); /* -> size (+8 bits [14/32]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+                    }
+                    /* Add third bytes to doSection.DOs[index].size  */
+                    else if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s1 )
+                    {
+                        cfgCode->doSection.DOs[index].size |= cfgBin << (18 - 8);  /* -> size (+8 bits [22/32]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+                    }
+                    /* Add fourth bytes to doSection.DOs[index].size  */
+                    else if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s2 )
+                    {
+                        cfgCode->doSection.DOs[index].size |= cfgBin << (10 - 8); /* -> size (+8 bits [30/32]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+                    }
+                    /* Add 5 bytes to doSection.DOs[index].size  */
+                    else if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s3 )
+                    {
+                        cfgCode->doSection.DOs[index].size |= ((cfgBin >> 6) & MASK_TWO_BITS_R); /* -> size (+2 bits [32/32]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+
+                        parseFlags.doSec.doCfg.stageCnt = RESET_FLAG;
+                        parseFlags.doSec.doCfg.size  = SET_FLAG;
+                        parseFlags.doSec.doCfg.start = SET_FLAG;
+                    }
+
+
+                }
+                // size 4 byte
+                // access time 4 byte
+                // len 1 byte
+                // data % byte
+
+                /* 
+                uint8_t DO_ID;          //* Identificator of data
+                uint32_t size;          //* Maximum data size in bytes
+                uint32_t access_time;   //* Access time in ns
+                uint8_t length;         //* Current size of data (max 256 bytes of data)
+                uint8_t *data;          //* Pointer to data
+                 */
+            }
+
+            /* ASF_config parse */
+            // else if(parseFlags.doSec.asfCfg == RESET_FLAG)
+            // {
+            //     parseFlags.doSec.Ncnt++;
+            //     /* Check End DO section parse */
+            //     if (parseFlags.doSec.Ncnt >= cfgCode->doSection.N_DO)
+            //     {
+            //         //end doSec parse
+            //         parseFlags.doSec.end = SET_FLAG;
+            //         parseState = PARSE_STATE_FINISH; //! THIS
+
+            //     }
+            // }
+                
+            
+
+            
+
+            
+            
+
     }
-    parseFlags.stageCnt++;
 
     return parseState;
 }
@@ -171,16 +354,17 @@ void rvm_cfgCodeFetcher::clearParseFlags()
     parseFlags.start = RESET_FLAG;
     parseFlags.end = RESET_FLAG;
     parseFlags.stageCnt = RESET_FLAG;
+    parseFlags.ctrlSec = RESET_FLAG;
+    parseFlags.doSec.start = RESET_FLAG;
+    parseFlags.doSec.end = RESET_FLAG;
+    parseFlags.doSec.Ncnt = RESET_FLAG;
 
-    /* Reset control section */
-    parseFlags.ctrlSec.LCF = RESET_FLAG;
-    parseFlags.ctrlSec.NAF = RESET_FLAG;
-    // parseFlags.ctrlSec.Task_ID = RESET_FLAG;
-    parseFlags.ctrlSec.RPI_version = RESET_FLAG;
-    parseFlags.ctrlSec.Reference_ID = RESET_FLAG;
-    parseFlags.ctrlSec.Implementation_version = RESET_FLAG;
-    parseFlags.ctrlSec.Developer_ID[0] = RESET_FLAG;
-    parseFlags.ctrlSec.Developer_ID[1] = RESET_FLAG;
-    parseFlags.ctrlSec.Creation_Date[0] = RESET_FLAG;
-    parseFlags.ctrlSec.Creation_Date[1] = RESET_FLAG;
+    parseFlags.doSec.doCfg.start = RESET_FLAG;
+    parseFlags.doSec.doCfg.DO_ID = RESET_FLAG;
+    parseFlags.doSec.doCfg.size = RESET_FLAG;
+    parseFlags.doSec.doCfg.access_time = RESET_FLAG;
+    parseFlags.doSec.doCfg.length = RESET_FLAG;
+    parseFlags.doSec.doCfg.data = RESET_FLAG;
+
+    parseFlags.doSec.asfCfg = RESET_FLAG;
 }

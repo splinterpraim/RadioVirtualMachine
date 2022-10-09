@@ -12,17 +12,27 @@ struct ParseCfgCodeFlags_s
     uint8_t start = RESET_FLAG;
     uint8_t end = RESET_FLAG;
     uint8_t stageCnt = RESET_FLAG;
-    struct ControlSectionFlags
-    {
-        uint8_t LCF = RESET_FLAG;                            // 1 bit
-        uint8_t NAF = RESET_FLAG;                            // 1 bit
-        uint8_t Task_ID[2] = {RESET_FLAG, RESET_FLAG};       // 8 bit
-        uint8_t RPI_version = RESET_FLAG;                    // 8 bit
-        uint8_t Reference_ID = RESET_FLAG;                   // 8 bit
-        uint8_t Implementation_version = RESET_FLAG;         // 8 bit
-        uint8_t Developer_ID[2] = {RESET_FLAG, RESET_FLAG};  // in stand 16 , but 15 bits
-        uint8_t Creation_Date[2] = {RESET_FLAG, RESET_FLAG}; // in stand 16 , but 17 bits
-    } ctrlSec;
+    uint8_t ctrlSec = RESET_FLAG;
+    struct doSec_s
+    {   
+        uint8_t end = RESET_FLAG;
+        uint8_t start = RESET_FLAG;
+        uint8_t Ncnt = RESET_FLAG;
+        struct doCfg_s
+        {
+            uint8_t start = RESET_FLAG;
+            uint8_t DO_ID = RESET_FLAG;
+            uint8_t size = RESET_FLAG;
+            uint8_t access_time = RESET_FLAG;
+            uint8_t length = RESET_FLAG;
+            uint8_t data = RESET_FLAG;
+            uint8_t stageCnt = RESET_FLAG;
+        } doCfg;
+        
+        uint8_t asfCfg = RESET_FLAG;
+
+    }doSec;
+  
 };
 using ParseCfgCodeFlags = struct ParseCfgCodeFlags_s;
 
