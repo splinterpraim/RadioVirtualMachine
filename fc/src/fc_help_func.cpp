@@ -457,6 +457,7 @@ APE_Config *getApeConfig(IrObjects &irObjects)
 uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
 {
     //todo: check max size (3 bits available)
+    //todo: get result from refference radiolibrary (example: operator "multiple" => number of ports = 3 )
     uint8_t apeNumPorts = 0;
     
     /* Iterations on links */
