@@ -25,7 +25,7 @@ IrOperator convertToIrOperator(pugi::xml_node &op_xml)
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
-
+    op.setOpcode(op_xml.attribute("opcode").value());
     return op;
 }
 
@@ -46,7 +46,8 @@ void showIrOperators(const std::vector<IrOperator> &operators)
     for (auto el : operators)
     {
         std::cout << "id = " << el.getId() << ", "
-                  << "type = " << el.getType() << std::endl;
+                  << "type = " << el.getType() << ", "
+                  << "opcode = " << el.getOpcode() << std::endl;
     }
 }
 
@@ -442,8 +443,13 @@ APE_Config *getApeConfig(IrObjects &irObjects)
     int i = 0;
     for (auto &op : irObjects.operators)
     {
+        if (!checkNumPorts(op, irObjects))
+        {
+            throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in XML and radiolib!"));
+
+        }
         apeConfigRes[i].APE_ID = i;
-        apeConfigRes[i].op_code = radioLib.getOpCode(op.getId()); // associate with radio lib
+        apeConfigRes[i].op_code = std::stoul(op.getOpcode()); 
         apeConfigRes[i].T = APE_T_STATIC;
         apeConfigRes[i].NN = getApeNumPorts(op.getId(), irObjects);
         apeConfigRes[i].cost = 10;
@@ -490,6 +496,21 @@ uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjec
     }
 
     return accessType;
+}
+
+bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects)
+{
+    int numInputLink = getNumInputLink(irOperator.getId(), irObjects.links);
+    int numOutputLink = getNumOutputLink(irOperator.getId(), irObjects.links);
+
+    IOPortsCnt numIOPortsLib = radioLib.getIOPortsCnt(std::stoul(irOperator.getOpcode()));
+
+    if ((numInputLink == numIOPortsLib.input) && (numOutputLink == numIOPortsLib.output))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 size_t getFileLen(std::string fileName)

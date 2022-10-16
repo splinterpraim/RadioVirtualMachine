@@ -66,6 +66,7 @@ int getNumOutputLink(std::string opId, std::vector<IrLink> &links);
 APE_Config *getApeConfig(IrObjects &irObjects);
 uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects);
 uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects);
+bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects);
 
 /*  */
 size_t getFileLen(std::string fileName);

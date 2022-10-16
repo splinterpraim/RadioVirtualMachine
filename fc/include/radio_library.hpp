@@ -4,15 +4,23 @@
 #include <string>
 #include <map>
 
+struct IOPortsCnt_s
+{
+    int input;
+    int output;
+};
+using IOPortsCnt = struct IOPortsCnt_s;
+
 class RadioLibrary
 {
 
 public:
     RadioLibrary();
     int getOpCode(std::string operatorId);
+    IOPortsCnt getIOPortsCnt(int opcode);
 
 private:
-    std::map<std::string, int> opCodeTable;
+    std::map<int, IOPortsCnt> opCodeTable;
 
 };
 #endif // RADIO_LIBRARY_HPP

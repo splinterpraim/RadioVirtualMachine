@@ -5,17 +5,18 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <fstream>
 #include "fc_help_func.hpp"
 
-
-
-
+#define MASK_LOW_BIT 0x01 /* 0000 0001 */
+#define MASK_MS_6_BIT 0xfc /* 1111 1100 */
+#define MASK_LS_2_BIT 0x03 /* 0000 0011 */
+#define MASK_1_BYTE 0xff /* 1111 1111 */
 
 
 int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects);
 int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects);
 int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects);
-
 
 int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {
@@ -48,15 +49,6 @@ int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
     apeSec.APEs = getApeConfig(irObjects);
     return 0;
 }
-
-
-
-
-
-
-
-
-
 
 /* Main functions */
 IrObjects parseSWIR(const std::string &fileNameSWIR)
@@ -144,7 +136,7 @@ ConfigObjects convert2rvmIr(IrObjects &irObjects)
     return configObjects;
 }
 
-void showConfigObjects(ConfigObjects & cfgObj)
+void showConfigObjects(ConfigObjects &cfgObj)
 {
     std::cout << "Control Section: " << std::endl;
     showControlSection(cfgObj.controlSection);
@@ -152,8 +144,7 @@ void showConfigObjects(ConfigObjects & cfgObj)
     showDoSection(cfgObj.doSection);
     std::cout << "APE Section: " << std::endl;
     showApeSection(cfgObj.apeSection);
-
-} 
+}
 
 int clearConfigObjects(ConfigObjects &cfgObj)
 {
@@ -164,4 +155,43 @@ int clearConfigObjects(ConfigObjects &cfgObj)
     return 0;
 }
 
+void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
+{
 
+    uint8_t curbyte = 0;
+
+    std::ofstream cfgF(fileNameBin, std::ios::binary);
+    {
+        /* Control Section */
+
+        //create byte 1
+        curbyte = (cfgObj.controlSection.LCF & MASK_LOW_BIT) << 7;         
+        curbyte |= (cfgObj.controlSection.NAF & MASK_LOW_BIT) << 6;
+        curbyte |= (cfgObj.controlSection.Task_ID & MASK_MS_6_BIT) >> 2;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //create byte 2
+        curbyte = (cfgObj.controlSection.Task_ID & MASK_LS_2_BIT) << 6;
+        curbyte |= (cfgObj.controlSection.RPI_version & MASK_MS_6_BIT) >> 2;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //create byte 3
+        curbyte = (cfgObj.controlSection.RPI_version & MASK_LS_2_BIT) << 6;
+        curbyte |= (cfgObj.controlSection.Reference_ID & MASK_MS_6_BIT) >> 2;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //create byte 4
+        curbyte = (cfgObj.controlSection.Reference_ID & MASK_LS_2_BIT) << 6;
+        curbyte |= (cfgObj.controlSection.Implementation_version & MASK_MS_6_BIT) >> 2;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //create byte 5
+        curbyte = (cfgObj.controlSection.Implementation_version & MASK_LS_2_BIT) << 6;
+        curbyte |= ((cfgObj.controlSection.Developer_ID << 8) & MASK_MS_6_BIT) >> 2;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //create byte 6
+        curbyte = (cfgObj.controlSection.Developer_ID >> 2)& MASK_1_BYTE;
+        cfgF.write((char *)&curbyte, sizeof(curbyte));
+
+        /* DO Section */
+        /* APE Section */
+
+    }
+    cfgF.close();
+}

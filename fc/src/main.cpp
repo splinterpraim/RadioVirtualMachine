@@ -38,19 +38,25 @@ int main(int argc, char *argv[])
         fc_glob_set();
 
 
-        std::string file_name = "./XML_files/AlgScalar2.xml";
+        std::string file_nameSWIR = "./XML_files/AlgScalar2.xml";
+        std::string file_nameBin = "./config_codes/cfgcode1.bin";
+
         if (argc == 2)
         {
-            file_name = argv[1];
+            file_nameSWIR = argv[1];
         }
 
         FC_LOG("----- parseSWIR");
-        struct IrObjects irObjects = parseSWIR(file_name);
+        struct IrObjects irObjects = parseSWIR(file_nameSWIR);
         showIrObjects(irObjects);
 
         FC_LOG("----- convert2rvmIr");
         ConfigObjects configObjects = convert2rvmIr(irObjects);
         showConfigObjects(configObjects);
+
+        FC_LOG("----- create RVM configcode");
+        createRVMcfgcode(configObjects, file_nameBin);
+
         clearConfigObjects(configObjects);
     }
     catch (const std::exception &e)
