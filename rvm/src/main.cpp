@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
 {
     try
     {
+    // todo: replace progMem cfgFe code in Rvm run
+
         progMem.init(10);
         progMem.load("./XML_files/bin/cfg1.bin");
         rvm_cfgCodeFetcher cfgFe;

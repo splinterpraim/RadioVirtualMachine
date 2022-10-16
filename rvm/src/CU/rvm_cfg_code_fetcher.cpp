@@ -46,6 +46,9 @@ enum parseStageDoSec
 
 extern rvm_ProgramMemory progMem;
 
+
+
+
 uint8_t binGetFirstBit(uint8_t byte)
 {
     return (byte >> 7) & (MASK_ONE);
@@ -64,7 +67,14 @@ rvm_cfgCodeFetcher::~rvm_cfgCodeFetcher()
 {
 }
 
-int rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
+void rvm_cfgCodeFetcher::associate(rvm_ProgramMemory &programMemory)
+{
+    this->programMemory = &programMemory;
+}
+
+// todo: rename progMem on programMemory
+
+ConfigObjects * rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
 {
     uint64_t progMemSize = progMem.getSize();
 
@@ -87,7 +97,9 @@ int rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
             break;
         }
     }
-    return 0;
+
+    
+    return cfgCode;
 }
 
 void rvm_cfgCodeFetcher::showCfgCode()
@@ -257,7 +269,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgBin)
             {
                 uint8_t index = parseFlags.doSec.Ncnt;
 
-                // DO_ID 1 byte
+                /* DO_config.DO_ID parse 1 byte */
                 if(parseFlags.doSec.doCfg.DO_ID == RESET_FLAG)
                 {
                     if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s0 )
@@ -273,9 +285,9 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgBin)
                         parseFlags.doSec.doCfg.DO_ID = SET_FLAG;
                         parseFlags.doSec.doCfg.stageCnt = RESET_FLAG;
                     }
-                    
-
                 }
+
+                /* DO_config.size parse 4 byte */
                 else if (parseFlags.doSec.doCfg.size == RESET_FLAG)
                 {
                     /* Add first/second bytes to doSection.DOs[index].size  */
@@ -300,14 +312,27 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgBin)
                     else if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s3 )
                     {
                         cfgCode->doSection.DOs[index].size |= ((cfgBin >> 6) & MASK_TWO_BITS_R); /* -> size (+2 bits [32/32]) */
-                        parseFlags.doSec.doCfg.stageCnt++;
+                        cfgCode->doSection.DOs[index].access_time = (cfgBin & MASK_SIX_BITS_R) << (32 - 6); /* -> size (+6 bits [6/32]) */
+                        
 
                         parseFlags.doSec.doCfg.stageCnt = RESET_FLAG;
                         parseFlags.doSec.doCfg.size  = SET_FLAG;
-                        parseFlags.doSec.doCfg.start = SET_FLAG;
+                        
                     }
 
 
+                }
+
+                /* DO_config.access_time parse 4 byte */
+                else if (parseFlags.doSec.doCfg.access_time == RESET_FLAG)
+                {
+                    /* Add first/second bytes to doSection.DOs[index].access_time  */
+                    if ( parseFlags.doSec.doCfg.stageCnt ==  parseStageDoSec::s0 )
+                    {
+                        cfgCode->doSection.DOs[index].size |= cfgBin << (26 - 8); /* -> size (+8 bits [14/32]) */
+                        parseFlags.doSec.doCfg.stageCnt++;
+                    }
+                    parseFlags.doSec.doCfg.start = SET_FLAG;
                 }
                 // size 4 byte
                 // access time 4 byte

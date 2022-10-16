@@ -7,9 +7,16 @@
 /* Project Headers */
 #include "class_definition.h"
 #include "rvm_structs.h"
+#include "CU/rvm_cfg_code_fetcher.hpp"
+#include "CU/rvm_data_path_configuration_block.hpp"
 #include "DO/data_object.h"
 #include "APE/abstract_processing_element.h"
 #include "ASF/abstract_switch_fabric.h"
+
+#include "rvm_program_mem.hpp"
+#include "rvm_basic_operations.hpp"
+#include "rvm_data_path.hpp"
+
 
 #include "config_code_structure.hpp"
 
@@ -32,6 +39,20 @@ namespace rvm
         /* Destructor */
         ~ControlUnit();
 
+
+        /* Work function */
+        void work();
+
+
+        /**
+         * @brief Associates Control Unit with other related blocks
+         * 
+         * @param programMemory 
+         * @param basicOperations 
+         * @param dataPath 
+         */
+        void associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath);
+
         
         /* Configuring */
         int configuringDataObjects();
@@ -50,6 +71,17 @@ namespace rvm
         AbstractSwitchFabric *abstractSwitchFabric = nullptr; 
         size_t dataObjects_size = 0; 
         size_t abstractProcessingElements_size = 0; 
+
+        uint32_t cfgCounter = 0;
+        rvm_cfgCodeFetcher cfgFetcher;
+        rvm_dataPathConfigurationBlock cfgnBlock;
+
+
+
+        /* Associated objects */
+        rvm_ProgramMemory * programMemory;
+        rvm_BasicOperations * basicOperations;
+        rvm_DataPath * dataPath;
 
 
     };

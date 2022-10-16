@@ -9,6 +9,23 @@ rvm::ControlUnit::~ControlUnit()
     delete abstractSwitchFabric;
 }
 
+void rvm::ControlUnit::work()
+{
+
+    cfgFetcher.associate(*programMemory);
+    ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
+
+
+}
+
+void rvm::ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath)
+{
+    this->programMemory = &programMemory;
+    this->basicOperations = &basicOperations;
+    this->dataPath = &dataPath;
+}
+
+
 int rvm::ControlUnit::configuringDataObjects()
 {
     LogManager("DO.log").clear();
@@ -88,13 +105,13 @@ int rvm::ControlUnit::configuringAbstractSwitchFabric()
             /* Range on related APE */
             for (int j = 0; j < record.N; j++)
             {
-                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number,record.APE_KP[j].port_number);
+                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number, record.APE_KP[j].port_number);
 
                 /* Create connectors between data ports (dataId) and next available processing ports  */
                 abstractSwitchFabric->createConnector(i, (i + j), dir); // other approach to identify connectors without i , i + j
             }
             //************************************************************************************************
-             delete [] record.APE_KP;
+            delete[] record.APE_KP;
             //************************************************************************************************
         }
     }
@@ -278,17 +295,16 @@ int getDirectionFromAPE(uint8_t APE_number, uint8_t port_number)
 {
     /* return - 0 - from data port to processing port,
                                    1 - from processing port to data port */
-    if ((APE_number == 0) || (APE_number == 1) ||  (APE_number == 2))
+    if ((APE_number == 0) || (APE_number == 1) || (APE_number == 2))
     {
-        if((port_number == 0) || (port_number == 1))
+        if ((port_number == 0) || (port_number == 1))
         {
-            return 0; 
+            return 0;
         }
-        else if(port_number == 2)
+        else if (port_number == 2)
         {
-            return 1; 
+            return 1;
         }
     }
     return -1;
-
 }

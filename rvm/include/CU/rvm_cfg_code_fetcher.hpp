@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include "config_code_structure.hpp"
+#include "rvm_program_mem.hpp"
 
 #define SET_FLAG 1
 #define RESET_FLAG 0
@@ -14,7 +15,7 @@ struct ParseCfgCodeFlags_s
     uint8_t stageCnt = RESET_FLAG;
     uint8_t ctrlSec = RESET_FLAG;
     struct doSec_s
-    {   
+    {
         uint8_t end = RESET_FLAG;
         uint8_t start = RESET_FLAG;
         uint8_t Ncnt = RESET_FLAG;
@@ -28,11 +29,10 @@ struct ParseCfgCodeFlags_s
             uint8_t data = RESET_FLAG;
             uint8_t stageCnt = RESET_FLAG;
         } doCfg;
-        
+
         uint8_t asfCfg = RESET_FLAG;
 
-    }doSec;
-  
+    } doSec;
 };
 using ParseCfgCodeFlags = struct ParseCfgCodeFlags_s;
 
@@ -42,17 +42,19 @@ public:
     rvm_cfgCodeFetcher();
     ~rvm_cfgCodeFetcher();
 
+    void associate(rvm_ProgramMemory &programMemory);
+
     /**
      * @brief Fetch config code from program memory
      *
-     * @param cfgAddr Start address
-     * @return Configcode
+     * @param[in] cfgAddr Start address
+     * @return Config Objects
      */
-    int fetch(uint64_t cfgAddr);
+    ConfigObjects *fetch(uint64_t cfgAddr);
 
     /**
      * @brief Show config code
-     * 
+     *
      */
     void showCfgCode();
 
@@ -61,6 +63,9 @@ private:
     ParseCfgCodeFlags parseFlags;
     int do_num;
     int ape_num;
+
+    /* Associated objects */
+    rvm_ProgramMemory *programMemory;
 
     int parseCfgCode(uint8_t &cfgBin);
     void clearParseFlags();
