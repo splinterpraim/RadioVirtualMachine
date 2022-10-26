@@ -8,11 +8,10 @@
 #include <fstream>
 #include "fc_help_func.hpp"
 
-#define MASK_LOW_BIT 0x01 /* 0000 0001 */
+#define MASK_LOW_BIT 0x01  /* 0000 0001 */
 #define MASK_MS_6_BIT 0xfc /* 1111 1100 */
 #define MASK_LS_2_BIT 0x03 /* 0000 0011 */
-#define MASK_1_BYTE 0xff /* 1111 1111 */
-
+#define MASK_1_BYTE 0xff   /* 1111 1111 */
 
 int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects);
 int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects);
@@ -155,6 +154,13 @@ int clearConfigObjects(ConfigObjects &cfgObj)
     return 0;
 }
 
+#define CFG_WRITE(v)                                        \
+    for (int i = sizeof(v); i > 0; i--)                     \
+    {                                                       \
+        uint8_t new_v = (v >> (8 * (i - 1))) & MASK_1_BYTE; \
+        cfgF.write((char *)&(new_v), sizeof(char));         \
+    }
+
 void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
 {
 
@@ -163,35 +169,51 @@ void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
     std::ofstream cfgF(fileNameBin, std::ios::binary);
     {
         /* Control Section */
+        ControlSection &ctrlSec = cfgObj.controlSection;
 
-        //create byte 1
-        curbyte = (cfgObj.controlSection.LCF & MASK_LOW_BIT) << 7;         
-        curbyte |= (cfgObj.controlSection.NAF & MASK_LOW_BIT) << 6;
-        curbyte |= (cfgObj.controlSection.Task_ID & MASK_MS_6_BIT) >> 2;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //create byte 2
-        curbyte = (cfgObj.controlSection.Task_ID & MASK_LS_2_BIT) << 6;
-        curbyte |= (cfgObj.controlSection.RPI_version & MASK_MS_6_BIT) >> 2;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //create byte 3
-        curbyte = (cfgObj.controlSection.RPI_version & MASK_LS_2_BIT) << 6;
-        curbyte |= (cfgObj.controlSection.Reference_ID & MASK_MS_6_BIT) >> 2;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //create byte 4
-        curbyte = (cfgObj.controlSection.Reference_ID & MASK_LS_2_BIT) << 6;
-        curbyte |= (cfgObj.controlSection.Implementation_version & MASK_MS_6_BIT) >> 2;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //create byte 5
-        curbyte = (cfgObj.controlSection.Implementation_version & MASK_LS_2_BIT) << 6;
-        curbyte |= ((cfgObj.controlSection.Developer_ID << 8) & MASK_MS_6_BIT) >> 2;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //create byte 6
-        curbyte = (cfgObj.controlSection.Developer_ID >> 2)& MASK_1_BYTE;
-        cfgF.write((char *)&curbyte, sizeof(curbyte));
+        // LCF, NAF
+        curbyte = (ctrlSec.LCF & MASK_LOW_BIT) << 7;
+        curbyte |= (ctrlSec.NAF & MASK_LOW_BIT) << 6;
+        CFG_WRITE(curbyte)
+        CFG_WRITE(ctrlSec.Creation_Date)
+        // cfgF.write((char *)&curbyte, sizeof(curbyte));
+
+        // // Task_ID
+        // cfgF.write((char *)&ctrlSec.Task_ID, sizeof(ctrlSec.Task_ID));
+
+        // // RPI_version
+        // cfgF.write((char *)&ctrlSec.RPI_version, sizeof(ctrlSec.RPI_version));
+
+        // // Reference_ID
+        // cfgF.write((char *)&ctrlSec.Reference_ID, sizeof(ctrlSec.Reference_ID));
+
+        // // Implementation_version
+        // cfgF.write((char *)&(ctrlSec.Implementation_version), sizeof(ctrlSec.Implementation_version));
+
+        // // Developer_ID
+        // curbyte = (ctrlSec.Developer_ID >> 8) & MASK_1_BYTE;
+        // cfgF.write((char *)&curbyte, sizeof(curbyte));
+        // curbyte = ctrlSec.Developer_ID & MASK_1_BYTE;
+        // cfgF.write((char *)&curbyte, sizeof(curbyte));
+
+        // Creation_Date
+        // cfgF.write((char *)&(ctrlSec.Creation_Date), sizeof(ctrlSec.Creation_Date));
 
         /* DO Section */
-        /* APE Section */
 
+        // create byte 10
+        //  curbyte = cfgObj.doSection.N_DO;
+        //  cfgF.write((char *)&curbyte, sizeof(curbyte));
+
+        // for (uint8_t i = 0; i < cfgObj.doSection.N_DO; i++)
+        // {
+        //     curbyte = cfgObj.doSection.DOs[i].DO_ID;
+        //     cfgF.write((char *)&curbyte, sizeof(curbyte));
+        //     curbyte = cfgObj.doSection.DOs[i].size
+
+        // }
+
+        /* APE Section */
     }
     cfgF.close();
 }

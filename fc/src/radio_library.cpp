@@ -1,5 +1,9 @@
 #include "radio_library.hpp"
 
+
+// need different opcodes for typisation
+// what needs to do for complex operators (now there is no opcode for them)
+
 RadioLibrary::RadioLibrary()
 {
     opCodeTable[2] = {2,1}; 
