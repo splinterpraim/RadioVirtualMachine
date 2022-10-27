@@ -296,9 +296,9 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         if (irData.getType() == XML_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
-            if (fc_glob.endian == CMN_BIG_ENDIAN)
+            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
             {
-                intVal = convertToLittleEndian(intVal);
+                intVal = reverseEndian(intVal);
             }
 
             res = new uint8_t[len];
@@ -310,7 +310,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             //! need convert to endians
             // if (fc_glob.endian == CMN_BIG_ENDIAN)
             // {
-            //     fltVal = convertToLittleEndian(fltVal);
+            //     fltVal = reverseEndian(fltVal);
             // }
 
             res = new uint8_t[len];

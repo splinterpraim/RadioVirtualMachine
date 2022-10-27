@@ -11,6 +11,7 @@
 #define MASK_LOW_BIT 0x01  /* 0000 0001 */
 #define MASK_MS_6_BIT 0xfc /* 1111 1100 */
 #define MASK_LS_2_BIT 0x03 /* 0000 0011 */
+#define MASK_LS_3_BIT 0x07 /* 0000 0111 */
 #define MASK_1_BYTE 0xff   /* 1111 1111 */
 
 int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects);
@@ -154,11 +155,11 @@ int clearConfigObjects(ConfigObjects &cfgObj)
     return 0;
 }
 
-#define CFG_WRITE(v)                                        \
-    for (int i = sizeof(v); i > 0; i--)                     \
-    {                                                       \
-        uint8_t new_v = (v >> (8 * (i - 1))) & MASK_1_BYTE; \
-        cfgF.write((char *)&(new_v), sizeof(char));         \
+#define CFG_WRITE(v)                                                \
+    for (int coefShift = sizeof(v); coefShift > 0; coefShift--)     \
+    {                                                               \
+        uint8_t new_v = (v >> (8 * (coefShift - 1))) & MASK_1_BYTE; \
+        cfgF.write((char *)&(new_v), sizeof(char));                 \
     }
 
 void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
@@ -168,52 +169,81 @@ void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
 
     std::ofstream cfgF(fileNameBin, std::ios::binary);
     {
-        /* Control Section */
         ControlSection &ctrlSec = cfgObj.controlSection;
+        DO_Section &doSec = cfgObj.doSection;
+        APE_Section &apeSec = cfgObj.apeSection;
 
-        // LCF, NAF
+        /* Control Section */
         curbyte = (ctrlSec.LCF & MASK_LOW_BIT) << 7;
         curbyte |= (ctrlSec.NAF & MASK_LOW_BIT) << 6;
         CFG_WRITE(curbyte)
+        CFG_WRITE(ctrlSec.Task_ID)
+        CFG_WRITE(ctrlSec.RPI_version)
+        CFG_WRITE(ctrlSec.Reference_ID)
+        CFG_WRITE(ctrlSec.Implementation_version)
+        CFG_WRITE(ctrlSec.Developer_ID)
         CFG_WRITE(ctrlSec.Creation_Date)
-        // cfgF.write((char *)&curbyte, sizeof(curbyte));
-
-        // // Task_ID
-        // cfgF.write((char *)&ctrlSec.Task_ID, sizeof(ctrlSec.Task_ID));
-
-        // // RPI_version
-        // cfgF.write((char *)&ctrlSec.RPI_version, sizeof(ctrlSec.RPI_version));
-
-        // // Reference_ID
-        // cfgF.write((char *)&ctrlSec.Reference_ID, sizeof(ctrlSec.Reference_ID));
-
-        // // Implementation_version
-        // cfgF.write((char *)&(ctrlSec.Implementation_version), sizeof(ctrlSec.Implementation_version));
-
-        // // Developer_ID
-        // curbyte = (ctrlSec.Developer_ID >> 8) & MASK_1_BYTE;
-        // cfgF.write((char *)&curbyte, sizeof(curbyte));
-        // curbyte = ctrlSec.Developer_ID & MASK_1_BYTE;
-        // cfgF.write((char *)&curbyte, sizeof(curbyte));
-
-        // Creation_Date
-        // cfgF.write((char *)&(ctrlSec.Creation_Date), sizeof(ctrlSec.Creation_Date));
 
         /* DO Section */
-
-        // create byte 10
-        //  curbyte = cfgObj.doSection.N_DO;
-        //  cfgF.write((char *)&curbyte, sizeof(curbyte));
-
-        // for (uint8_t i = 0; i < cfgObj.doSection.N_DO; i++)
-        // {
-        //     curbyte = cfgObj.doSection.DOs[i].DO_ID;
-        //     cfgF.write((char *)&curbyte, sizeof(curbyte));
-        //     curbyte = cfgObj.doSection.DOs[i].size
-
-        // }
+        CFG_WRITE(doSec.N_DO)
+        for (uint8_t i = 0; i < doSec.N_DO; i++)
+        {
+            CFG_WRITE(doSec.DOs[i].DO_ID);
+            CFG_WRITE(doSec.DOs[i].size);
+            CFG_WRITE(doSec.DOs[i].access_time);
+            CFG_WRITE(doSec.DOs[i].length);
+            for (uint8_t j = 0; j < doSec.DOs[i].length; j++)
+            {
+                CFG_WRITE(doSec.DOs[i].data[j]);
+            }
+            CFG_WRITE(doSec.ASFs[i].DO);
+            CFG_WRITE(doSec.ASFs[i].N);
+            for (uint8_t j = 0; j < doSec.ASFs[i].N; j++)
+            {
+                CFG_WRITE(doSec.ASFs[i].APE_KP[j].APE_number);
+                CFG_WRITE(doSec.ASFs[i].APE_KP[j].port_number);
+            }
+        }
 
         /* APE Section */
+        CFG_WRITE(apeSec.N_APE);
+        for (uint16_t i = 0; i < apeSec.N_APE; i++)
+        {
+            CFG_WRITE(apeSec.APEs[i].APE_ID);
+            CFG_WRITE(apeSec.APEs[i].op_code);
+            curbyte = (apeSec.APEs[i].T & MASK_LOW_BIT) << 7;
+            curbyte |= (apeSec.APEs[i].NN & MASK_LS_3_BIT) << 4;
+            CFG_WRITE(curbyte);
+            CFG_WRITE(apeSec.APEs[i].cost);
+            CFG_WRITE(apeSec.APEs[i].time);
+
+            // 2*1=2     
+            // xx000000  
+            // 0  ... 8   8...16
+            
+            // 2*7=14
+            // xxxxxxxx   xxxxxx00  
+            // 0  ... 8   8  ... 16
+            // 6 4 2 0
+
+            curbyte = 0;
+            uint16_t cur2byte = 0;
+
+            for (uint8_t j = 0; j < apeSec.APEs[i].NN; j++)
+            {
+                cur2byte |= (apeSec.APEs[i].access_type[j] & MASK_LS_2_BIT) << ( 16 - 2 * (j+1) );
+            }
+
+            if( apeSec.APEs[i].NN >  4)
+            {
+                CFG_WRITE(cur2byte);
+            }
+            else
+            {
+                curbyte = ((cur2byte >> 8) & MASK_1_BYTE);
+                CFG_WRITE(curbyte);
+            }
+        }
     }
     cfgF.close();
 }

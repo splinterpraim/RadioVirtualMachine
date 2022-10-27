@@ -41,7 +41,7 @@ using ASF_variable_part = struct ASF_variable_part;
 
 struct ASF_Config{
     uint8_t DO;
-    uint8_t N; //* 6 bit
+    uint8_t N; //* 6 bit (but in cfgbin 8 bit)
     ASF_variable_part *APE_KP ;
 };
 using ASF_Config = struct ASF_Config;
@@ -55,7 +55,7 @@ using DO_Section = struct DO_Section;
 
 struct APE_Config{
     uint16_t APE_ID;
-    uint32_t  op_code;
+    uint32_t  op_code; //* 20 bits (but 32 bits)
     uint8_t T; //* flag for static (=0) or dynamic (=1) operations
     uint8_t NN; //* number of ports (3 bits)
     uint16_t cost; //* execution cost value (2 bytes)
