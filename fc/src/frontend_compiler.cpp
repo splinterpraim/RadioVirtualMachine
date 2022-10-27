@@ -217,13 +217,13 @@ void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
             CFG_WRITE(apeSec.APEs[i].cost);
             CFG_WRITE(apeSec.APEs[i].time);
 
-            // 2*1=2     
-            // xx000000  
-            // 0  ... 8   8...16
-            
+            // 2*1=2
+            // xx000000
+            // 16 ... 8   8  ... 0
+
             // 2*7=14
-            // xxxxxxxx   xxxxxx00  
-            // 0  ... 8   8  ... 16
+            // xxxxxxxx   xxxxxx00
+            // 16 ... 8   8  ... 0
             // 6 4 2 0
 
             curbyte = 0;
@@ -231,10 +231,10 @@ void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
 
             for (uint8_t j = 0; j < apeSec.APEs[i].NN; j++)
             {
-                cur2byte |= (apeSec.APEs[i].access_type[j] & MASK_LS_2_BIT) << ( 16 - 2 * (j+1) );
+                cur2byte |= (apeSec.APEs[i].access_type[j] & MASK_LS_2_BIT) << (16 - 2 * (j + 1));
             }
 
-            if( apeSec.APEs[i].NN >  4)
+            if (apeSec.APEs[i].NN > 4)
             {
                 CFG_WRITE(cur2byte);
             }
