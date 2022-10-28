@@ -55,6 +55,14 @@ void showConfigObjects(ConfigObjects & cfgObj);
 int clearConfigObjects(ConfigObjects & cfgObj);
 
 
+/**
+ * @brief Create RVM binary config code from Config Objects 
+ * 
+ * @param[in] cfgObj Reference to Config Objects
+ * @param[in] fileNameBin File name where will be binary config code
+ */
+void createRVMcfgcode(ConfigObjects & cfgObj, const std::string &fileNameBin);
+
 
 
 #endif // FC_FRONTEND_COMPILER_H

@@ -9,7 +9,7 @@ public:
 	/* Constructors */
 	IrLink(){};
 	IrLink(std::string dataId, std::string operatorId, int dir, int dataOrder)
-			:dataId(dataId), operatorId(operatorId), dir(dir), dataOrder(dataOrder)
+			:dataId(dataId), dataOrder(dataOrder), operatorId(operatorId), dir(dir) 
 			{};
 
 	/* Setters */
@@ -30,7 +30,7 @@ private:
     std::string dataId;
     int dataOrder;
 	std::string operatorId;
-	int dir;	/* 0 - from data to operator
-				   1 - from operator to data */
+	int dir;	/* 0 - from data to operator (input)
+				   1 - from operator to data (output) */
 };
 #endif // IR_LINK_H

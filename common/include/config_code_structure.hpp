@@ -6,6 +6,12 @@
 #define FC_CONFIG_CODE_STRUCTURE_HPP
 #include <iostream>
 
+#define APE_T_STATIC 0
+#define APE_T_DYNAMIC 1
+
+#define APE_ACCESS_TYPE_R 0
+#define APE_ACCESS_TYPE_W 1
+
 struct ControlSection {
     uint8_t LCF;
     uint8_t NAF;
@@ -28,20 +34,20 @@ struct DO_Config{
 using DO_Config = struct DO_Config;
 
 struct ASF_variable_part{
-    uint8_t APE_number;
+    uint8_t APE_number; //* ID of APE
     uint8_t port_number;
 };
 using ASF_variable_part = struct ASF_variable_part;
 
 struct ASF_Config{
     uint8_t DO;
-    uint8_t N;
+    uint8_t N; //* 6 bit (but in cfgbin 8 bit)
     ASF_variable_part *APE_KP ;
 };
 using ASF_Config = struct ASF_Config;
 
 struct DO_Section {
-    uint8_t N_DO; //number of DO
+    uint8_t N_DO; //* Number of DO
     DO_Config *DOs;
     ASF_Config *ASFs;
 };
@@ -49,17 +55,17 @@ using DO_Section = struct DO_Section;
 
 struct APE_Config{
     uint16_t APE_ID;
-    uint32_t  op_code;
-    uint8_t T;
-    uint8_t NN;
-    uint16_t cost;
-    uint16_t time;
+    uint32_t  op_code; //* 20 bits (but 32 bits)
+    uint8_t T; //* flag for static (=0) or dynamic (=1) operations
+    uint8_t NN; //* number of ports (3 bits)
+    uint16_t cost; //* execution cost value (2 bytes)
+    uint16_t time; //* constraint value (2 bytes)
     uint8_t  *access_type;
 };
 using APE_Config = struct APE_Config;
 
 struct APE_Section{
-    uint16_t N_APE;
+    uint16_t N_APE; //* Number of APE
     APE_Config *APEs;
 };
 using APE_Section = struct APE_Section;

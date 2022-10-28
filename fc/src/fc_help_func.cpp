@@ -3,6 +3,8 @@
 #include "fc_glob.hpp"
 #include "fc_system.hpp"
 
+#include "radio_library.hpp"
+
 #include <fstream>
 #include <cstring>
 #include <exception>
@@ -15,6 +17,7 @@
 #define DO_CFG_LEN_FOR_FILE 255
 
 extern fc_glob_t fc_glob;
+extern RadioLibrary radioLib;
 
 /* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
@@ -22,7 +25,7 @@ IrOperator convertToIrOperator(pugi::xml_node &op_xml)
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
-
+    op.setOpcode(op_xml.attribute("opcode").value());
     return op;
 }
 
@@ -43,7 +46,8 @@ void showIrOperators(const std::vector<IrOperator> &operators)
     for (auto el : operators)
     {
         std::cout << "id = " << el.getId() << ", "
-                  << "type = " << el.getType() << std::endl;
+                  << "type = " << el.getType() << ", "
+                  << "opcode = " << el.getOpcode() << std::endl;
     }
 }
 
@@ -133,6 +137,8 @@ void showDoSection(DO_Section &doSec)
     std::cout << space << "N_DO: " << (int)doSec.N_DO << std::endl;
     std::cout << space << "DO_Config: " << std::endl;
     showDO_Config(*doSec.DOs, doSec.N_DO);
+    std::cout << space << "ASF_Config: " << std::endl;
+    showASF_config(*doSec.ASFs, doSec.N_DO);
 }
 
 void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
@@ -141,18 +147,53 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
     DO_Config *ptrDoCfg = &doCfg;
     for (uint8_t i = 0; i < N_DO; i++)
     {
-        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID <<
-                            ", size: " << (int)ptrDoCfg[i].size << 
-                            ", access_time: " << (int)ptrDoCfg[i].access_time << 
-                            ", length: " << (int)ptrDoCfg[i].length <<
-                            ", data: ";
-                            for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
-                                std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
-                            std::cout << std::dec;
+        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length << ", data: ";
+        for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
+            std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
+        std::cout << std::dec;
         std::cout << std::endl;
     }
 }
 
+void showASF_config(ASF_Config &asfCfg, uint8_t N_DO)
+{
+    std::string space4 = "    ";
+    ASF_Config *ptrAsfCfg = &asfCfg;
+    for (uint8_t i = 0; i < N_DO; i++)
+    {
+        std::cout << space4 << "DO_ID: " << (int)ptrAsfCfg[i].DO << ", Number of APEs connected with DO: " << (int)ptrAsfCfg[i].N << ", APE_KP (APE:PORT) = [ ";
+        for (int j = 0; j < ptrAsfCfg[i].N; ++j)
+        {
+            std::cout << (int)ptrAsfCfg[i].APE_KP[j].APE_number << ":" << (int)ptrAsfCfg[i].APE_KP[j].port_number; 
+            if ((j + 1) != ptrAsfCfg[i].N)
+            {
+                std::cout<< ", ";
+            }
+        }
+        std::cout << " ]" << std::endl;
+    }
+}
+
+void showApeSection(APE_Section &apeSec)
+{
+    std::string space = "  ";
+    std::cout << space << "N_APE: " << (int)apeSec.N_APE << std::endl;
+    std::cout << space << "APE_Config: " << std::endl;
+    showAPE_Config(*apeSec.APEs, apeSec.N_APE);
+}
+
+void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE)
+{
+    std::string space4 = "    ";
+    APE_Config *ptrApeCfg = &apeCfg;
+    for (uint16_t i = 0; i < N_APE; i++)
+    {
+        std::cout << space4 << "APE_ID: " << (int)ptrApeCfg[i].APE_ID << ", op code: " << (int)ptrApeCfg[i].op_code << ", T: " << (int)ptrApeCfg[i].T << ", NN: " << (int)ptrApeCfg[i].NN << ", cost: " << (int)ptrApeCfg[i].cost << ", time: " << (int)ptrApeCfg[i].time << ", access type: ";
+        for (size_t j = 0; j < ptrApeCfg[i].NN; ++j)
+            std::cout << (int)ptrApeCfg[i].access_type[j] << " ";
+        std::cout << std::endl;
+    }
+}
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
     //+todo: 1. type of file is not txt - it's binary.
@@ -169,35 +210,6 @@ DO_Config *getDoConfig(IrObjects &irObjects)
         doConfigRes[i].length = getDoConfig_length(elem);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
-#ifdef xxx
-
-        if (elem.getType() == "float")
-        {
-            do_section.DOs[i].size = sizeof(float);
-        }
-        if (elem.getPath() == "")
-        {
-            if (elem.getValue() != "")
-            {
-                if (elem.getType() == "float")
-                {
-                    do_section.DOs[i].length = sizeof(float);
-                    //***********************
-                    // convert float to bin (union)
-                    do_section.DOs[i].data = new uint8_t[sizeof(float)];
-                    auto bufData = stof(elem.getValue());
-                    memcpy(do_section.DOs[i].data, &bufData, sizeof(float));
-                }
-            }
-        }
-        else
-        {
-            do_section.DOs[i].length = elem.getPath().size();
-            do_section.DOs[i].data = new uint8_t[elem.getPath().size()];
-            auto bufData = elem.getPath().c_str();
-            memcpy(do_section.DOs[i].data, &bufData, elem.getPath().size());
-        }
-#endif
         i++;
     }
     return doConfigRes;
@@ -265,8 +277,6 @@ uint8_t getDoConfig_length(IrData &irData)
     return res;
 }
 
-
-
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
 {
     uint8_t *res = nullptr;
@@ -286,9 +296,9 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         if (irData.getType() == XML_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
-            if (fc_glob.endian == CMN_BIG_ENDIAN)
+            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
             {
-                intVal = convertToLittleEndian(intVal);
+                intVal = reverseEndian(intVal);
             }
 
             res = new uint8_t[len];
@@ -300,7 +310,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             //! need convert to endians
             // if (fc_glob.endian == CMN_BIG_ENDIAN)
             // {
-            //     fltVal = convertToLittleEndian(fltVal);
+            //     fltVal = reverseEndian(fltVal);
             // }
 
             res = new uint8_t[len];
@@ -308,6 +318,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         }
         else if (irData.getType() == XML_TYPE_STRING)
         {
+            // todo: get data for string
             // res = irData.getValue().size();
         }
         else
@@ -318,26 +329,188 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     /* Filled path */
     else if (doPath.length() != 0)
     {
-        // open file
-        // read info
-        // check size
-        // std::cout << "p1" << std::endl;
         res = getFileData(doPath);
     }
-
-    // std::cout << "d0: " << doVal << ")" << " len = " << (int)len << std::endl;
-
-    // for (size_t i = 0; i < len; ++i)
-    //     std::cout <<std::hex << (int)res[i] << " ";
-    // std::cout << std::endl;
-    // std::cout << "d_end: " << doVal << ")" << std::endl;
 
     return res;
 }
 
 ASF_Config *getAsfConfig(IrObjects &irObjects)
 {
-    return NULL;
+    ASF_Config *asfConfigRes = new ASF_Config[irObjects.data.size()];
+    int i = 0;
+    for (auto &elem : irObjects.data)
+    {
+        asfConfigRes[i].DO = i;
+        asfConfigRes[i].N = getAsfConfig_numApe(elem, irObjects); //! cannot be more than 63
+        asfConfigRes[i].APE_KP = getAsfConfig_APE_KP(elem, asfConfigRes[i].N, irObjects);
+
+        i++;
+    }
+    return asfConfigRes;
+}
+
+uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects)
+{
+    uint8_t res = 0;
+    std::string dataId = irData.getId();
+
+    for (auto &elem : irObjects.links)
+    {
+        if (dataId.compare(elem.getDataId()) == 0)
+            res++;
+    }
+
+    return res;
+}
+
+ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects)
+{
+    ASF_variable_part *res = nullptr;
+    std::string dataId = irData.getId();
+
+    res = new ASF_variable_part[N];
+    int i = 0;
+
+    /* Iterations on links */
+    for (auto &link : irObjects.links)
+    {
+        /* Finds a link with a dataId field equal to IR dataId */
+        if (dataId.compare(link.getDataId()) == 0)
+        {
+            res[i].APE_number = getApeOrderNum(link.getOperatorId(), irObjects);
+
+            /* input */
+            if (link.getDir() == 0)
+            {
+                res[i].port_number = link.getDataOrder();
+            }
+            /* output */
+            else
+            {
+                res[i].port_number = link.getDataOrder() + getNumInputLink(link.getOperatorId(), irObjects.links);
+            }
+            i++;
+        }
+    }
+
+    return res;
+}
+uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects)
+{
+    uint8_t apeOrderNum = 0;
+    
+    /* Iterations on operators */
+    for (auto & op : irObjects.operators)
+    {
+        /* Finds a operator */
+        if (apeId.compare(op.getId()) == 0)
+        {
+            break;
+        }
+        apeOrderNum++;
+    }
+    return apeOrderNum;
+}
+
+int getNumInputLink(std::string opId, std::vector<IrLink> &links)
+{
+    int res = 0;
+
+    for (auto &elem : links)
+    {
+        if ((opId.compare(elem.getOperatorId()) == 0) && (elem.getDir() == 0))
+            res++;
+    }
+    return res;
+}
+
+int getNumOutputLink(std::string opId, std::vector<IrLink> &links)
+{
+    int res = 0;
+
+    for (auto &elem : links)
+    {
+        if ((opId.compare(elem.getOperatorId()) == 0) && (elem.getDir() == 1))
+            res++;
+    }
+    return res;
+}
+
+APE_Config *getApeConfig(IrObjects &irObjects)
+{
+    APE_Config *apeConfigRes = new APE_Config[irObjects.operators.size()];
+    int i = 0;
+    for (auto &op : irObjects.operators)
+    {
+        if (!checkNumPorts(op, irObjects))
+        {
+            throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in XML and radiolib!"));
+
+        }
+        apeConfigRes[i].APE_ID = i;
+        apeConfigRes[i].op_code = std::stoul(op.getOpcode()); 
+        apeConfigRes[i].T = APE_T_STATIC;
+        apeConfigRes[i].NN = getApeNumPorts(op.getId(), irObjects);
+        apeConfigRes[i].cost = 10;
+        apeConfigRes[i].time = 10;
+        apeConfigRes[i].access_type = getAccessType(apeConfigRes[i].NN, op.getId(), irObjects);
+        i++;
+    }
+    return apeConfigRes;
+}
+
+uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
+{
+    //todo: check max size (3 bits available)
+    //todo: get result from refference radiolibrary (example: operator "multiple" => number of ports = 3 )
+    uint8_t apeNumPorts = 0;
+    
+    /* Iterations on links */
+    for (auto & link : irObjects.links)
+    {
+        /* Finds a link with a operatorId field equal to IR operatorId */
+        if (opId.compare(link.getOperatorId()) == 0)
+        {
+            apeNumPorts++;
+        }
+    }
+    return apeNumPorts;
+}
+
+uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
+{
+    uint8_t* accessType = new uint8_t[apeNumPorts];
+
+    int numInputLink = getNumInputLink(opId, irObjects.links);
+    int numOutputLink = getNumOutputLink(opId, irObjects.links);
+    
+    for (int i = 0; i < numInputLink; i++)
+    {
+        accessType[i] = APE_ACCESS_TYPE_R;
+    }
+
+    for (int i = 0; i < numOutputLink; i++)
+    {
+        accessType[i + numInputLink] = APE_ACCESS_TYPE_W;
+    }
+
+    return accessType;
+}
+
+bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects)
+{
+    int numInputLink = getNumInputLink(irOperator.getId(), irObjects.links);
+    int numOutputLink = getNumOutputLink(irOperator.getId(), irObjects.links);
+
+    IOPortsCnt numIOPortsLib = radioLib.getIOPortsCnt(std::stoul(irOperator.getOpcode()));
+
+    if ((numInputLink == numIOPortsLib.input) && (numOutputLink == numIOPortsLib.output))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 size_t getFileLen(std::string fileName)
@@ -354,9 +527,9 @@ size_t getFileLen(std::string fileName)
     return res;
 }
 
-uint8_t* getFileData(std::string fileName)
+uint8_t *getFileData(std::string fileName)
 {
-    uint8_t * res = nullptr;
+    uint8_t *res = nullptr;
     size_t fSize = 0;
 
     std::ifstream dataFile;

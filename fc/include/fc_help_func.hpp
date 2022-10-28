@@ -48,9 +48,9 @@ void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData>
 void showControlSection(ControlSection &ctrlSec);
 void showDoSection(DO_Section &doSec);
 void showDO_Config(DO_Config &doCfg, uint8_t N_DO);
-
-
-
+void showASF_config(ASF_Config &asfCfg, uint8_t N_DO);
+void showApeSection(APE_Section &apeSec);
+void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE);
 
 /* Get config */
 DO_Config *getDoConfig(IrObjects &irObjects);
@@ -58,7 +58,15 @@ uint32_t getDoConfig_size(IrData &irData);
 uint8_t getDoConfig_length(IrData &irData);
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len);
 ASF_Config *getAsfConfig(IrObjects &irObjects);
-
+uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects);
+ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects);
+uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects);
+int getNumInputLink(std::string opId , std::vector<IrLink> &links);
+int getNumOutputLink(std::string opId, std::vector<IrLink> &links);
+APE_Config *getApeConfig(IrObjects &irObjects);
+uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects);
+uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects);
+bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects);
 
 /*  */
 size_t getFileLen(std::string fileName);

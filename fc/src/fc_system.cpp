@@ -7,7 +7,7 @@ bool endianIsLittle()
     return (b[0] ? true : false);
 }
 
-int convertToLittleEndian(int val)
+int reverseEndian(int val)
 {
     int res = 0;
     for (std::size_t i = 0; i < sizeof(val); ++i)

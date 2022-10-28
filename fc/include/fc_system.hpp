@@ -5,6 +5,6 @@
 
 bool endianIsLittle();
 
-int convertToLittleEndian(int val);
+int reverseEndian(int val);
 
 #endif // FC_SYSTEM_HPP
