@@ -10,6 +10,8 @@
 #include "log_manager.h"
 
 #include "rvm_glob_define.h"
+#include "common.hpp"
+#include "config_code_structure.hpp"
 
 // #include "config_code_structure.hpp"
 // rvm_ProgramMemory progMem;
@@ -24,10 +26,12 @@ int main(int argc, char *argv[])
     // todo: replace progMem cfgFe code in Rvm run
 
         progMem.init(10);
-        progMem.load("./XML_files/bin/cfg1.bin");
+        // progMem.load("./XML_files/bin/cfg1.bin");
+        progMem.load("./config_codes/cfgcode1.bin");
         rvm_cfgCodeFetcher cfgFe;
-        cfgFe.fetch(0);
-        cfgFe.showCfgCode();
+        ConfigObjects *cfg = cfgFe.fetch(0);
+        showConfigObjects((*cfg));
+        // cfgFe.showCfgCode();
         
 
     }

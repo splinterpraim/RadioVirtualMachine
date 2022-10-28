@@ -35,5 +35,9 @@
 #define SET_GREEN(m) GN m RT
 #define SET_RED(m) RD m RT
 
+/* Masks */
+#define MASK_LOW_BIT 0x01  /* 0000 0001 */
+
+
 
 #endif //COMMON_HPP

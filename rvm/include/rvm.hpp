@@ -21,6 +21,6 @@ private:
     // progmem
     // basic op
     // datapath
-}
+};
 
 #endif // RVM_CLASS

@@ -77,5 +77,11 @@ struct ConfigObjects{
 };
 using ConfigObjects = struct ConfigObjects;
 
+
+void initConfigObjects(ConfigObjects & cfgObj); 
+void showConfigObjects(ConfigObjects & cfgObj); 
+void clearConfigObjects(ConfigObjects & cfgObj); 
+
+
 #endif //FC_CONFIG_CODE_STRUCTURE_HPP
 

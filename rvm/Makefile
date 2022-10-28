@@ -16,6 +16,7 @@ RVM_INC := $(CUR_DIR)/include
 RVM_INC_DIR := $(INC_DIR)/rvm
 RVM_OBJ_DIR := $(OBJ_DIR)/rvm
 RVM_CXXFLAGS := $(DEBUG_FLAGS) -std=c++14 -I$(INC_DIR)/common -I$(RVM_INC_DIR) 
+RVM_LDFLAGS :=   -std=c++14 -L$(LIB_DIR) -lcommon
 
 RVM_TEMPLATE_FIND_CPP := $(RVM_SRC)/*.cpp $(RVM_SRC)/*/*.cpp
 RVM_ALL_CPP := $(wildcard $(RVM_TEMPLATE_FIND_CPP))
@@ -60,7 +61,7 @@ $(RVM): $(ECHO_RVM_BUILD) $(MKDIR_BUILD) $(CP_INC) $(RVM_BIN)
 
 $(RVM_BIN):  $(RVM_OBJ)
 	@echo "$(PURPLE)[LN]$(RESET) $@ <- ($(RVM_OBJ))"
-	@g++ -o $@ $(RVM_OBJ)
+	@g++ -o $@   $(RVM_OBJ) $(RVM_LDFLAGS)
 
 
 $(RVM_OBJ_DIR)/%.o: $(RVM_SRC)/%.cpp
