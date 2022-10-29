@@ -307,11 +307,10 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
         else if (irData.getType() == XML_TYPE_FLOAT)
         {
             float fltVal = std::stof(doVal);
-            //! need convert to endians
-            // if (fc_glob.endian == CMN_BIG_ENDIAN)
-            // {
-            //     fltVal = reverseEndian(fltVal);
-            // }
+            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
+            {
+                fltVal = reverseEndian(fltVal);
+            }
 
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&fltVal, len);
