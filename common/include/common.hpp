@@ -37,6 +37,9 @@
 
 /* Masks */
 #define MASK_LOW_BIT 0x01  /* 0000 0001 */
+#define MASK_LS_2_BIT 0x03 /* 0000 0011 */
+#define MASK_LS_3_BIT 0x07 /* 0000 0111 */
+
 
 
 

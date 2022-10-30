@@ -30,9 +30,42 @@ struct ParseCfgCodeFlags_s
             uint8_t stageCnt = RESET_FLAG;
         } doCfg;
 
-        uint8_t asfCfg = RESET_FLAG;
+        struct asfCfg_s
+        {
+            uint8_t start = RESET_FLAG;
+            uint8_t DO = RESET_FLAG;
+            uint8_t N = RESET_FLAG;
+            uint8_t APE_KP = RESET_FLAG;
+            uint8_t cntAPE_KP = RESET_FLAG;
+            uint8_t stageCnt = RESET_FLAG;
+        } asfCfg;
+
 
     } doSec;
+
+
+    struct apeSec_s
+    {
+        uint8_t end = RESET_FLAG;
+        uint8_t start = RESET_FLAG;
+        uint8_t Ncnt = RESET_FLAG;
+        uint8_t stageCnt = RESET_FLAG;
+
+         struct apeCfg_s
+        {
+            uint8_t start = RESET_FLAG;
+            uint8_t APE_ID = RESET_FLAG;
+            uint8_t op_code = RESET_FLAG;
+            uint8_t T = RESET_FLAG;
+            uint8_t NN = RESET_FLAG;
+            uint8_t cost = RESET_FLAG;
+            uint8_t time = RESET_FLAG;
+            uint8_t access_type = RESET_FLAG;
+            uint8_t stageCnt = RESET_FLAG;
+        } apeCfg;
+
+    }apeSec;
+
 };
 using ParseCfgCodeFlags = struct ParseCfgCodeFlags_s;
 
