@@ -6,14 +6,19 @@
 #include <stdexcept>
 
 using namespace std;
-
-class IrData {
+/**
+ * @brief Class for describing of Intermediate representation data
+ *
+ */
+class IrData
+{
 
 public:
-	IrData(){}
-	~IrData(){}
-	void setId(const string &id);
-	string getId();
+    IrData() {}
+    ~IrData() {}
+
+    void setId(const string &id);
+    string getId();
 
     void setType(const string &type);
     string getType();
@@ -27,19 +32,14 @@ public:
     void setValue(const string &value);
     string getValue();
 
-//    ----
+    /* Overload */
+    bool operator==(const IrData &rData);
 
-
-	/* Overload */
-	bool operator==(const IrData & rData);
 private:
-	string id = "";
-	string type = "";
-	string path = "";
+    string id = "";
+    string type = "";
+    string path = "";
     string accessTime = "";
     string value = "";
-
-
 };
 #endif // IR_DATA_H
-

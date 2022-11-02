@@ -3,6 +3,10 @@
 
 #include <cstdint>
 
+/**
+ * @brief Struct for storage global variables
+ * 
+ */
 struct fc_glob_s
 {
     uint8_t endian; 

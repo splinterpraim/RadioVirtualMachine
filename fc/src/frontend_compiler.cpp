@@ -90,8 +90,8 @@ IrObjects parseSWIR(const std::string &fileNameSWIR)
             irObjects.operators.push_back(currOp);
 
             /* Create link objects from input/output IR data and IR operator */
-            createLinksFromVectorData(irObjects.links, inputData, currOp, 0);
-            createLinksFromVectorData(irObjects.links, outputData, currOp, 1);
+            createLinksFromVectorData(irObjects.links, inputData, currOp, LINK_INPUT);
+            createLinksFromVectorData(irObjects.links, outputData, currOp, LINK_OUTPUT);
 
             auto xmlNodeType = curOperator.next_sibling().type();
 
@@ -146,13 +146,12 @@ void showConfigObjects(ConfigObjects &cfgObj)
     showApeSection(cfgObj.apeSection);
 }
 
-int clearConfigObjects(ConfigObjects &cfgObj)
+void clearConfigObjects(ConfigObjects &cfgObj)
 {
     delete[] cfgObj.doSection.DOs->data;
     delete[] cfgObj.doSection.DOs;
     delete[] cfgObj.doSection.ASFs->APE_KP;
     delete[] cfgObj.doSection.ASFs;
-    return 0;
 }
 
 #define CFG_WRITE(v)                                                \

@@ -21,9 +21,6 @@
 #include "config_code_structure.hpp"
 
 
-
-
-// todo: continue filling of config structure
 // todo: doxygen comment style
 /**
  * @brief Parse XML file to Intermediate representation
@@ -33,6 +30,11 @@
  */
 IrObjects parseSWIR(const std::string &fileNameSWIR);
 
+/**
+ * @brief Shows IR objects in standart output
+ * 
+ * @param irObjects IR objects for output
+ */
 void showIrObjects(const IrObjects &irObjects);
 
 /**
@@ -42,17 +44,20 @@ void showIrObjects(const IrObjects &irObjects);
  * @return ConfigObjects 
  */
 ConfigObjects convert2rvmIr(IrObjects &irObjects); 
-// Create RVM Input
 
+/**
+ * @brief Shows Config objects in standart output
+ * 
+ * @param cfgObj Config objects for output
+ */
 void showConfigObjects(ConfigObjects & cfgObj); 
 
 /**
  * @brief Clear Config Objects
  * 
  * @param cfgObj Reference to Config Objects
- * @retval 0
  */
-int clearConfigObjects(ConfigObjects & cfgObj);
+void clearConfigObjects(ConfigObjects & cfgObj);
 
 
 /**
