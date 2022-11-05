@@ -17,8 +17,8 @@ struct rl_Operator_s
     std::string name;
     struct Opcode_s
     {
-        uint opClass; /* Code of operation */
-        uint opSubClass; /* Code of data type for operator processing */
+        int opClass; /* Code of operation */
+        int opSubClass; /* Code of data type for operator processing */
     } opcode;
 
     struct OpPort
@@ -42,11 +42,16 @@ class RadioLibrary
 
 public:
     RadioLibrary();
+
+    rl_Operator findByOpCode(int opcode);
+
     int getOpCode(std::string operatorId);
     IOPortsCnt getIOPortsCnt(int opcode);
 
 private:
     std::vector<rl_Operator> operators;
+
+    uint32_t concatOpCode(int opClass, int opSubClass);
     // std::map<int, IOPortsCnt> opCodeTable;
 };
 #endif // RADIO_LIBRARY_HPP

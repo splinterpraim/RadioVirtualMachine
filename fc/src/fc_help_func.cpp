@@ -33,7 +33,7 @@ IrData convertToIrData(pugi::xml_node &data_xml)
 {
     IrData data;
     data.setId(data_xml.attribute("id").as_string());
-    data.setType(data_xml.attribute("type").as_string());
+    // data.setType(data_xml.attribute("type").as_string());
     data.setPath(data_xml.attribute("path").as_string());
     data.setAccessTime(data_xml.attribute("access_time").as_string());
     data.setValue(data_xml.attribute("value").as_string());
@@ -56,7 +56,7 @@ void showIrData(const std::vector<IrData> &data)
     for (auto el : data)
     {
         std::cout << "id = " << el.getId() << ", ";
-        std::cout << "type = " << el.getType() << ", ";
+        // std::cout << "type = " << el.getType() << ", ";
         std::cout << "path = " << el.getPath() << ", ";
         std::cout << "access_time = " << el.getAccessTime() << ", ";
         std::cout << "value = " << el.getValue() << std::endl;
@@ -75,13 +75,23 @@ std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conn
 {
     //    std::vector<IrData> dataResult;
     std::map<int, IrData> dataResult;
+    rl_Operator op_rl = radioLib.findByOpCode(op_xml.attribute("opcode").as_int());
+    if (op_rl.name.length() == 0)
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode for operator"));
+
+
+
     for (auto data : op_xml)
     {
         std::string dataConnectType = data.attribute("connect_type").as_string();
-        if (dataConnectType == connectType)
+        if (dataConnectType.compare(connectType) == 0)
         {
             IrData currData = convertToIrData(data);
             int order = data.attribute("order").as_int();
+
+            /* Find port type by order */
+            int dataType = op_rl.ports[order-1].type;
+            currData.setType(dataType);
             dataResult[order] = currData;
         }
     }
@@ -218,15 +228,15 @@ DO_Config *getDoConfig(IrObjects &irObjects)
 uint32_t getDoConfig_size(IrData &irData)
 {
     uint32_t res = 0;
-    if (irData.getType() == XML_TYPE_INT)
+    if (irData.getType() == RL_TYPE_INT)
     {
         res = sizeof(int);
     }
-    else if (irData.getType() == XML_TYPE_FLOAT)
+    else if (irData.getType() == RL_TYPE_FLOAT)
     {
         res = sizeof(float);
     }
-    else if (irData.getType() == XML_TYPE_STRING)
+    else if (irData.getType() == RL_TYPE_STRING)
     {
         res = irData.getValue().size();
     }
@@ -252,15 +262,15 @@ uint8_t getDoConfig_length(IrData &irData)
     /* Filled value */
     if (doVal.length() != 0)
     {
-        if (irData.getType() == XML_TYPE_INT)
+        if (irData.getType() == RL_TYPE_INT)
         {
             res = sizeof(int);
         }
-        else if (irData.getType() == XML_TYPE_FLOAT)
+        else if (irData.getType() == RL_TYPE_FLOAT)
         {
             res = sizeof(float);
         }
-        else if (irData.getType() == XML_TYPE_STRING)
+        else if (irData.getType() == RL_TYPE_STRING)
         {
             res = irData.getValue().size();
         }
@@ -293,7 +303,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     /* Filled value */
     if (doVal.length() != 0)
     {
-        if (irData.getType() == XML_TYPE_INT)
+        if (irData.getType() == RL_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
             if (fc_glob.endian == CMN_LITTLE_ENDIAN)
@@ -304,7 +314,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&intVal, len);
         }
-        else if (irData.getType() == XML_TYPE_FLOAT)
+        else if (irData.getType() == RL_TYPE_FLOAT)
         {
             float fltVal = std::stof(doVal);
             if (fc_glob.endian == CMN_LITTLE_ENDIAN)
@@ -315,7 +325,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&fltVal, len);
         }
-        else if (irData.getType() == XML_TYPE_STRING)
+        else if (irData.getType() == RL_TYPE_STRING)
         {
             // todo: get data for string
             // res = irData.getValue().size();

@@ -36,4 +36,12 @@
 #define SET_RED(m) RD m RT
 
 
+
+
+
+
+#define RL_TYPE_INT 0
+#define RL_TYPE_FLOAT 1
+#define RL_TYPE_STRING 2
+
 #endif //COMMON_HPP
