@@ -85,6 +85,8 @@ public:
      */
     ConfigObjects *fetch(uint64_t cfgAddr);
 
+    uint64_t lastAddress();
+
     /**
      * @brief Show config code
      *
@@ -96,6 +98,8 @@ private:
     ParseCfgCodeFlags parseFlags;
     int do_num;
     int ape_num;
+
+    uint64_t lAddress; /* Last used address */
 
     /* Associated objects */
     rvm_ProgramMemory *programMemory;

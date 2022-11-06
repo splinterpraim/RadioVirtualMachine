@@ -76,7 +76,7 @@ void rvm_cfgCodeFetcher::associate(rvm_ProgramMemory &programMemory)
 
 ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
 {
-    uint64_t progMemSize = progMem.getSize();
+    uint64_t progMemSize = programMemory->getSize();
 
     /* Check on out of memory */
     if (cfgAddr >= progMemSize)
@@ -88,19 +88,28 @@ ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
     uint8_t byte = 0;
 
     /* Loop for parsing config code */
-    byte = progMem.get(addr++);
-    std::cout << "mem[" << addr - 1 << "] = " << (int)byte << std::endl;
+    byte = programMemory->get(addr);
+    lAddress = addr;
+    std::cout << "mem[" << addr << "] = " << (int)byte << std::endl;
     while (parseCfgCode(byte) != PARSE_STATE_FINISH)
     {
-        byte = progMem.get(addr++);
-        std::cout << "mem[" << addr - 1 << "] = " << (int)byte << std::endl;
+        addr++;
         if (addr >= progMemSize)
         {
             break;
         }
+        byte = programMemory->get(addr);
+        lAddress = addr;
+        std::cout << "mem[" << addr << "] = " << (int)byte << std::endl;
+        
     }
 
     return cfgCode;
+}
+
+uint64_t rvm_cfgCodeFetcher::lastAddress()
+{
+    return lAddress;
 }
 
 void rvm_cfgCodeFetcher::showCfgCode()
@@ -412,12 +421,11 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
                 {
                     std::memset(&(cfgCode->apeSection.APEs[i]), 0, sizeof(cfgCode->apeSection.APEs[i]));
                 }
-                parseFlags.doSec.doCfg.stageCnt = RESET_FLAG;
                 parseFlags.apeSec.start = SET_FLAG;
             }
         }
 
-        /* APE _Config parse */
+        /* APE_Config parse */
         else if (parseFlags.apeSec.apeCfg.start == RESET_FLAG)
         {
             APE_Config &curAPE_cfg = cfgCode->apeSection.APEs[index];
@@ -499,7 +507,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
             /* access_type */
             else if(parseFlags.apeSec.apeCfg.access_type == RESET_FLAG)
             {
-                for(int shift = 6; shift > 0; shift+=2)
+                for(int shift = 6; shift > 0; shift-=2)
                 {
                     curAPE_cfg.access_type[parseFlags.apeSec.apeCfg.stageCnt] = (cfgByte >> shift) & MASK_LS_2_BIT;
                     parseFlags.apeSec.apeCfg.stageCnt++;

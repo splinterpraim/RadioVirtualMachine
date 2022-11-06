@@ -11,10 +11,19 @@ rvm::ControlUnit::~ControlUnit()
 
 void rvm::ControlUnit::work()
 {
-
     cfgFetcher.associate(*programMemory);
-    ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
+    cfgnBlock.associate(*dataPath);
 
+    ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
+    uint64_t lastCfgAddr = cfgFetcher.lastAddress();
+
+    if(cfgnBlock.configure(*cfgCode) == 0)
+    {
+        
+    }
+    
+    showConfigObjects((*cfgCode));
+    std::cout << lastCfgAddr << std::endl;
 
 }
 

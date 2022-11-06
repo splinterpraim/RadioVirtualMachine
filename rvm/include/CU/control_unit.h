@@ -79,9 +79,9 @@ namespace rvm
 
 
         /* Associated objects */
-        rvm_ProgramMemory * programMemory;
-        rvm_BasicOperations * basicOperations;
-        rvm_DataPath * dataPath;
+        rvm_ProgramMemory * programMemory  = nullptr;
+        rvm_BasicOperations * basicOperations  = nullptr;
+        rvm_DataPath * dataPath  = nullptr;
 
 
     };

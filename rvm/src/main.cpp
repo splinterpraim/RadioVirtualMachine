@@ -3,6 +3,8 @@
 #include <exception>
 #include <stdexcept>
 
+#include "rvm.hpp"
+
 #include "rvm_program_mem.hpp"
 #include "CU/control_unit.h"
 #include "CU/rvm_cfg_code_fetcher.hpp"
@@ -23,15 +25,11 @@ int main(int argc, char *argv[])
 {
     try
     {
-    // todo: replace progMem cfgFe code in Rvm run
 
-        progMem.init(10);
-        // progMem.load("./XML_files/bin/cfg1.bin");
-        progMem.load("./config_codes/cfgcode1.bin");
-        rvm_cfgCodeFetcher cfgFe;
-        ConfigObjects *cfg = cfgFe.fetch(0);
-        showConfigObjects((*cfg));
-        // cfgFe.showCfgCode();
+    // todo: replace progMem cfgFe code in Rvm run
+        Rvm rvm1;
+        rvm1.run();
+        
         
 
     }
