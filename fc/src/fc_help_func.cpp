@@ -216,6 +216,25 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     {
         doConfigRes[i].DO_ID = i;
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
+        
+        //todo: Processing of error (mismatch type)
+        for (auto &link : irObjects.links)
+        {
+             if (elem.getId().compare(link.getDataId()) == 0)
+            {
+                string opId = link.getOperatorId();
+                for (auto &op : irObjects.operators)
+                {
+                    if (opId.compare(op.getId()) == 0)
+                    {
+                        rl_Operator rl_op = radioLib.findByOpCode(std::stoi(op.getOpcode()));
+                        //todo: find type of data in radio lib and check correct type in attribute value
+                    }
+                }
+            }
+        }
+        
+
         doConfigRes[i].size = getDoConfig_size(elem);
         doConfigRes[i].length = getDoConfig_length(elem);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);

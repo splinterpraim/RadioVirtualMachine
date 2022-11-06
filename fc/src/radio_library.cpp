@@ -15,8 +15,7 @@ RadioLibrary::RadioLibrary()
     rl_Operator addInt;
     {
         addInt.name = "additionInt";
-        addInt.opcode.opClass = 1;
-        addInt.opcode.opSubClass = 1;
+        addInt.opcode = 1;
         addInt.cost = 10;
         addInt.time = 10;
         addInt.ports.push_back({1, RL_TYPE_INT, LINK_INPUT});
@@ -28,8 +27,7 @@ RadioLibrary::RadioLibrary()
     rl_Operator addFloat;
     {
         addFloat.name = "additionFloat";
-        addFloat.opcode.opClass = 1;
-        addFloat.opcode.opSubClass = 2;
+        addFloat.opcode = 2;
         addFloat.cost = 10;
         addFloat.time = 10;
         addFloat.ports.push_back({1, RL_TYPE_FLOAT, LINK_INPUT});
@@ -41,8 +39,7 @@ RadioLibrary::RadioLibrary()
     rl_Operator multInt;
     {
         multInt.name = "multipicationInt";
-        multInt.opcode.opClass = 2;
-        multInt.opcode.opSubClass = 1;
+        multInt.opcode = 3;
         multInt.cost = 10;
         multInt.time = 10;
         multInt.ports.push_back({1, RL_TYPE_INT, LINK_INPUT});
@@ -54,8 +51,7 @@ RadioLibrary::RadioLibrary()
     rl_Operator multFloat;
     {
         multFloat.name = "multipicationFloat";
-        multFloat.opcode.opClass = 2;
-        multFloat.opcode.opSubClass = 2;
+        multFloat.opcode = 4;
         multFloat.cost = 10;
         multFloat.time = 10;
         multFloat.ports.push_back({1, RL_TYPE_FLOAT, LINK_INPUT});
@@ -72,7 +68,7 @@ rl_Operator RadioLibrary::findByOpCode(int opcode)
 {
     for(auto &oneOp : operators)
     {
-        if(concatOpCode(oneOp.opcode.opClass, oneOp.opcode.opSubClass) == opcode) //concat
+        if(oneOp.opcode == opcode) 
         {
             return oneOp;
         }
@@ -94,11 +90,3 @@ IOPortsCnt RadioLibrary::getIOPortsCnt(int opcode)
     // return opCodeTable[opcode];
 }
 
-
-/* Private */
-uint32_t RadioLibrary::concatOpCode(int opClass, int opSubClass)
-{
-    int res = opSubClass & 0x03ff; /* 0000 0011 1111 1111 */  
-    res |= (opClass & 0x03ff) << 10;
-    return res;
-}

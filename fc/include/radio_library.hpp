@@ -15,27 +15,22 @@ using IOPortsCnt = struct IOPortsCnt_s;
 struct rl_Operator_s
 {
     std::string name;
-    struct Opcode_s
-    {
-        int opClass; /* Code of operation */
-        int opSubClass; /* Code of data type for operator processing */
-    } opcode;
+    int opcode;
 
     struct OpPort
     {
-        int num; /* Number of port */
-        int type; /* Type of data */
+        int num;    /* Number of port */
+        int type;   /* Type of data */
         int direct; /* Data input or output */
-    };  
+    };
     using OpPort = struct OpPort;
+    
     std::vector<OpPort> ports;
 
     uint16_t cost;
     uint16_t time;
 };
 using rl_Operator = struct rl_Operator_s;
-
-
 
 class RadioLibrary
 {
@@ -51,7 +46,6 @@ public:
 private:
     std::vector<rl_Operator> operators;
 
-    uint32_t concatOpCode(int opClass, int opSubClass);
     // std::map<int, IOPortsCnt> opCodeTable;
 };
 #endif // RADIO_LIBRARY_HPP
