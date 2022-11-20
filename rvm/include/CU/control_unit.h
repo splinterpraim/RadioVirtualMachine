@@ -9,6 +9,7 @@
 #include "rvm_structs.h"
 #include "CU/rvm_cfg_code_fetcher.hpp"
 #include "CU/rvm_data_path_configuration_block.hpp"
+#include "CU/rvm_operation_fetcher.hpp"
 #include "DO/data_object.h"
 #include "APE/abstract_processing_element.h"
 #include "ASF/abstract_switch_fabric.h"
@@ -28,8 +29,6 @@
 
 // #include "call_back_functions.h"
 
-namespace rvm
-{
     // friends functions
 
     class ControlUnit
@@ -72,9 +71,11 @@ namespace rvm
         size_t dataObjects_size = 0; 
         size_t abstractProcessingElements_size = 0; 
 
+        /* Inside class */
         uint32_t cfgCounter = 0;
         rvm_cfgCodeFetcher cfgFetcher;
         rvm_dataPathConfigurationBlock cfgnBlock;
+        rvm_operationFetcher opFetcher;
 
 
 
@@ -85,7 +86,6 @@ namespace rvm
 
 
     };
-};
 
 ///plugs
 int countPortsAllAPE();

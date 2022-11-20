@@ -2,32 +2,33 @@
 
 // using namespace rvm;
 
-rvm::ControlUnit::~ControlUnit()
+ControlUnit::~ControlUnit()
 {
     delete[] dataObjects;
     delete[] abstractProcessingElements;
     delete abstractSwitchFabric;
 }
 
-void rvm::ControlUnit::work()
+void ControlUnit::work()
 {
     cfgFetcher.associate(*programMemory);
-    cfgnBlock.associate(*dataPath);
+    cfgnBlock.associate(*dataPath, opFetcher);
 
     ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
     uint64_t lastCfgAddr = cfgFetcher.lastAddress();
 
-    if(cfgnBlock.configure(*cfgCode) == 0)
-    {
-        
-    }
-    
+
     showConfigObjects((*cfgCode));
     std::cout << lastCfgAddr << std::endl;
 
+    cfgnBlock.configure(*cfgCode);
+    cfgnBlock.runDataPath();
+    
+    
+
 }
 
-void rvm::ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath)
+void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath)
 {
     this->programMemory = &programMemory;
     this->basicOperations = &basicOperations;
@@ -35,13 +36,14 @@ void rvm::ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOper
 }
 
 
-int rvm::ControlUnit::configuringDataObjects()
+int ControlUnit::configuringDataObjects()
 {
     LogManager("DO.log").clear();
 
     uint8_t binFileData[11] = {'v', 'e', 'c', 't', 'o', 'r', '.', 't', 'x', 't', '\n'};
     uint8_t binData[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
+    (void)binData; //warn fix
+    (void)binFileData; //warn fix
     /* Allocate mem */
     dataObjects = new DataObject[dataObjects_size];
 
@@ -65,11 +67,12 @@ int rvm::ControlUnit::configuringDataObjects()
     return 0;
 }
 
-int rvm::ControlUnit::configuringAbstractProcessingElements()
+int ControlUnit::configuringAbstractProcessingElements()
 {
 
     // data
     uint8_t binData[11] = {'v', 'e', 'c', 't', 'o', 'r', '.', 't', 'x', 't', '\n'};
+    (void)binData; //warn fix
 
     abstractProcessingElements = new AbstractProcessingElement[abstractProcessingElements_size];
     for (size_t i = 0; i < abstractProcessingElements_size; i++)
@@ -91,7 +94,7 @@ int rvm::ControlUnit::configuringAbstractProcessingElements()
     return 0;
 }
 
-int rvm::ControlUnit::configuringAbstractSwitchFabric()
+int ControlUnit::configuringAbstractSwitchFabric()
 {
     /* Create ASF */
     abstractSwitchFabric = new AbstractSwitchFabric;
@@ -158,7 +161,7 @@ int rvm::ControlUnit::configuringAbstractSwitchFabric()
     return 0;
 }
 
-void rvm::ControlUnit::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
+void ControlUnit::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
 {
     if (statusDO.exception != 0)
     {
@@ -166,7 +169,7 @@ void rvm::ControlUnit::sendStatusFromDataObject(const StatusFromDataObject &stat
     }
 }
 
-void rvm::ControlUnit::sendStatusFromAbstractProcessingElement(const StatusFromAbstractProcessingElement &statusAPE)
+void ControlUnit::sendStatusFromAbstractProcessingElement(const StatusFromAbstractProcessingElement &statusAPE)
 {
     if (statusAPE.exception != 0)
     {

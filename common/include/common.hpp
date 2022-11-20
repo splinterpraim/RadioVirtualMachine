@@ -2,6 +2,7 @@
 #define COMMON_HPP
 //the following are UBUNTU/LINUX, and MacOS ONLY terminal color codes.
 
+/* Colors defines */
 #define RT   "\033[0m"      /* Reset */
 #define BK   "\033[30m"      /* Black */
 #define RD     "\033[31m"      /* Red */

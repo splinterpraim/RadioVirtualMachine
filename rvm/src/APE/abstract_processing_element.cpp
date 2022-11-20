@@ -1,14 +1,14 @@
 #include "APE/abstract_processing_element.h"
 
-rvm::AbstractProcessingElement::AbstractProcessingElement()
+AbstractProcessingElement::AbstractProcessingElement()
 {
 }
-rvm::AbstractProcessingElement::~AbstractProcessingElement()
+AbstractProcessingElement::~AbstractProcessingElement()
 {
     delete[] ports;
 }
 
-int rvm::AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t time, uint16_t T, const std::map<uint8_t, uint8_t> &portsAccessTypes)
+int AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t time, uint16_t T, const std::vector<uint8_t> &portsAccessTypes)
 {
     /* Throw exceptions */
     {
@@ -41,8 +41,8 @@ int rvm::AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t tim
             int i = 0;
             for (auto el : portsAccessTypes)
             {
-                ports[i].num = el.first;
-                ports[i].accessTypes = el.second;
+                ports[i].num = 0;
+                ports[i].accessTypes = el;
                 i++;
             }
             this->id = id;
@@ -68,7 +68,7 @@ int rvm::AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t tim
 
 
 
-int rvm::AbstractProcessingElement::init(const uint32_t &opcode, int (*operation)(uint8_t argc, ...))
+int AbstractProcessingElement::init(const uint32_t &opcode, int (*operation)(uint8_t argc, ...))
 {
     /* Throw exceptions */
     {
@@ -83,30 +83,35 @@ int rvm::AbstractProcessingElement::init(const uint32_t &opcode, int (*operation
     return 0;
 }
 
-void rvm::AbstractProcessingElement::setSendControlUnit(ControlUnit &cu)
+void AbstractProcessingElement::setSendControlUnit(ControlUnit &cu)
 {
     this->cu = &cu;
 }
 
-int rvm::AbstractProcessingElement::checkCallBack()
+void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
+{
+    this->cfgnBlock = &cfgnBlock;
+}
+
+int AbstractProcessingElement::checkCallBack()
 {
     std::cout << "d" << std::endl;
     // status.id = id;
     // status.state = inactive;
     // status.exception = 0;
     // cu->sendStatusFromAbstractProcessingElement(status);
-    int result;
+    int result = 0;
     operation(3, 1, 2, result);
     return 0;
 }
 
-void rvm::AbstractProcessingElement::doOperation()
+void AbstractProcessingElement::doOperation()
 {
     int rez = 0;
     operation(3, 2, 2, 1, &rez);
     LogManager().makeLog(std::to_string(rez));
 }
-std::string rvm::AbstractProcessingElement::to_str()
+std::string AbstractProcessingElement::to_str()
 {
     std::string result_str = "id " + std::to_string(id) + ", cost " + std::to_string(cost) +
                              ", time " + std::to_string(time) + ", opcode " + std::to_string(opcode) + "\n";

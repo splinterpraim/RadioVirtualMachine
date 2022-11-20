@@ -5,13 +5,21 @@
 #include <iostream>
 #include <string>
 
-enum
+enum stDO
 {
     empty,
     full
 };
 
-enum
+enum exDO
+{
+    NOEXCEPT = 0,
+    OP_WITH_BIGSIZE,
+    WRITE_CONFL,
+    READ_ERASE_CONFL
+};
+
+enum stAPE
 {
     inactive,
     active
@@ -32,9 +40,9 @@ struct StatusFromDataObject
     uint8_t id : 8;
     uint8_t state : 1;      // 0 - empty, 1 - full
     uint8_t accessType : 2; // 0 - at::read,  1 - at::write, 2 - at::readErase
-    uint8_t exception : 2;
+    uint8_t exception : 2; //
 
-    StatusFromDataObject() : id(0), state(empty), accessType(0), exception(0) {}
+    StatusFromDataObject() : id(0), state(stDO::empty), accessType(0), exception(0) {}
 
     std::string to_str() const
     {
@@ -52,7 +60,7 @@ struct StatusFromAbstractProcessingElement
     uint8_t state : 1; /* 0 - inactive, 1 - active */
     uint8_t exception : 2;
 
-    StatusFromAbstractProcessingElement() : id(0), state(inactive), exception(0) {}
+    StatusFromAbstractProcessingElement() : id(0), state(stAPE::inactive), exception(0) {}
 
     std::string to_str() const
     {

@@ -5,11 +5,11 @@
 #include "APE/abstract_processing_element.h"
 struct DataPort
 {
-    rvm::DataObject *relatedDO;
+    DataObject *relatedDO;
 };
 struct ProcessingPort
 {
-    rvm::AbstractProcessingElement *relatedAPE;
+    AbstractProcessingElement *relatedAPE;
     uint8_t number;
 };
 
@@ -21,8 +21,6 @@ struct Connector
                                    1 - from processing port to data port */
 };
 
-namespace rvm
-{
     class AbstractSwitchFabric
     {
 
@@ -62,6 +60,5 @@ namespace rvm
         int connectors_size;
     };
 
-};
 
 #endif // ABSTRACT_SWITCH_FABRIC_CLASS

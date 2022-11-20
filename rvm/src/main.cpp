@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include <exception>
 #include <stdexcept>
 
@@ -18,7 +19,6 @@
 // #include "config_code_structure.hpp"
 // rvm_ProgramMemory progMem;
 
-
 int test();
 
 int main(int argc, char *argv[])
@@ -26,14 +26,13 @@ int main(int argc, char *argv[])
     try
     {
 
-    // todo: replace progMem cfgFe code in Rvm run
-        Rvm rvm1;
+        // todo: replace progMem cfgFe code in Rvm run
+        std::vector<std::string> cfgFileNames;
+        cfgFileNames.push_back("./config_codes/cfgcode1.bin");
+        Rvm rvm1(cfgFileNames);
         rvm1.run();
-        
-        
-
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -45,13 +44,13 @@ int test()
     try
     {
 
-        rvm::DataObject do1;
+        DataObject do1;
         do1.set(1, 10, 1);
         // do1.set(1, 10, 1);
         std::cout << do1.to_str() << std::endl;
 
         // struct StatusFromDataObject s;
-        // rvm::ControlUnit mainCU, slaveCU;
+        // ControlUnit mainCU, slaveCU;
         // mainCU.configuringDataObjects();
         // mainCU.configuringAbstractProcessingElements();
         // mainCU.configuringAbstractSwitchFabric();
@@ -64,13 +63,13 @@ int test()
         // mainCU.showStatus();
         // slaveCU.showStatus();
 
-        // rvm::DataObject mainDO;
+        // DataObject mainDO;
         // mainDO.set(1, 0, 3);
         // mainDO.setSendControlUnit(mainCU);
-        // // mainDO.setSendStatusFunction(rvm::sendStatusDO);
+        // // mainDO.setSendStatusFunction(sendStatusDO);
         // mainDO.checkCallBack();
         // s.id = 2;
-        // rvm::sendStatusDO(slaveCU, s);
+        // sendStatusDO(slaveCU, s);
         // mainCU.showStatus();
         // slaveCU.showStatus();
 

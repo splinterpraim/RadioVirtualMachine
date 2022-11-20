@@ -1,13 +1,13 @@
 #include "ASF/abstract_switch_fabric.h"
 
-rvm::AbstractSwitchFabric::~AbstractSwitchFabric()
+AbstractSwitchFabric::~AbstractSwitchFabric()
 {
     delete[] dataPorts;
     delete[] processingPorts;
     delete[] connectors;
 }
 
-void rvm::AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
+void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
 {
     if(numPortsDO<0){
         /* exeption */
@@ -19,23 +19,23 @@ void rvm::AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
     processingPorts_size = numPortsAPE;
     connectors_size = numPortsAPE;
 }
-void rvm::AbstractSwitchFabric::createDataPorts(uint8_t numberPorts)
+void AbstractSwitchFabric::createDataPorts(uint8_t numberPorts)
 {
     dataPorts = new struct DataPort[numberPorts];
 }
 
-void rvm::AbstractSwitchFabric::createProcessingPorts(uint32_t numberPorts)
+void AbstractSwitchFabric::createProcessingPorts(uint32_t numberPorts)
 {
     processingPorts = new struct ProcessingPort[numberPorts];
 }
 
 /* Create connectors */
-void rvm::AbstractSwitchFabric::allocConnectors(int numConnectors)
+void AbstractSwitchFabric::allocConnectors(int numConnectors)
 {
     connectors = new struct Connector[numConnectors];
 }
 
-void rvm::AbstractSwitchFabric::createConnector(int DataPortsId, int ProcessingPortsId, int dir)
+void AbstractSwitchFabric::createConnector(int DataPortsId, int ProcessingPortsId, int dir)
 {
     static int i = 0;
     connectors[i].dataPortId = DataPortsId;

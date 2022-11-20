@@ -1,30 +1,31 @@
 
 #include "DO/data_object.h"
+#include "common.hpp"
 
 // using namespace rvm;
-rvm::DataObject::DataObject()
+DataObject::DataObject()
 {
 }
 
-rvm::DataObject::~DataObject()
+DataObject::~DataObject()
 {
     delete[] data;
 }
 
-int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t &accessTime)
+int DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t &accessTime)
 {
     /* Throw exceptions */
     {
         /* Invalid argument */
         if (size == 0)
         {
-            throw std::invalid_argument("Setting DataObject failed, argument size = 0!");
+            throw std::invalid_argument(RVM_ERR_STR("Setting DataObject failed, argument size = 0!"));
         }
 
         /* Double function call */
         if (data != nullptr)
         {
-            throw std::runtime_error("Setting DataObject failed, Double set function call!");
+            throw std::runtime_error(RVM_ERR_STR("Setting DataObject failed, Double set function call!"));
         }
     }
 
@@ -46,12 +47,12 @@ int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t
         }
         catch (const std::bad_alloc &e)
         {
-            std::cerr << "Bad_alloc: Setting DataObject failed, Memory allocation error " << std::endl;
+            std::cerr << RVM_ERR_STR("Bad_alloc: Setting DataObject failed, Memory allocation error ") << std::endl;
             return -1;
         }
         catch (const std::exception &e)
         {
-            std::cerr << "Exception: Setting DataObject failed, error during function execution!" << std::endl;
+            std::cerr << RVM_ERR_STR("Exception: Setting DataObject failed, error during function execution!") << std::endl;
             return -1;
         }
     }
@@ -59,18 +60,18 @@ int rvm::DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t
     return 0;
 }
 
-int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
+int DataObject::init(const uint8_t &initData, uint8_t length)
 {
     /* Throw exceptions */
     {
         /*  Error size */
         if ((length > size) && (length != 255))
         {
-            throw std::invalid_argument("Initialization DataObject failed, argument length > allocated size!");
+            throw std::invalid_argument(RVM_ERR_STR("Initialization DataObject failed, argument length > allocated size!"));
         }
-        if (cu == nullptr)
+        if (cfgnBlock == nullptr)
         {
-            throw std::runtime_error("Initialization DataObject failed, Data Object is not related to  Control Unit!");
+            throw std::runtime_error(RVM_ERR_STR("Initialization DataObject failed, Data Object is not related to  Control Unit's data path configuration block!"));
         }
     }
 
@@ -81,7 +82,7 @@ int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
             /* Read non-empty data */
             if (length != 0)
             {
-                /* Read data from file */
+                /* Read data from file */ //?DELL
                 if (length == 255)
                 {
                     std::string filename = convertToFilename(initData);
@@ -96,11 +97,11 @@ int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
                 status.state = full;
             }
 
-            cu->sendStatusFromDataObject(status);
+            cfgnBlock->sendStatusFromDataObject(status);
         }
         catch (const std::exception &e)
         {
-            std::cerr << "Exception: Initialization DataObject failed, error during function execution!" << std::endl;
+            std::cerr << RVM_ERR_STR("Exception: Initialization DataObject failed, error during function execution!") << std::endl;
             return -1;
         }
     }
@@ -108,12 +109,18 @@ int rvm::DataObject::init(const uint8_t &initData, uint8_t length)
     return 0;
 }
 
-void rvm::DataObject::setSendControlUnit(ControlUnit &cu)
+void DataObject::setSendControlUnit(ControlUnit &cu)
 {
     this->cu = &cu;
 }
 
-std::string rvm::DataObject::to_str()
+void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
+{
+    this->cfgnBlock = &cfgnBlock;
+}
+
+
+std::string DataObject::to_str()
 {
     std::string result_str = "id " + std::to_string(id) + ", " +
                              "size " + std::to_string(size) + ", " +
@@ -125,7 +132,7 @@ std::string rvm::DataObject::to_str()
 
 
 
-std::string rvm::DataObject::to_strData()
+std::string DataObject::to_strData()
 {
     std::string result_str;
 
@@ -138,7 +145,7 @@ std::string rvm::DataObject::to_strData()
 }
 
 /* Other functions */
-std::string rvm::DataObject::convertToFilename(const uint8_t &initData)
+std::string DataObject::convertToFilename(const uint8_t &initData)
 {
     std::string filename;
     char symbol = ' ';
@@ -154,7 +161,7 @@ std::string rvm::DataObject::convertToFilename(const uint8_t &initData)
     return filename;
 }
 
-int rvm::DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t length)
+int DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t length)
 {
     for (size_t i = 0; i < length; i++)
     {
@@ -163,13 +170,13 @@ int rvm::DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t len
     return 0;
 }
 
-int rvm::DataObject::readDataFromFile(std::string fileName)
+int DataObject::readDataFromFile(std::string fileName)
 {
     /* Open file */
     std::ifstream infile(fileName);
     if (!infile.is_open())
     {
-        throw std::string("Error DO_" + std::to_string(id) + ": in init(), file can't open");
+        throw std::string(RVM_ERR_STR("Error DO_" + std::to_string(id) + ": in init(), file can't open"));
     }
 
     /* Read Data */

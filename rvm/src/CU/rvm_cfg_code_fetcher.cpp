@@ -90,7 +90,6 @@ ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
     /* Loop for parsing config code */
     byte = programMemory->get(addr);
     lAddress = addr;
-    std::cout << "mem[" << addr << "] = " << (int)byte << std::endl;
     while (parseCfgCode(byte) != PARSE_STATE_FINISH)
     {
         addr++;
@@ -100,7 +99,6 @@ ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
         }
         byte = programMemory->get(addr);
         lAddress = addr;
-        std::cout << "mem[" << addr << "] = " << (int)byte << std::endl;
         
     }
 
