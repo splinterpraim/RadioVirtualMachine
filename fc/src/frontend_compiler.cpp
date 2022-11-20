@@ -79,8 +79,7 @@ IrObjects parseSWIR(const std::string &fileNameSWIR)
             /* Take input/output data from operator tag */
             auto inputData = takeIrData(curOperator, "input");
             auto outputData = takeIrData(curOperator, "output");
-
-            associateWithRadioLib(curOperator, inputData, "input");
+    
 
             /* Add input/output Ir data in Ir objects  */
             addIrDataToVector(irObjects.data, inputData);

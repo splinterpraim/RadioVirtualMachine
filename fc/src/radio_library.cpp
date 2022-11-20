@@ -18,9 +18,9 @@ RadioLibrary::RadioLibrary()
         addInt.opcode = 1;
         addInt.cost = 10;
         addInt.time = 10;
-        addInt.ports.push_back({1, RL_TYPE_INT, LINK_INPUT});
-        addInt.ports.push_back({2, RL_TYPE_INT, LINK_INPUT});
-        addInt.ports.push_back({3, RL_TYPE_INT, LINK_OUTPUT});
+        addInt.ports.in.push_back({1, RL_TYPE_INT});
+        addInt.ports.in.push_back({2, RL_TYPE_INT});
+        addInt.ports.out.push_back({3, RL_TYPE_INT});
     }
     operators.push_back(addInt);
 
@@ -30,9 +30,9 @@ RadioLibrary::RadioLibrary()
         addFloat.opcode = 2;
         addFloat.cost = 10;
         addFloat.time = 10;
-        addFloat.ports.push_back({1, RL_TYPE_FLOAT, LINK_INPUT});
-        addFloat.ports.push_back({2, RL_TYPE_FLOAT, LINK_INPUT});
-        addFloat.ports.push_back({3, RL_TYPE_FLOAT, LINK_OUTPUT});
+        addFloat.ports.in.push_back({1, RL_TYPE_FLOAT});
+        addFloat.ports.in.push_back({2, RL_TYPE_FLOAT});
+        addFloat.ports.out.push_back({3, RL_TYPE_FLOAT});
     }
     operators.push_back(addFloat);
 
@@ -42,9 +42,9 @@ RadioLibrary::RadioLibrary()
         multInt.opcode = 3;
         multInt.cost = 10;
         multInt.time = 10;
-        multInt.ports.push_back({1, RL_TYPE_INT, LINK_INPUT});
-        multInt.ports.push_back({2, RL_TYPE_INT, LINK_INPUT});
-        multInt.ports.push_back({3, RL_TYPE_INT, LINK_OUTPUT});
+        multInt.ports.in.push_back({1, RL_TYPE_INT});
+        multInt.ports.in.push_back({2, RL_TYPE_INT});
+        multInt.ports.out.push_back({3, RL_TYPE_INT});
     }
     operators.push_back(multInt);
 
@@ -54,9 +54,9 @@ RadioLibrary::RadioLibrary()
         multFloat.opcode = 4;
         multFloat.cost = 10;
         multFloat.time = 10;
-        multFloat.ports.push_back({1, RL_TYPE_FLOAT, LINK_INPUT});
-        multFloat.ports.push_back({2, RL_TYPE_FLOAT, LINK_INPUT});
-        multFloat.ports.push_back({3, RL_TYPE_FLOAT, LINK_OUTPUT});
+        multFloat.ports.in.push_back({1, RL_TYPE_FLOAT});
+        multFloat.ports.in.push_back({2, RL_TYPE_FLOAT});
+        multFloat.ports.out.push_back({3, RL_TYPE_FLOAT});
     }
     operators.push_back(multFloat);
 
@@ -87,6 +87,14 @@ int RadioLibrary::getOpCode(std::string operatorId)
 
 IOPortsCnt RadioLibrary::getIOPortsCnt(int opcode)
 {
+    for (auto &oneOp: operators)
+    {
+        if ( oneOp.opcode == opcode)
+        {
+            IOPortsCnt cntPorts = {(int)oneOp.ports.in.size(), (int)oneOp.ports.out.size()};
+            return cntPorts;
+        }
+    }
     // return opCodeTable[opcode];
 }
 

@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
         FC_LOG("----- parseSWIR");
         struct IrObjects irObjects = parseSWIR(file_nameSWIR);
         showIrObjects(irObjects);
-        return 0;
 
         FC_LOG("----- convert2rvmIr");
         ConfigObjects configObjects = convert2rvmIr(irObjects);

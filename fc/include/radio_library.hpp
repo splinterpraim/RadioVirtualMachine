@@ -21,11 +21,15 @@ struct rl_Operator_s
     {
         int num;    /* Number of port */
         int type;   /* Type of data */
-        int direct; /* Data input or output */
     };
     using OpPort = struct OpPort;
     
-    std::vector<OpPort> ports;
+    struct Ports_s
+    {
+        std::vector<OpPort> in;
+        std::vector<OpPort> out;
+
+    }ports;
 
     uint16_t cost;
     uint16_t time;

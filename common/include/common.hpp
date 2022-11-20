@@ -29,8 +29,11 @@
 
 #define ERR_STR_(m) RD "Error: " RT m
 #define ERR_STR(m)  ADD_LINE_FILE(ERR_STR_(m), __LINE__,__FILE__) 
+#define WARN_STR_(m) MAGENTA "Warning: " RT m
+#define WARN_STR(m) ADD_LINE_FILE(WARN_STR_(m), __LINE__,__FILE__) 
 #define RVM_ERR_STR(m)  "RVM: " ERR_STR(m)
 #define FC_ERR_STR(m)  "FC: " ERR_STR(m) 
+#define FC_WARN_STR(m) "FC: "  WARN_STR(m)
 
 #define SET_GREEN(m) GN m RT
 #define SET_RED(m) RD m RT
