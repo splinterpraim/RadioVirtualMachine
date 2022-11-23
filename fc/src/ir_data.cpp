@@ -13,14 +13,14 @@ string IrData::getId() {
 }
 
 
-void IrData::setType(const string &type) {
-    if (type == "")
-        throw std::invalid_argument("setType function failed, argument 'type' is empty");
+void IrData::setType(const int &type) {
+    // if (type == "")
+    //     throw std::invalid_argument("setType function failed, argument 'type' is empty");
 
     this->type = type;
 }
 
-string IrData::getType() {
+int IrData::getType() {
     return type;
 }
 

@@ -4,17 +4,30 @@
 #include <iostream>
 #include <string>
 
-class IrOperator{
+/**
+ * @brief Class for describing of Intermediate representation operator
+ *
+ */
+class IrOperator
+{
 
 public:
-	IrOperator(){}
-	~IrOperator(){}
+	IrOperator() {}
+
+	~IrOperator() {}
+
 	void setId(const std::string &id);
+
 	std::string getId();
-    void setType (const std::string &type);
-    std::string getType();
+
+	void setType(const std::string &type);
+
+	std::string getType();
+
 	void setOpcode(const std::string &opcode);
+	
 	std::string getOpcode();
+
 private:
 	std::string id = "";
 	std::string type = "";

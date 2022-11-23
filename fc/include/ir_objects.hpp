@@ -10,6 +10,10 @@
 #include "ir_operator.h"
 #include "ir_link.h"
 
+/**
+ * @brief Class for describing of Intermediate representation objects
+ * 
+ */
 struct IrObjects
 {
     std::vector<IrOperator> operators;

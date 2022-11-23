@@ -33,7 +33,7 @@ IrData convertToIrData(pugi::xml_node &data_xml)
 {
     IrData data;
     data.setId(data_xml.attribute("id").as_string());
-    data.setType(data_xml.attribute("type").as_string());
+    // data.setType(data_xml.attribute("type").as_string());
     data.setPath(data_xml.attribute("path").as_string());
     data.setAccessTime(data_xml.attribute("access_time").as_string());
     data.setValue(data_xml.attribute("value").as_string());
@@ -56,7 +56,7 @@ void showIrData(const std::vector<IrData> &data)
     for (auto el : data)
     {
         std::cout << "id = " << el.getId() << ", ";
-        std::cout << "type = " << el.getType() << ", ";
+        // std::cout << "type = " << el.getType() << ", ";
         std::cout << "path = " << el.getPath() << ", ";
         std::cout << "access_time = " << el.getAccessTime() << ", ";
         std::cout << "value = " << el.getValue() << std::endl;
@@ -75,13 +75,36 @@ std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conn
 {
     //    std::vector<IrData> dataResult;
     std::map<int, IrData> dataResult;
+
+    /* Gets description of operator in Radio lib */
+    rl_Operator op_rl = radioLib.findByOpCode(op_xml.attribute("opcode").as_int());
+    if (op_rl.name.length() == 0)
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode for operator"));
+
+    /* Loop for finding and converting Data from xml to IR */
     for (auto data : op_xml)
     {
         std::string dataConnectType = data.attribute("connect_type").as_string();
-        if (dataConnectType == connectType)
+        if (dataConnectType.compare(connectType) == 0)
         {
             IrData currData = convertToIrData(data);
+
+            /* Finds data type */
             int order = data.attribute("order").as_int();
+            int dataType = -1;
+            if (dataConnectType.compare("input") == 0)
+            {
+                dataType = op_rl.ports.in[order - 1].type;
+            }
+            else if (dataConnectType.compare("output") == 0)
+            {
+                dataType = op_rl.ports.out[order - 1].type;
+            }
+            else
+            {
+                // err
+            }
+            currData.setType(dataType);
             dataResult[order] = currData;
         }
     }
@@ -164,10 +187,10 @@ void showASF_config(ASF_Config &asfCfg, uint8_t N_DO)
         std::cout << space4 << "DO_ID: " << (int)ptrAsfCfg[i].DO << ", Number of APEs connected with DO: " << (int)ptrAsfCfg[i].N << ", APE_KP (APE:PORT) = [ ";
         for (int j = 0; j < ptrAsfCfg[i].N; ++j)
         {
-            std::cout << (int)ptrAsfCfg[i].APE_KP[j].APE_number << ":" << (int)ptrAsfCfg[i].APE_KP[j].port_number; 
+            std::cout << (int)ptrAsfCfg[i].APE_KP[j].APE_number << ":" << (int)ptrAsfCfg[i].APE_KP[j].port_number;
             if ((j + 1) != ptrAsfCfg[i].N)
             {
-                std::cout<< ", ";
+                std::cout << ", ";
             }
         }
         std::cout << " ]" << std::endl;
@@ -194,6 +217,7 @@ void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE)
         std::cout << std::endl;
     }
 }
+
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
     //+todo: 1. type of file is not txt - it's binary.
@@ -206,8 +230,27 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     {
         doConfigRes[i].DO_ID = i;
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
+
+        // todo: Processing of error (mismatch type)
+        for (auto &link : irObjects.links)
+        {
+            if (elem.getId().compare(link.getDataId()) == 0)
+            {
+                string opId = link.getOperatorId();
+                for (auto &op : irObjects.operators)
+                {
+                    if (opId.compare(op.getId()) == 0)
+                    {
+                        rl_Operator rl_op = radioLib.findByOpCode(std::stoi(op.getOpcode()));
+                        // todo: find type of data in radio lib and check correct type in attribute value
+                        // rl_op.ports[0].type
+                    }
+                }
+            }
+        }
+
         doConfigRes[i].size = getDoConfig_size(elem);
-        doConfigRes[i].length = getDoConfig_length(elem);
+        doConfigRes[i].length = getDoConfig_length(elem, doConfigRes[i].size);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
         i++;
@@ -218,15 +261,15 @@ DO_Config *getDoConfig(IrObjects &irObjects)
 uint32_t getDoConfig_size(IrData &irData)
 {
     uint32_t res = 0;
-    if (irData.getType() == XML_TYPE_INT)
+    if (irData.getType() == RL_TYPE_INT)
     {
         res = sizeof(int);
     }
-    else if (irData.getType() == XML_TYPE_FLOAT)
+    else if (irData.getType() == RL_TYPE_FLOAT)
     {
         res = sizeof(float);
     }
-    else if (irData.getType() == XML_TYPE_STRING)
+    else if (irData.getType() == RL_TYPE_STRING)
     {
         res = irData.getValue().size();
     }
@@ -237,7 +280,7 @@ uint32_t getDoConfig_size(IrData &irData)
     return res;
 }
 
-uint8_t getDoConfig_length(IrData &irData)
+uint8_t getDoConfig_length(IrData &irData, uint32_t size)
 {
     uint8_t res = 0;
     std::string doVal = irData.getValue();
@@ -252,27 +295,25 @@ uint8_t getDoConfig_length(IrData &irData)
     /* Filled value */
     if (doVal.length() != 0)
     {
-        if (irData.getType() == XML_TYPE_INT)
-        {
-            res = sizeof(int);
-        }
-        else if (irData.getType() == XML_TYPE_FLOAT)
-        {
-            res = sizeof(float);
-        }
-        else if (irData.getType() == XML_TYPE_STRING)
-        {
-            res = irData.getValue().size();
-        }
-        else
-        {
-            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
-        }
+        int dataType = irData.getType();
+        size_t dataValSize = irData.getValue().size();
+
+        //TODO: normal length count 
+        res = detectSize(dataType, dataValSize);
     }
     /* Filled path */
     else if (doPath.length() != 0)
     {
         res = getFileLen(doPath);
+    }
+
+    if (res > size)
+    {
+        std::cout << FC_WARN_STR("Length in file more then size. Data was readed partly.") << std::endl;
+        int dataType = irData.getType();
+        size_t dataValSize = irData.getValue().size();
+
+        res = detectSize(dataType, dataValSize);
     }
     return res;
 }
@@ -293,7 +334,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     /* Filled value */
     if (doVal.length() != 0)
     {
-        if (irData.getType() == XML_TYPE_INT)
+        if (irData.getType() == RL_TYPE_INT)
         {
             int intVal = std::stoi(doVal);
             if (fc_glob.endian == CMN_LITTLE_ENDIAN)
@@ -304,19 +345,18 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&intVal, len);
         }
-        else if (irData.getType() == XML_TYPE_FLOAT)
+        else if (irData.getType() == RL_TYPE_FLOAT)
         {
             float fltVal = std::stof(doVal);
-            //! need convert to endians
-            // if (fc_glob.endian == CMN_BIG_ENDIAN)
-            // {
-            //     fltVal = reverseEndian(fltVal);
-            // }
+            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
+            {
+                fltVal = reverseEndian(fltVal);
+            }
 
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&fltVal, len);
         }
-        else if (irData.getType() == XML_TYPE_STRING)
+        else if (irData.getType() == RL_TYPE_STRING)
         {
             // todo: get data for string
             // res = irData.getValue().size();
@@ -399,9 +439,9 @@ ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irO
 uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects)
 {
     uint8_t apeOrderNum = 0;
-    
+
     /* Iterations on operators */
-    for (auto & op : irObjects.operators)
+    for (auto &op : irObjects.operators)
     {
         /* Finds a operator */
         if (apeId.compare(op.getId()) == 0)
@@ -446,10 +486,9 @@ APE_Config *getApeConfig(IrObjects &irObjects)
         if (!checkNumPorts(op, irObjects))
         {
             throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in XML and radiolib!"));
-
         }
         apeConfigRes[i].APE_ID = i;
-        apeConfigRes[i].op_code = std::stoul(op.getOpcode()); 
+        apeConfigRes[i].op_code = std::stoul(op.getOpcode());
         apeConfigRes[i].T = APE_T_STATIC;
         apeConfigRes[i].NN = getApeNumPorts(op.getId(), irObjects);
         apeConfigRes[i].cost = 10;
@@ -462,12 +501,12 @@ APE_Config *getApeConfig(IrObjects &irObjects)
 
 uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
 {
-    //todo: check max size (3 bits available)
-    //todo: get result from refference radiolibrary (example: operator "multiple" => number of ports = 3 )
+    // todo: check max size (3 bits available)
+    // todo: get result from refference radiolibrary (example: operator "multiple" => number of ports = 3 )
     uint8_t apeNumPorts = 0;
-    
+
     /* Iterations on links */
-    for (auto & link : irObjects.links)
+    for (auto &link : irObjects.links)
     {
         /* Finds a link with a operatorId field equal to IR operatorId */
         if (opId.compare(link.getOperatorId()) == 0)
@@ -480,11 +519,11 @@ uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects)
 
 uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
 {
-    uint8_t* accessType = new uint8_t[apeNumPorts];
+    uint8_t *accessType = new uint8_t[apeNumPorts];
 
     int numInputLink = getNumInputLink(opId, irObjects.links);
     int numOutputLink = getNumOutputLink(opId, irObjects.links);
-    
+
     for (int i = 0; i < numInputLink; i++)
     {
         accessType[i] = APE_ACCESS_TYPE_R;
@@ -549,4 +588,27 @@ uint8_t *getFileData(std::string fileName)
     }
 
     return res;
+}
+
+uint32_t detectSize(int dataType, size_t dataValSize)
+{
+    uint32_t res;
+
+    if (dataType == RL_TYPE_INT)
+        {
+            res = sizeof(int);
+        }
+        else if (dataType == RL_TYPE_FLOAT)
+        {
+            res = sizeof(float);
+        }
+        else if (dataType == RL_TYPE_STRING)
+        {
+            res = dataValSize;
+        }
+        else
+        {
+            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
+        }
+        return res;
 }

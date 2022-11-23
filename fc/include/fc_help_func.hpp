@@ -55,7 +55,7 @@ void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE);
 /* Get config */
 DO_Config *getDoConfig(IrObjects &irObjects);
 uint32_t getDoConfig_size(IrData &irData);
-uint8_t getDoConfig_length(IrData &irData);
+uint8_t getDoConfig_length(IrData &irData, uint32_t size);
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len);
 ASF_Config *getAsfConfig(IrObjects &irObjects);
 uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects);
@@ -71,6 +71,6 @@ bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects);
 /*  */
 size_t getFileLen(std::string fileName);
 uint8_t* getFileData(std::string fileName);
-
+uint32_t detectSize(int dataType, size_t dataValSize);
 
 #endif // FC_HELP_FUNC_HPP

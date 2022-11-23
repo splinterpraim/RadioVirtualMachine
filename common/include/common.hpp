@@ -30,8 +30,11 @@
 
 #define ERR_STR_(m) RD "Error: " RT m
 #define ERR_STR(m)  ADD_LINE_FILE(ERR_STR_(m), __LINE__,__FILE__) 
+#define WARN_STR_(m) MAGENTA "Warning: " RT m
+#define WARN_STR(m) ADD_LINE_FILE(WARN_STR_(m), __LINE__,__FILE__) 
 #define RVM_ERR_STR(m)  "RVM: " ERR_STR(m)
 #define FC_ERR_STR(m)  "FC: " ERR_STR(m) 
+#define FC_WARN_STR(m) "FC: "  WARN_STR(m)
 
 #define SET_GREEN(m) GN m RT
 #define SET_RED(m) RD m RT
@@ -42,7 +45,7 @@
 #define MASK_LS_2_BIT 0x03 /* 0000 0011 */
 #define MASK_LS_3_BIT 0x07 /* 0000 0111 */
 
-
-
-
+#define RL_TYPE_INT 0
+#define RL_TYPE_FLOAT 1
+#define RL_TYPE_STRING 2
 #endif //COMMON_HPP

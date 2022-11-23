@@ -3,6 +3,13 @@
 #include <iostream>
 #include <string>
 
+#define LINK_INPUT 0 
+#define LINK_OUTPUT 1
+
+/**
+ * @brief Class for describing of Intermediate representation links
+ * 
+ */
 class IrLink{
 public:
 
@@ -30,7 +37,7 @@ private:
     std::string dataId;
     int dataOrder;
 	std::string operatorId;
-	int dir;	/* 0 - from data to operator (input)
-				   1 - from operator to data (output) */
+	int dir;	/* LINK_INPUT - from data to operator (input)
+				   LINK_OUTPUT - from operator to data (output) */
 };
 #endif // IR_LINK_H
