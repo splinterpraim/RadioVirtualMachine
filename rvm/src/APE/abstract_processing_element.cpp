@@ -66,14 +66,12 @@ int AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t time, ui
     return 0;
 }
 
-
-
 int AbstractProcessingElement::init(const uint32_t &opcode, int (*operation)(uint8_t argc, ...))
 {
     /* Throw exceptions */
     {
         /* Invalid argument operation */
-        if (operation ==  nullptr)
+        if (operation == nullptr)
         {
             throw std::invalid_argument("Setting AbstractProcessingElement failed, operation ==  nullptr!");
         }
@@ -91,6 +89,11 @@ void AbstractProcessingElement::setSendControlUnit(ControlUnit &cu)
 void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
 {
     this->cfgnBlock = &cfgnBlock;
+}
+
+uint16_t AbstractProcessingElement::getId()
+{
+    return id;
 }
 
 int AbstractProcessingElement::checkCallBack()

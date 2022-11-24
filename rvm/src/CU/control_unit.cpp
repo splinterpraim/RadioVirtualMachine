@@ -1,5 +1,6 @@
 #include "CU/control_unit.h"
 
+#include "rvm_glob_define.h"
 // using namespace rvm;
 
 ControlUnit::~ControlUnit()
@@ -11,30 +12,30 @@ ControlUnit::~ControlUnit()
 
 void ControlUnit::work()
 {
+    /* Stage Associate */
     cfgFetcher.associate(*programMemory);
     cfgnBlock.associate(*dataPath, opFetcher);
 
+    /* Stage Fetch */
+    LLOG(LogLevels::FIRST, std::cout << "STAGE FETCH" << std::endl)
     ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
     uint64_t lastCfgAddr = cfgFetcher.lastAddress();
+    LLOG(LogLevels::SECOND, showConfigObjects((*cfgCode)))
 
-
-    showConfigObjects((*cfgCode));
-    std::cout << lastCfgAddr << std::endl;
-
+    /* Stage Configure */
+    LLOG(LogLevels::FIRST, std::cout << "STAGE CONFIGURE" << std::endl)
     cfgnBlock.configure(*cfgCode);
-    cfgnBlock.runDataPath();
-    
-    
+    LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
 
+    cfgnBlock.runDataPath();
 }
 
-void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath)
+void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath &dataPath)
 {
     this->programMemory = &programMemory;
     this->basicOperations = &basicOperations;
     this->dataPath = &dataPath;
 }
-
 
 int ControlUnit::configuringDataObjects()
 {
@@ -42,8 +43,8 @@ int ControlUnit::configuringDataObjects()
 
     uint8_t binFileData[11] = {'v', 'e', 'c', 't', 'o', 'r', '.', 't', 'x', 't', '\n'};
     uint8_t binData[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    (void)binData; //warn fix
-    (void)binFileData; //warn fix
+    (void)binData;     // warn fix
+    (void)binFileData; // warn fix
     /* Allocate mem */
     dataObjects = new DataObject[dataObjects_size];
 
@@ -72,7 +73,7 @@ int ControlUnit::configuringAbstractProcessingElements()
 
     // data
     uint8_t binData[11] = {'v', 'e', 'c', 't', 'o', 'r', '.', 't', 'x', 't', '\n'};
-    (void)binData; //warn fix
+    (void)binData; // warn fix
 
     abstractProcessingElements = new AbstractProcessingElement[abstractProcessingElements_size];
     for (size_t i = 0; i < abstractProcessingElements_size; i++)

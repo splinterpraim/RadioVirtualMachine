@@ -10,7 +10,6 @@
 #include "CU/control_unit.h"
 #include "CU/rvm_data_path_configuration_block.hpp"
 
-
 // struct PortsAccessTypes{
 //     int size;
 //     std::vector<int> accessTypes;
@@ -52,8 +51,9 @@ public:
 
     void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
 
-        /* other */
-        int checkCallBack();
+    uint16_t getId();
+    /* other */
+    int checkCallBack();
     void doOperation();
     std::string to_str();
 

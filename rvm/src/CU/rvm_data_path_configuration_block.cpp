@@ -49,7 +49,7 @@ void rvm_dataPathConfigurationBlock::sendStatusFromAbstractProcessingElement(con
 void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode)
 {
     DO_Section &doSec = cfgCode.doSection;
-    dataPath->dataObjs = new DataObject[doSec.N_DO];
+    dataPath->dataObjs.resize(doSec.N_DO); // = new DataObject[doSec.N_DO];
 
     for (size_t i = 0; i < doSec.N_DO; ++i)
     {
@@ -61,16 +61,11 @@ void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode
             throw std::runtime_error(RVM_ERR_STR("Configuring Data Objects failed!"));
         }
     }
-
-    for (size_t i = 0; i < doSec.N_DO; ++i)
-    {
-        std::cout << dataPath->dataObjs[i].to_str() << std::endl;
-    }
 }
 void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigObjects &cfgCode)
 {
     APE_Section &apeSec = cfgCode.apeSection;
-    dataPath->apes = new AbstractProcessingElement[apeSec.N_APE];
+    dataPath->apes.resize(apeSec.N_APE);
 
     for (size_t i = 0; i < apeSec.N_APE; ++i)
     {
@@ -95,10 +90,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigO
         }
     }
 
-    for (size_t i = 0; i < apeSec.N_APE; ++i)
-    {
-        std::cout << dataPath->apes[i].to_str() << std::endl;
-    }
+
 }
 void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects &cfgCode)
 {
@@ -120,22 +112,26 @@ void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects
     {
         /* Creates data and processing ports (empty) */
         dataPath->asf->set(numPortsDO, numPortsAPE);
+        int cntPortsDO = 0;
+        int cntPortsAPE = 0;
 
         /* Loop to create connectors  */
         for (int i = 0; i < numPortsDO; i++)
         {
             /* Read current ASF config */
             ASF_Config &record = doSec.ASFs[i];
-
+            
             /* Range on related APE */
             for (int j = 0; j < record.N; j++)
             {
 
-                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number, record.APE_KP[j].port_number);
+                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number, record.APE_KP[j].port_number); //TODO: HERE
 
                 /* Create connectors between data ports (dataId) and next available processing ports  */
-                dataPath->asf->createConnector(i, (i + j), dir); // other approach to identify connectors without i , i + j
+                dataPath->asf->createConnector(cntPortsDO, cntPortsAPE, dir); 
+                cntPortsAPE++;
             }
+            cntPortsDO++;
         }
     }
 

@@ -59,6 +59,8 @@ public:
     void setSendControlUnit(ControlUnit &cu);
     void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
 
+    uint8_t getId();
+
     /* Other functions */
     std::string to_str();
 

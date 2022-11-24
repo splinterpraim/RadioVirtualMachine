@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstdio>
 #include <vector>
 #include <exception>
 #include <stdexcept>
@@ -20,11 +21,14 @@
 // rvm_ProgramMemory progMem;
 
 int test();
+void parseArg(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
     try
     {
+        rvm_globDefaultFill();
+        parseArg(argc, argv);
 
         // todo: replace progMem cfgFe code in Rvm run
         std::vector<std::string> cfgFileNames;
@@ -92,4 +96,31 @@ int test()
         std::cout << "Exception" << std::endl;
     }
     return 0;
+}
+
+
+void parseArg(int argc, char *argv[])
+{
+    if (argc > 2)
+    {
+        throw std::runtime_error(RVM_ERR_STR("invalid program argument"));
+    }
+
+    
+
+    if (argc == 2)
+    {
+        rvm_glob_t newGlob;
+        int logLevel = -1;
+        std::sscanf(argv[1], "%d", &logLevel);
+        if (logLevel > static_cast<int>(LogLevels::SECOND) || logLevel == -1)
+        {
+            throw std::runtime_error(RVM_ERR_STR("invalid program argument - logLevel"));
+        }
+        newGlob.log_levl = static_cast<LogLevels>(logLevel);
+        rvm_globFill(newGlob);
+    }
+    
+    
+
 }

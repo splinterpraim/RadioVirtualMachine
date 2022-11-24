@@ -1,5 +1,9 @@
 
 #include "DO/data_object.h"
+
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 #include "common.hpp"
 
 // using namespace rvm;
@@ -41,7 +45,7 @@ int DataObject::set(const uint8_t &id, const uint32_t &size, const uint32_t &acc
             this->id = id;
             this->size = size;
             this->accessTime = accessTime;
-           
+
             /* Set status */
             status.id = id;
         }
@@ -119,6 +123,10 @@ void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
     this->cfgnBlock = &cfgnBlock;
 }
 
+uint8_t DataObject::getId()
+{
+    return id;
+}
 
 std::string DataObject::to_str()
 {
@@ -130,18 +138,16 @@ std::string DataObject::to_str()
     return result_str;
 }
 
-
-
 std::string DataObject::to_strData()
 {
-    std::string result_str;
+    std::stringstream resStream;
 
     for (size_t i = 0; i < size; i++)
     {
-        result_str += std::to_string(data[i]) + " ";
+        resStream << std::hex << (int)data[i] << std::dec << " ";
     }
-    result_str += '\n';
-    return result_str;
+    resStream << std::endl;
+    return resStream.str();
 }
 
 /* Other functions */
