@@ -48,8 +48,8 @@ public:
     void createPortAPE(int id_DO, int APE_info);
 
     /* Init part */
-    void associateDataPort(int dataPortId, uint8_t *DO);
-    void associateProccessingPort(int processingPortId, uint8_t *APE);
+    void associateDataPort(int dataPortId, DataObject &DO);
+    void associateProccessingPort(int processingPortId, AbstractProcessingElement &APE);
 
     void init(int);
 

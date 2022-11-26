@@ -63,5 +63,8 @@ private:
      * @param[in] cfgCode Config code objects
      */
     void configureAbstractSwitchFabric(ConfigObjects &cfgCode);
+
+
+    int getDirectionFromAPE(ConfigObjects &cfgCode, uint8_t APE_Id, uint8_t port_number);
 };
 #endif // RVM_DATA_PATH_CONFIGURATION_BLOCK_CLASS

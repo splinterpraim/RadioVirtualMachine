@@ -13,8 +13,8 @@ ControlUnit::~ControlUnit()
 void ControlUnit::work()
 {
     /* Stage Associate */
-    cfgFetcher.associate(*programMemory);
-    cfgnBlock.associate(*dataPath, opFetcher);
+    // cfgFetcher.associate(*programMemory);
+    // cfgnBlock.associate(*dataPath, opFetcher);
 
     /* Stage Fetch */
     LLOG(LogLevels::FIRST, std::cout << "STAGE FETCH" << std::endl)
@@ -35,6 +35,10 @@ void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperation
     this->programMemory = &programMemory;
     this->basicOperations = &basicOperations;
     this->dataPath = &dataPath;
+
+    /* Stage Associate */
+    cfgFetcher.associate(*(this->programMemory));
+    cfgnBlock.associate(*(this->dataPath), opFetcher);
 }
 
 int ControlUnit::configuringDataObjects()

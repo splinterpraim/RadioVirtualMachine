@@ -27,6 +27,7 @@ void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
     createProcessingPorts(numPortsAPE);
     allocConnectors(numPortsAPE);
 }
+
 void AbstractSwitchFabric::createDataPorts(uint8_t numberPorts)
 {
     dataPorts.resize(numberPorts);
@@ -52,6 +53,26 @@ void AbstractSwitchFabric::createConnector(int DataPortsId, int ProcessingPortsI
     connectors[i].set = 1;
     i++;
 }
+
+void AbstractSwitchFabric::associateDataPort(int dataPortId, DataObject &DO)
+{
+    if (dataPortId > static_cast<int>(dataPorts.size()))
+    {
+        throw std::runtime_error(RVM_ERR_STR("Incorrect dataPortId. Out of range in ASF data ports"));
+    }
+    dataPorts[dataPortId].relatedDO = &DO;
+}
+
+void AbstractSwitchFabric::associateProccessingPort(int processingPortId, AbstractProcessingElement &APE)
+{
+    
+    if (processingPortId > static_cast<int>(processingPorts.size()))
+    {
+        throw std::runtime_error(RVM_ERR_STR("Incorrect dataPortId. Out of range in ASF data ports"));
+    }
+    processingPorts[processingPortId].relatedAPE = &APE;
+}
+
 
 std::string AbstractSwitchFabric::to_str()
 {

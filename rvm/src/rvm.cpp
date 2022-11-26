@@ -6,6 +6,7 @@ Rvm::Rvm(std::vector<std::string> &cfgFileNames)
 
 void Rvm::run()
 {
+   /* Stage associate */
    controlUnit.associate(programMemory, basicOperations, dataPath);
 
    /* Program memory load */

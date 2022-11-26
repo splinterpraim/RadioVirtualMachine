@@ -125,7 +125,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects
             for (int j = 0; j < record.N; j++)
             {
 
-                int dir = getDirectionFromAPE(record.APE_KP[j].APE_number, record.APE_KP[j].port_number); //TODO: HERE
+                int dir = getDirectionFromAPE(cfgCode, record.APE_KP[j].APE_number, record.APE_KP[j].port_number); //TODO: HERE
 
                 /* Create connectors between data ports (dataId) and next available processing ports  */
                 dataPath->asf->createConnector(cntPortsDO, cntPortsAPE, dir); 
@@ -136,33 +136,64 @@ void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects
     }
 
     /* Init ASF */
-    // {
-    //     /* Associate DO and data ports*/
-    //     {
-    //         for (range DO_N : i)
-    //         {
-    //             abstractSwitchFabric.associateDataPort(dataPortId = i, DO = &dataObjects[i]);
-    //         }
-    //     }
+    {
+        /* Associate DO and data ports*/
+        {
+            for (int i = 0; i < numPortsDO; i++)
+            {
+                dataPath->asf->associateDataPort(i, dataPath->dataObjs[i]);
+            }
+        }
 
-    //     /* Associate APE and processing ports*/
-    //     {
-    //         counterAPEPort = 0;
+        /* Associate APE and processing ports*/
+        {
+            int cntPortsAPE = 0;
 
-    //         for (range DO_N : i)
-    //         {
-    //             /* Read current ASF config */
-    //             record = readASFconfig(i);
+            for (int i = 0; i < numPortsDO; i++)
+            {
+                /* Read current ASF config */
+                ASF_Config &record = doSec.ASFs[i];
 
-    //             /* Range on related APE */
-    //             for (range record.N : j)
-    //             {
-    //                 /* Create connectors between data ports (dataId) and next available processing ports  */
-    //                 abstractSwitchFabric.associateProccessingPort(processingPortId = counterAPEPort, APE = &record.APE_part[j].ape_id);
-    //                 counterAPEPort++;
-    //             }
+                /* Range on related APE */
+                for (int j = 0; j < record.N; j++)
+                {
+                    /* Create connectors between data ports (dataId) and next available processing ports  */
+                    uint8_t apeIdFind= record.APE_KP[j].APE_number;
+                    AbstractProcessingElement * apeFind = nullptr;
+                    for (auto& ape : dataPath->apes)
+                    {
+                        if (ape.getId() == apeIdFind)
+                        {
+                            apeFind = &ape;
+                        }
+                    }
+                    if (apeFind == nullptr)
+                    {
+                        throw std::runtime_error(RVM_ERR_STR("APE id not found"));
+                    }
+                    dataPath->asf->associateProccessingPort(cntPortsAPE, *apeFind);
+                    cntPortsAPE++;
+                }
 
-    //         }
-    //     }
-    // }
+            }
+        }
+    }
+}
+
+int rvm_dataPathConfigurationBlock::getDirectionFromAPE(ConfigObjects &cfgCode, uint8_t APE_Id, uint8_t port_number)
+{
+    for (size_t i = 0; i < cfgCode.apeSection.N_APE; i++)
+    {
+        if (cfgCode.apeSection.APEs[i].APE_ID == APE_Id)
+        {
+            /* Check out of range in port of APE */
+            if (port_number > cfgCode.apeSection.APEs[i].NN)
+            {
+                throw std::runtime_error(RVM_ERR_STR("Incorrect port of APE"));
+            }
+            return cfgCode.apeSection.APEs[i].access_type[port_number-1];
+        }
+    }
+    throw std::runtime_error(RVM_ERR_STR("Cannot find APE id "));
+    
 }
