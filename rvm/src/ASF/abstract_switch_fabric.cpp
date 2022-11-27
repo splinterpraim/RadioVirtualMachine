@@ -63,7 +63,7 @@ void AbstractSwitchFabric::associateDataPort(int dataPortId, DataObject &DO)
     dataPorts[dataPortId].relatedDO = &DO;
 }
 
-void AbstractSwitchFabric::associateProccessingPort(int processingPortId, AbstractProcessingElement &APE)
+void AbstractSwitchFabric::associateProccessingPort(int processingPortId, AbstractProcessingElement &APE, uint8_t portAPE)
 {
     
     if (processingPortId > static_cast<int>(processingPorts.size()))
@@ -71,6 +71,7 @@ void AbstractSwitchFabric::associateProccessingPort(int processingPortId, Abstra
         throw std::runtime_error(RVM_ERR_STR("Incorrect dataPortId. Out of range in ASF data ports"));
     }
     processingPorts[processingPortId].relatedAPE = &APE;
+    processingPorts[processingPortId].port_number = portAPE;
 }
 
 
@@ -83,11 +84,11 @@ std::string AbstractSwitchFabric::to_str()
             result_str += std::to_string(port.relatedDO->getId()) + " ";
     }
 
-    result_str += "\nprocessing ports related " + std::to_string(processingPorts.size()) + ":\n";
+    result_str += "\nprocessing ports related " + std::to_string(processingPorts.size()) + ":\n(APE Id, port):\n";
     for (auto &port : processingPorts)
     {
         if (port.relatedAPE != nullptr)
-            result_str += std::to_string(port.relatedAPE->getId()) + " ";
+            result_str += "("+std::to_string(port.relatedAPE->getId()) + ":" + std::to_string(port.port_number) + ") ";
     }
 
     result_str += "\nconnectors " + std::to_string(connectors.size()) + ":\n(dataPortId, processingPortId, dir):\n";
@@ -95,11 +96,11 @@ std::string AbstractSwitchFabric::to_str()
     {
         if (con.set == 1)
         {
-            result_str += "  " + std::to_string(con.dataPortId) + " " +
-                          std::to_string(con.processingPortId) + " " +
-                          std::to_string(con.dir) + "\n";
+            result_str += "(" + std::to_string(con.dataPortId) + ":" +
+                          std::to_string(con.processingPortId) + ":" +
+                          std::to_string(con.dir) + ") ";
         }
     }
-
+    result_str += "\n";
     return result_str;
 }

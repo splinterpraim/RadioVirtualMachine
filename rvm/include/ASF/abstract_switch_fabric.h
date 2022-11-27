@@ -11,7 +11,7 @@ typedef struct DataPort_s
 typedef struct ProcessingPort_s
 {
     AbstractProcessingElement *relatedAPE = nullptr;
-    uint8_t number = 0;
+    uint8_t port_number = 0;
 } ProcessingPort;
 
 typedef struct Connector_s
@@ -49,7 +49,7 @@ public:
 
     /* Init part */
     void associateDataPort(int dataPortId, DataObject &DO);
-    void associateProccessingPort(int processingPortId, AbstractProcessingElement &APE);
+    void associateProccessingPort(int processingPortId, AbstractProcessingElement &APE, uint8_t portAPE);
 
     void init(int);
 

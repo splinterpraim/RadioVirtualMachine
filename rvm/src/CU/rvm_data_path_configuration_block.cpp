@@ -125,7 +125,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects
             for (int j = 0; j < record.N; j++)
             {
 
-                int dir = getDirectionFromAPE(cfgCode, record.APE_KP[j].APE_number, record.APE_KP[j].port_number); //TODO: HERE
+                int dir = getDirectionFromAPE(cfgCode, record.APE_KP[j].APE_number, record.APE_KP[j].port_number-1); 
 
                 /* Create connectors between data ports (dataId) and next available processing ports  */
                 dataPath->asf->createConnector(cntPortsDO, cntPortsAPE, dir); 
@@ -171,7 +171,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects
                     {
                         throw std::runtime_error(RVM_ERR_STR("APE id not found"));
                     }
-                    dataPath->asf->associateProccessingPort(cntPortsAPE, *apeFind);
+                    dataPath->asf->associateProccessingPort(cntPortsAPE, *apeFind, record.APE_KP[j].port_number-1);
                     cntPortsAPE++;
                 }
 
@@ -191,7 +191,7 @@ int rvm_dataPathConfigurationBlock::getDirectionFromAPE(ConfigObjects &cfgCode, 
             {
                 throw std::runtime_error(RVM_ERR_STR("Incorrect port of APE"));
             }
-            return cfgCode.apeSection.APEs[i].access_type[port_number-1];
+            return cfgCode.apeSection.APEs[i].access_type[port_number];
         }
     }
     throw std::runtime_error(RVM_ERR_STR("Cannot find APE id "));
