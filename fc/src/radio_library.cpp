@@ -1,4 +1,7 @@
 #include "radio_library.hpp"
+#include <exception>
+#include <stdexcept>
+
 #include "common.hpp"
 
 #define LINK_INPUT 0
@@ -95,6 +98,7 @@ IOPortsCnt RadioLibrary::getIOPortsCnt(int opcode)
             return cntPorts;
         }
     }
-    // return opCodeTable[opcode];
+
+    throw std::runtime_error(FC_ERR_STR("Operator not found!"));
 }
 

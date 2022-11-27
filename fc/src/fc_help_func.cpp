@@ -220,35 +220,12 @@ void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE)
 
 DO_Config *getDoConfig(IrObjects &irObjects)
 {
-    //+todo: 1. type of file is not txt - it's binary.
-    //+todo: 2. error - if there are full value and path
-    //+todo: 3. mb get data from file immediately
-
     DO_Config *doConfigRes = new DO_Config[irObjects.data.size()];
     int i = 0;
     for (auto &elem : irObjects.data)
     {
         doConfigRes[i].DO_ID = i;
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
-
-        // todo: Processing of error (mismatch type)
-        for (auto &link : irObjects.links)
-        {
-            if (elem.getId().compare(link.getDataId()) == 0)
-            {
-                string opId = link.getOperatorId();
-                for (auto &op : irObjects.operators)
-                {
-                    if (opId.compare(op.getId()) == 0)
-                    {
-                        rl_Operator rl_op = radioLib.findByOpCode(std::stoi(op.getOpcode()));
-                        // todo: find type of data in radio lib and check correct type in attribute value
-                        // rl_op.ports[0].type
-                    }
-                }
-            }
-        }
-
         doConfigRes[i].size = getDoConfig_size(elem);
         doConfigRes[i].length = getDoConfig_length(elem, doConfigRes[i].size);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
@@ -307,6 +284,7 @@ uint8_t getDoConfig_length(IrData &irData, uint32_t size)
         res = getFileLen(doPath);
     }
 
+    /* Overflow type check */
     if (res > size)
     {
         std::cout << FC_WARN_STR("Length in file more then size. Data was readed partly.") << std::endl;
@@ -323,6 +301,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     uint8_t *res = nullptr;
     std::string doVal = irData.getValue();
     std::string doPath = irData.getPath();
+    int dataType = irData.getType();
 
     /* Filled both value and path */
     if ((doVal.length() != 0) && (doPath.length() != 0))
@@ -334,9 +313,21 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
     /* Filled value */
     if (doVal.length() != 0)
     {
-        if (irData.getType() == RL_TYPE_INT)
+        if (dataType == RL_TYPE_INT)
         {
-            int intVal = std::stoi(doVal);
+            size_t procSymbCnt = 0;
+            for (auto sym : doVal)
+            {
+                if (sym == ' ')
+                {
+                    throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+                }
+            }
+            int intVal = std::stoi(doVal, &procSymbCnt);
+            if (procSymbCnt != doVal.size())
+            {
+                throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+            }
             if (fc_glob.endian == CMN_LITTLE_ENDIAN)
             {
                 intVal = reverseEndian(intVal);
@@ -345,9 +336,22 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&intVal, len);
         }
-        else if (irData.getType() == RL_TYPE_FLOAT)
+        else if (dataType == RL_TYPE_FLOAT)
         {
-            float fltVal = std::stof(doVal);
+            size_t procSymbCnt = 0;
+            for (auto sym : doVal)
+            {
+                if (sym == ' ')
+                {
+                    throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+                }
+            }
+
+            float fltVal = std::stof(doVal, &procSymbCnt);
+            if (procSymbCnt != doVal.size())
+            {
+                throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+            }
             if (fc_glob.endian == CMN_LITTLE_ENDIAN)
             {
                 fltVal = reverseEndian(fltVal);
@@ -356,7 +360,7 @@ uint8_t *getDoConfig_data(IrData &irData, uint8_t len)
             res = new uint8_t[len];
             std::memcpy((void *)res, (const void *)&fltVal, len);
         }
-        else if (irData.getType() == RL_TYPE_STRING)
+        else if (dataType == RL_TYPE_STRING)
         {
             // todo: get data for string
             // res = irData.getValue().size();
