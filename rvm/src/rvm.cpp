@@ -7,7 +7,7 @@ Rvm::Rvm(std::vector<std::string> &cfgFileNames)
 void Rvm::run()
 {
    /* Stage associate */
-   controlUnit.associate(programMemory, basicOperations, dataPath);
+   controlUnit.associate(programMemory, basicOperations, dataPath); //todo: replace to constructor
 
    /* Program memory load */
    for (auto fileName : cfgFileNames)
