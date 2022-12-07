@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <program name="inner product Complex">
-<!-- add attribute opcode for operator -->
+
   <operator id="multiplier2" type="Complex" opcode="0">
     <data id="x1" path="" connect_type="input" order="1" access_time="10" value="256y" />
     <data id="y1" path="" connect_type="input" order="2" access_time="10" value="28" />
