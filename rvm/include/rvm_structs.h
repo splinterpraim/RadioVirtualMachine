@@ -7,7 +7,7 @@
 
 enum stDO
 {
-    empty,
+    empty = 0,
     full
 };
 
@@ -38,7 +38,7 @@ namespace at
 struct StatusFromDataObject
 {
     uint8_t id : 8;
-    uint8_t state : 1;      // 0 - empty, 1 - full
+    uint8_t state : 1;      // stDO::empty - empty, stDO::full - full
     uint8_t accessType : 2; // 0 - at::read,  1 - at::write, 2 - at::readErase
     uint8_t exception : 2; //
 

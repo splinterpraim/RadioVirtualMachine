@@ -56,8 +56,20 @@ public:
      * @param cu[in] associated Control Unit object
      * @return void
      */
-    void setSendControlUnit(ControlUnit &cu);
+    // void setSendControlUnit(ControlUnit &cu);
+    
     void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
+
+    /**
+     * @brief Returns a value indicating the availability of the data
+     * 
+     * @retval stDO::empty  if data is empty 
+     * @retval stDO::full  if data is full 
+     */
+    uint8_t dataEnable(); 
+
+    uint8_t & read();
+    void write(uint8_t & tmpData);
 
     uint8_t getId();
 

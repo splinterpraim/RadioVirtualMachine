@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
+#include <iterator>
+
 #include "common.hpp"
 
 // using namespace rvm;
@@ -113,14 +116,61 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
     return 0;
 }
 
-void DataObject::setSendControlUnit(ControlUnit &cu)
-{
-    this->cu = &cu;
-}
+// void DataObject::setSendControlUnit(ControlUnit &cu)
+// {
+//     this->cu = &cu;
+// }
 
 void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
 {
     this->cfgnBlock = &cfgnBlock;
+}
+
+uint8_t DataObject::dataEnable()
+{
+    return status.state;
+}
+
+uint8_t &DataObject::read()
+{
+    if (!data)
+    {
+        throw std::runtime_error(RVM_ERR_STR("data is not initialized"));
+    }
+
+    if (status.state == stDO::empty)
+    {
+        throw std::runtime_error(RVM_ERR_STR("attempt to read empty data"));
+    }
+
+    uint8_t *tmpData = new uint8_t[size];
+    for (uint32_t  i = 0; i < size; i++)
+    {
+        tmpData[i] = data[i];
+        data[i] = 0;
+    }
+
+    status.state = stDO::empty; // todo: notify DP_cfgBlock
+    return *tmpData;
+}
+
+void DataObject::write(uint8_t &tmpData)
+{
+    if (!data)
+    {
+        throw std::runtime_error(RVM_ERR_STR("data is not initialized"));
+    }
+
+    if (status.state == stDO::full)
+    {
+        throw std::runtime_error(RVM_ERR_STR("attempt to write in full data"));
+    }
+    uint8_t * ptrTmpData = &tmpData;
+    for (uint32_t  i = 0; i < size; i++)
+    {
+        data[i] = ptrTmpData[i];
+    }
+    status.state = stDO::full; // todo: notify DP_cfgBlock
 }
 
 uint8_t DataObject::getId()

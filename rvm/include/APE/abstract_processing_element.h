@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "class_definition.h"
+#include "rvm_structs.h"
 #include "CU/control_unit.h"
 #include "CU/rvm_data_path_configuration_block.hpp"
 
@@ -14,6 +15,41 @@
 //     int size;
 //     std::vector<int> accessTypes;
 // };
+struct PortAPE_s //? map using?
+{
+    uint8_t num = 0;
+    uint8_t accessTypes = 0; /*  Port type  */
+};
+typedef struct PortAPE_s PortAPE;
+
+class APEportManager
+{
+public:
+    APEportManager();
+    void init(uint8_t numPorts);
+    void associate(std::vector<PortAPE> &portsAPE);
+
+    void commitDataEnable(uint8_t portNumber, uint8_t dEnable);
+
+    /**
+     * @brief Indicates ports ready for data transfer
+     * 
+     * @retval true - ready
+     * @retval false - not ready
+     */
+    bool portsReady();
+
+    void storeData(uint8_t portNumber, uint8_t &ptrTmpData);
+    uint8_t & loadData(uint8_t portNumber);
+
+
+private:
+    std::vector<PortAPE> *portsAPE;
+    std::vector<uint8_t> portsEnables;
+    std::vector<uint8_t*> portsDataBuffer;
+    uint8_t numPorts = 0;
+
+};
 
 class AbstractProcessingElement
 {
@@ -46,10 +82,31 @@ public:
      */
     int init(const uint32_t &opcode, int (*operation)(uint8_t argc, ...));
 
+    /**
+     * @brief Starts an operation on the data
+     * 
+     */
+    void run();
+
     /* Sets a pointer to the associated Control Unit */
     void setSendControlUnit(ControlUnit &cu);
 
     void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
+
+    void dataEnable(uint8_t portNumber, uint8_t dEnable);
+
+    /**
+     * @brief Returns access type for specific ports of APE and ports readiness
+     * 
+     * @param[in] portNumber Port number
+     * @param[out] acType  Access type
+     * @retval true - if ports of APE ready to transfer data
+     * @retval false - if not ready
+     */
+    bool accessType(uint8_t portNumber, uint8_t &acType);
+
+    void read(uint8_t portNumber, uint8_t &ptrTmpData);
+    uint8_t & write(uint8_t portNumber);
 
     uint16_t getId();
     /* other */
@@ -71,13 +128,8 @@ private:
 
     StatusFromAbstractProcessingElement status;
 
-    struct portAPE //? map using?
-    {
-        uint8_t num = 0;
-        uint8_t accessTypes = 0; /*  Port type  */
-    };
-
-    portAPE *ports = nullptr;
+    APEportManager portsMngr; /* Port manager */
+    std::vector<PortAPE> ports; //todo: vector 
     uint8_t numPorts = 0;
 
     /* for dynamic operations */

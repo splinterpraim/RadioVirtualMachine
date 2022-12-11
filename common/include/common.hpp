@@ -53,6 +53,9 @@
 #define LINK_INPUT 0 
 #define LINK_OUTPUT 1
 
+#define APE_ACCESS_TYPE_R 0
+#define APE_ACCESS_TYPE_W 1
+
 /* Log levels  */
 enum class LogLevels
 {

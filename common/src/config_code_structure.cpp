@@ -104,3 +104,24 @@ void clearConfigObjects(ConfigObjects & cfgObj)
     }
     std::memset(&(cfgObj.apeSection), 0, sizeof(APE_Section));
 }
+
+
+
+
+#include <cstddef>
+bool endianIsLittle()
+{
+    short int word = 0x0001;
+    char *b = (char *)&word;
+    return (b[0] ? true : false);
+}
+
+int reverseEndian(int val)
+{
+    int res = 0;
+    for (std::size_t i = 0; i < sizeof(val); ++i)
+    {
+        res = (res << 8) | ((val >> 8 * i) & 0xFF);
+    }
+    return res;
+}

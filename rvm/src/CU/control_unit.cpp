@@ -27,7 +27,11 @@ void ControlUnit::work()
     cfgnBlock.configure(*cfgCode);
     LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
 
+    LLOG(LogLevels::FIRST, std::cout << "STAGE RUN" << std::endl)
     cfgnBlock.runDataPath();
+    LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
+    LLOG(LogLevels::FIRST, std::cout << "STAGE FINISH" << std::endl)
+
 }
 
 void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath &dataPath)
@@ -55,7 +59,7 @@ int ControlUnit::configuringDataObjects()
     /* Do setting, initialazing */
     for (size_t i = 0; i < dataObjects_size; i++)
     {
-        dataObjects[i].setSendControlUnit(*this);
+        // dataObjects[i].setSendControlUnit(*this);
         dataObjects[i].set(i + 1, dataObjects_size, 0);
         dataObjects[i].init(*binFileData, 255);
     }
@@ -82,7 +86,7 @@ int ControlUnit::configuringAbstractProcessingElements()
     abstractProcessingElements = new AbstractProcessingElement[abstractProcessingElements_size];
     for (size_t i = 0; i < abstractProcessingElements_size; i++)
     {
-        abstractProcessingElements[i].setSendControlUnit(*this);
+        // abstractProcessingElements[i].setSendControlUnit(*this);
         // abstractProcessingElements[i].setID(i + 1, 2);
         // for (size_t j = 0; j < 2; j++)
         // {

@@ -4,6 +4,7 @@
 #include <vector>
 #include "class_definition.h"
 #include "common.hpp"
+#include "system_func.hpp"
 
 #include "DO/data_object.h"
 
@@ -22,11 +23,13 @@ int rvm_dataPathConfigurationBlock::configure(ConfigObjects &cfgCode)
     configureDataObjects(cfgCode);
     configureAbstractProcessingElements(cfgCode);
     configureAbstractSwitchFabric(cfgCode);
+    //todo: collect status and check it
     return 0;
 }
 
 void rvm_dataPathConfigurationBlock::runDataPath()
 {
+    dataPath->asf->run();
 }
 
 void rvm_dataPathConfigurationBlock::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
@@ -55,6 +58,18 @@ void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode
     {
         dataPath->dataObjs[i].associate(*this);
         dataPath->dataObjs[i].set(doSec.DOs[i].DO_ID, doSec.DOs[i].size, doSec.DOs[i].access_time);
+        if ( doSec.DOs[i].data )
+        {
+            if(endianIsLittle())
+            {
+                int tmpData0 = 0;
+                std::memcpy((void *)&tmpData0, (const void *) doSec.DOs[i].data, sizeof(tmpData0));
+
+                int tmpData1= reverseEndian(tmpData0);
+                std::memcpy((void *)doSec.DOs[i].data, (const void *)&tmpData1, sizeof(tmpData1));
+
+            }
+        }
         dataPath->dataObjs[i].init(*(doSec.DOs[i].data), doSec.DOs[i].length); //! len > size
         if (errorHand)
         {
