@@ -69,7 +69,10 @@ void showDoSection(DO_Section &doSec)
 void showControlSection(ControlSection &ctrlSec)
 {
     std::string space = "  ";
-    std::cout << space << "LCF: " << (int)ctrlSec.LCF << ", NAF: " << (int)ctrlSec.NAF << ", Task_ID: " << (int)ctrlSec.Task_ID << ", RPI_version: " << (int)ctrlSec.RPI_version << ", Reference_ID: " << (int)ctrlSec.Reference_ID << ", Impl_version: " << (int)ctrlSec.Implementation_version << ", Developer_ID: " << (unsigned int)ctrlSec.Developer_ID << ", Creation_Date: " << (unsigned int)ctrlSec.Creation_Date << std::endl;
+    std::cout << space << "LCF: " << (int)ctrlSec.LCF << ", NAF: " << (int)ctrlSec.NAF << ",\n"
+    << space << "Task_ID: " << (int)ctrlSec.Task_ID << ", RPI_version: " << (int)ctrlSec.RPI_version << ",\n"
+    << space << "Reference_ID: " << (int)ctrlSec.Reference_ID << ", Impl_version: " << (int)ctrlSec.Implementation_version << ",\n"
+    << space << "Developer_ID: " << (unsigned int)ctrlSec.Developer_ID << ", Creation_Date: " << (unsigned int)ctrlSec.Creation_Date << std::endl;
 }
 
 
@@ -108,20 +111,3 @@ void clearConfigObjects(ConfigObjects & cfgObj)
 
 
 
-#include <cstddef>
-bool endianIsLittle()
-{
-    short int word = 0x0001;
-    char *b = (char *)&word;
-    return (b[0] ? true : false);
-}
-
-int reverseEndian(int val)
-{
-    int res = 0;
-    for (std::size_t i = 0; i < sizeof(val); ++i)
-    {
-        res = (res << 8) | ((val >> 8 * i) & 0xFF);
-    }
-    return res;
-}
