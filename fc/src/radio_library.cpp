@@ -10,7 +10,7 @@
 // #define RL_TYPE_INT 0
 // #define RL_TYPE_FLOAT 1
 // #define RL_TYPE_STRING 2
-// need different opcodes for typisation
+// need different opcodes for typisation (Int32, int16 and etc)
 // what needs to do for complex operators (now there is no opcode for them)
 
 RadioLibrary::RadioLibrary()
