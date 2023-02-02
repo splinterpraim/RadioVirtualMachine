@@ -1,7 +1,7 @@
 //
 // Created by Елена on 15.05.2022.
 //
-#include "frontend_compiler.h"
+#include "frontend_compiler.hpp"
 #include <string>
 #include <map>
 #include <algorithm>
@@ -135,24 +135,6 @@ ConfigObjects convert2rvmIr(IrObjects &irObjects)
     fillDoSection(configObjects, irObjects);
     fillApeSection(configObjects, irObjects);
     return configObjects;
-}
-
-void showConfigObjects(ConfigObjects &cfgObj)
-{
-    std::cout << "Control Section: " << std::endl;
-    showControlSection(cfgObj.controlSection);
-    std::cout << "DO Section: " << std::endl;
-    showDoSection(cfgObj.doSection);
-    std::cout << "APE Section: " << std::endl;
-    showApeSection(cfgObj.apeSection);
-}
-
-void clearConfigObjects(ConfigObjects &cfgObj)
-{
-    delete[] cfgObj.doSection.DOs->data;
-    delete[] cfgObj.doSection.DOs;
-    delete[] cfgObj.doSection.ASFs->APE_KP;
-    delete[] cfgObj.doSection.ASFs;
 }
 
 #define CFG_WRITE(v)                                                \

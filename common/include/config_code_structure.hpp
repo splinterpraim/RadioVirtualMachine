@@ -78,8 +78,19 @@ struct ConfigObjects{
 using ConfigObjects = struct ConfigObjects;
 
 
-void initConfigObjects(ConfigObjects & cfgObj); 
-void showConfigObjects(ConfigObjects & cfgObj); 
+void initConfigObjects(ConfigObjects & cfgObj);
+/**
+ * @brief Shows Config objects in standart output
+ * 
+ * @param cfgObj Config objects for output
+ */ 
+void showConfigObjects(ConfigObjects & cfgObj);
+
+/**
+ * @brief Clear Config Objects
+ * 
+ * @param cfgObj Reference to Config Objects
+ */ 
 void clearConfigObjects(ConfigObjects & cfgObj); 
 
 

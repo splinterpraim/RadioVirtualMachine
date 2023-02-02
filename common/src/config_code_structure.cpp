@@ -80,8 +80,8 @@ void showControlSection(ControlSection &ctrlSec)
 void initConfigObjects(ConfigObjects & cfgObj)
 {
     std::memset(&(cfgObj), 0, sizeof(ConfigObjects));
-
 }
+
 void showConfigObjects(ConfigObjects &cfgObj)
 {
     std::cout << "Control Section: " << std::endl;

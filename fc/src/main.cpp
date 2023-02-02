@@ -11,12 +11,12 @@
 #include "pugixml/pugixml.hpp"
 
 /* Project headers */
-#include "ir_data.h"
-#include "ir_operator.h"
-#include "ir_link.h"
-#include "frontend_compiler.h"
+#include "ir_data.hpp"
+#include "ir_operator.hpp"
+#include "ir_link.hpp"
+#include "frontend_compiler.hpp"
 #include "radio_library.hpp"
-
+#include "config_code_structure.hpp"
 #include "fc_glob.hpp"
 #include "fc_glob_func.hpp"
 

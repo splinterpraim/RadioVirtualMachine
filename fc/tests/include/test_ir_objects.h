@@ -9,9 +9,9 @@
 #include <string>
 
 /* Project headers */
-#include "../../include/ir_data.h"
-#include "../../include/ir_operator.h"
-#include "../../include/ir_link.h"
+#include "../../include/ir_data.hpp"
+#include "../../include/ir_operator.hpp"
+#include "../../include/ir_link.hpp"
 
 /* Testing @1: testing IrData */
 void testIrData();

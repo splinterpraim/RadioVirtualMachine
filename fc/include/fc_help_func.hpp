@@ -13,9 +13,9 @@
 
 /* Project headers */
 #include "ir_objects.hpp"
-#include "ir_data.h"
-#include "ir_operator.h"
-#include "ir_link.h"
+#include "ir_data.hpp"
+#include "ir_operator.hpp"
+#include "ir_link.hpp"
 #include "config_code_structure.hpp"
 
 /* ######## Help functions*/
@@ -45,12 +45,6 @@ void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData>
 
 /* ######## Help functions*/
 /* ************************** convert2rvmIr */
-void showControlSection(ControlSection &ctrlSec);
-void showDoSection(DO_Section &doSec);
-void showDO_Config(DO_Config &doCfg, uint8_t N_DO);
-void showASF_config(ASF_Config &asfCfg, uint8_t N_DO);
-void showApeSection(APE_Section &apeSec);
-void showAPE_Config(APE_Config &apeCfg, uint16_t N_APE);
 
 /* Get config */
 DO_Config *getDoConfig(IrObjects &irObjects);

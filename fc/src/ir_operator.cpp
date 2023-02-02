@@ -1,4 +1,4 @@
-#include "ir_operator.h"
+#include "ir_operator.hpp"
 
 void IrOperator::setId(const std::string &id){
     if (id == "")

@@ -3,7 +3,6 @@
 
 /**
  * @brief Sets global variables
- * 
  */
 void fc_glob_set();
 

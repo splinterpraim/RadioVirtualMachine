@@ -6,9 +6,9 @@
 #include <vector> 
 
 /* Project headers */
-#include "ir_data.h"
-#include "ir_operator.h"
-#include "ir_link.h"
+#include "ir_data.hpp"
+#include "ir_operator.hpp"
+#include "ir_link.hpp"
 
 /**
  * @brief Class for describing of Intermediate representation objects

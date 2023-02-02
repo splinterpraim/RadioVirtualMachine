@@ -15,9 +15,9 @@
 
 /* Project headers */
 #include "ir_objects.hpp"
-#include "ir_data.h"
-#include "ir_operator.h"
-#include "ir_link.h"
+#include "ir_data.hpp"
+#include "ir_operator.hpp"
+#include "ir_link.hpp"
 #include "config_code_structure.hpp"
 
 
@@ -44,21 +44,6 @@ void showIrObjects(const IrObjects &irObjects);
  * @return ConfigObjects 
  */
 ConfigObjects convert2rvmIr(IrObjects &irObjects); 
-
-/**
- * @brief Shows Config objects in standart output
- * 
- * @param cfgObj Config objects for output
- */
-void showConfigObjects(ConfigObjects & cfgObj); 
-
-/**
- * @brief Clear Config Objects
- * 
- * @param cfgObj Reference to Config Objects
- */
-void clearConfigObjects(ConfigObjects & cfgObj);
-
 
 /**
  * @brief Create RVM binary config code from Config Objects 

@@ -1,4 +1,4 @@
-#include "ir_data.h"
+#include "ir_data.hpp"
 
 
 void IrData::setId(const string &id) {
