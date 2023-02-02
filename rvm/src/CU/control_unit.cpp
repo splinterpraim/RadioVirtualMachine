@@ -20,6 +20,7 @@ void ControlUnit::work()
     LLOG(LogLevels::FIRST, std::cout << "STAGE FETCH" << std::endl)
     ConfigObjects *cfgCode = cfgFetcher.fetch(cfgCounter);
     uint64_t lastCfgAddr = cfgFetcher.lastAddress();
+    (void)lastCfgAddr; /* fix warn */
     LLOG(LogLevels::SECOND, showConfigObjects((*cfgCode)))
 
     /* Stage Configure */

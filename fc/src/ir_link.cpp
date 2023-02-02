@@ -15,14 +15,18 @@ void IrLink::setDataOrder(int dataOrder){
 }
 
 void IrLink::setOperatorId(std::string operatorId){
-    if (operatorId == "")
+    if (operatorId.size() == 0)
+    {
         throw std::invalid_argument("setOperatorId function failed, argument 'operatorId' is empty");
+    }
 	this->operatorId = operatorId;
 }
 
 void IrLink::setDir(int dir){
     if (dir < 0)
+    {
         throw std::invalid_argument("setDir function failed, argument 'dir' is negative");
+    }
 	this->dir = dir;
 }
 
