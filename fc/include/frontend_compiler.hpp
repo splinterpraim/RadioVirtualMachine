@@ -1,6 +1,10 @@
-//
-// Created by Елена on 15.05.2022.
-//
+/**
+ * @file frontend_compiler.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Front-end compiler
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
 #ifndef FC_FRONTEND_COMPILER_H
 #define FC_FRONTEND_COMPILER_H
@@ -21,7 +25,7 @@
 #include "config_code_structure.hpp"
 
 
-// todo: doxygen comment style
+
 /**
  * @brief Parse XML file to Intermediate representation
  * 

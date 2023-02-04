@@ -1,3 +1,11 @@
+/**
+ * @file radio_library.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Reference Radio Library
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "radio_library.hpp"
 #include <exception>
 #include <stdexcept>

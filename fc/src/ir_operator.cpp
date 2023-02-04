@@ -1,3 +1,11 @@
+/**
+ * @file ir_operator.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of operator
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "ir_operator.hpp"
 
 void IrOperator::setId(const std::string &id){

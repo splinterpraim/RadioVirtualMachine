@@ -1,5 +1,12 @@
-#include "ir_link.hpp"
+/**
+ * @file ir_link.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of link
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
+#include "ir_link.hpp"
 
 void IrLink::setDataId(std::string dataId){
     if (dataId == "")

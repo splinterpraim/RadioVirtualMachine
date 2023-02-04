@@ -1,3 +1,11 @@
+/**
+ * @file radio_library.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Reference Radio Library
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef RADIO_LIBRARY_HPP
 #define RADIO_LIBRARY_HPP
 #include <iostream>

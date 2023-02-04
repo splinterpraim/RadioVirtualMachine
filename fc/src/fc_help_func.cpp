@@ -1,3 +1,11 @@
+/**
+ * @file fc_help_func.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Help functions for front-end compiler
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_help_func.hpp"
 #include "common.hpp"
 #include "fc_glob.hpp"
@@ -19,7 +27,6 @@
 extern fc_glob_t fc_glob;
 extern RadioLibrary radioLib;
 
-/* ######## Help functions*/
 IrOperator convertToIrOperator(pugi::xml_node &op_xml)
 {
     IrOperator op;
@@ -111,21 +118,6 @@ std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conn
     return dataResult;
 }
 
-std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml)
-{
-    std::vector<IrData> dataResult;
-    for (auto data : op_xml)
-    {
-        std::string connect_type = data.attribute("connect_type").value();
-        if (connect_type == "output")
-        {
-            IrData currData = convertToIrData(data);
-            dataResult.push_back(currData);
-        }
-    }
-    return dataResult;
-}
-
 void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData)
 {
     for (auto el : newData)
@@ -146,7 +138,6 @@ void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData>
     }
 }
 
-/* ######## Help functions*/
 /* ************************** convert2rvmIr */
 
 DO_Config *getDoConfig(IrObjects &irObjects)
@@ -353,7 +344,7 @@ ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irO
         /* Finds a link with a dataId field equal to IR dataId */
         if (dataId.compare(link.getDataId()) == 0)
         {
-            res[i].APE_number = getApeOrderNum(link.getOperatorId(), irObjects);
+            res[i].APE_number = getApeIdForCfgCode(link.getOperatorId(), irObjects);
 
             /* input */
             if (link.getDir() == 0)
@@ -371,7 +362,8 @@ ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irO
 
     return res;
 }
-uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects)
+
+uint8_t getApeIdForCfgCode(std::string apeId, IrObjects &irObjects)
 {
     uint8_t apeOrderNum = 0;
 
@@ -530,20 +522,20 @@ uint32_t detectSize(int dataType, size_t dataValSize)
     uint32_t res;
 
     if (dataType == RL_TYPE_INT)
-        {
-            res = sizeof(int);
-        }
-        else if (dataType == RL_TYPE_FLOAT)
-        {
-            res = sizeof(float);
-        }
-        else if (dataType == RL_TYPE_STRING)
-        {
-            res = dataValSize;
-        }
-        else
-        {
-            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
-        }
-        return res;
+    {
+        res = sizeof(int);
+    }
+    else if (dataType == RL_TYPE_FLOAT)
+    {
+        res = sizeof(float);
+    }
+    else if (dataType == RL_TYPE_STRING)
+    {
+        res = dataValSize;
+    }
+    else
+    {
+        throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
+    }
+    return res;
 }

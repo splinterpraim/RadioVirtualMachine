@@ -1,3 +1,11 @@
+/**
+ * @file ir_data.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of data
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef IR_DATA_H
 #define IR_DATA_H
 #include <iostream>
@@ -8,7 +16,6 @@
 using namespace std;
 /**
  * @brief Class for describing of Intermediate representation data
- *
  */
 class IrData
 {

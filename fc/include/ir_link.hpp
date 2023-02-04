@@ -1,3 +1,11 @@
+/**
+ * @file ir_link.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of link
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef IR_LINK_H
 #define IR_LINK_H
 #include <iostream>

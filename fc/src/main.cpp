@@ -1,3 +1,11 @@
+/**
+ * @file main.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Main
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #define FC_LOG(s) std::cout << s << std::endl
 
 /* C++ headers */
@@ -18,13 +26,10 @@
 #include "radio_library.hpp"
 #include "config_code_structure.hpp"
 #include "fc_glob.hpp"
-#include "fc_glob_func.hpp"
 
 // #include "../tests/include/test_ir_objects.h"
-fc_glob_t fc_glob;
+
 RadioLibrary radioLib;
-
-
 
 ///******************************
 int main(int argc, char *argv[])
@@ -44,6 +49,7 @@ int main(int argc, char *argv[])
         {
             file_nameSWIR = argv[1];
         }
+
 
         FC_LOG("----- parseSWIR");
         struct IrObjects irObjects = parseSWIR(file_nameSWIR);

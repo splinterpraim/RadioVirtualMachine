@@ -1,3 +1,11 @@
+/**
+ * @file ir_operator.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of operator
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef IR_OPERATOR_H
 #define IR_OPERATOR_H
 
@@ -6,7 +14,6 @@
 
 /**
  * @brief Class for describing of Intermediate representation operator
- *
  */
 class IrOperator
 {

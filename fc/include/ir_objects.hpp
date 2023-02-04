@@ -1,3 +1,11 @@
+/**
+ * @file ir_objects.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation Objects
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef FC_IR_OBJECTS_HPP
 #define FC_IR_OBJECTS_HPP
 
@@ -12,7 +20,6 @@
 
 /**
  * @brief Class for describing of Intermediate representation objects
- * 
  */
 struct IrObjects
 {

@@ -1,3 +1,10 @@
+/**
+ * @file fc_help_func.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Help functions for front-end compiler
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
 #ifndef FC_HELP_FUNC_HPP
 #define FC_HELP_FUNC_HPP
@@ -18,53 +25,243 @@
 #include "ir_link.hpp"
 #include "config_code_structure.hpp"
 
-/* ######## Help functions*/
 /* ************************** parseSWIR */
-/* Convert function */
+
+/**
+ * @brief Converts operator in XML format to IR operator format
+ * 
+ * @param[in] op_xml Operator in XML format
+ * 
+ * @retval IrOperator IR operator format
+ */
 IrOperator convertToIrOperator(pugi::xml_node &op_xml);
+
+/**
+ * @brief Converts data in XML format to IR data format
+ * 
+ * @param[in] data_xml Data in XML format
+ * 
+ * @retval IrData IR data format
+ */
 IrData convertToIrData(pugi::xml_node &data_xml);
 
-/* Show functions */
+/**
+ * @brief Shows IR operators
+ * 
+ * @param[in] operators Vector of IR operators
+ */
 void showIrOperators(const std::vector<IrOperator> &operators);
 
+/**
+ * @brief Shows IR data
+ * 
+ * @param[in] data Vector of IR data
+ */
 void showIrData(const std::vector<IrData> &data);
 
+/**
+ * @brief Shows IR links
+ * 
+ * @param[in] links Vector of IR links 
+ */
 void showIrLinks(const std::vector<IrLink> &links);
 
-/* Take data */
+/**
+ * Takes all data connected with specific operator and specific connect type.
+ * Converts data to key-value array where the key is order and value is IR data.
+ * 
+ * @param[in] op_xml Operator in XML format
+ * @param[in] connectType Type of connection operator with data
+ * 
+ * @retval std::map<int, IrData> Key-value array of IR data
+ */
 std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType);
 
-std::vector<IrData> takeOutputIrData(pugi::xml_node &op_xml);
-
-/* Add data to vector */
+/**
+ * @brief Adds IR data from key-value array to IR data vector if data is not exist 
+ * 
+ * @param[in,out] data Vector of IR data
+ * @param[in] newData Key-value array of IR data
+ */
 void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData);
 
-/* Create link */
+/**
+ * Creates a links with using key-value array of IR data and IR operator.
+ * Adds created links in vector of IR links.
+ * 
+ * @param[in,out] links Vector of IR links
+ * @param[in] data Vector of IR data
+ * @param[in] op IR operator
+ * @param[in] dir Direction of data to operator
+ */
 void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
 
-
-/* ######## Help functions*/
 /* ************************** convert2rvmIr */
 
-/* Get config */
+/**
+ * @brief Creates the DO Configs from IR objects
+ * 
+ * @param[in] irObjects IR objects
+ * 
+ * @retval DO_Config* Pointer to created DO Configs
+ */
 DO_Config *getDoConfig(IrObjects &irObjects);
+
+/**
+ * @brief Gets data size from IR data for the DO Config field
+ * 
+ * @param[in] irData IR data
+ * 
+ * @retval uint32_t Data size
+ */
 uint32_t getDoConfig_size(IrData &irData);
+
+/**
+ * @brief Gets real data length from IR data for the DO Config field
+ * 
+ * @param[in] irData IR data
+ * @param[in] size Data size
+ *  
+ * @retval uint8_t Data length
+ */
 uint8_t getDoConfig_length(IrData &irData, uint32_t size);
+
+/**
+ * @brief Gets data from IR data for the DO Config field
+ * 
+ * @param[in] irData IR data
+ * @param[in] len Data length
+ * 
+ * @retval uint8_t* Pointer to data
+ */
 uint8_t *getDoConfig_data(IrData &irData, uint8_t len);
+
+/**
+ * @brief Creates the ASF Configs from IR objects
+ * 
+ * @param[in] irObjects IR objects
+ *  
+ * @retval ASF_Config* Pointer to created ASF Configs
+ */
 ASF_Config *getAsfConfig(IrObjects &irObjects);
+
+/**
+ * @brief Gets amount of IR data connections with IR operators for the AsfConfig field 
+ * 
+ * @param[in] irData IR data
+ * @param[in] irObjects IR objects
+ * 
+ * @retval uint8_t Amount of IR data connections 
+ */
 uint8_t getAsfConfig_numApe(IrData &irData, IrObjects &irObjects);
+
+/**
+ * @brief Gets IR data connections with IR operators for the AsfConfig field
+ * 
+ * @param[in] irData    IR data
+ * @param[in] N         Amount of IR data connections
+ * @param[in] irObjects IR objects
+ * 
+ * @retval ASF_variable_part* Pointer to IR data connections
+ */
 ASF_variable_part *getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects);
-uint8_t getApeOrderNum(std::string apeId, IrObjects &irObjects);
+
+/**
+ * @brief Gets operator ID in context of Config Code
+ * 
+ * @param[in] apeId IR operator ID
+ * @param[in] irObjects IR objects
+ * 
+ * @retval uint8_t Operator ID
+ */
+uint8_t getApeIdForCfgCode(std::string apeId, IrObjects &irObjects);
+
+/**
+ * @brief Gets the amount of input links in operator
+ * 
+ * @param[in] opId IR operator ID
+ * @param[in] links Vector of IR links
+ * 
+ * @retval int Amount of input links
+ */
 int getNumInputLink(std::string opId , std::vector<IrLink> &links);
+
+/**
+ * @brief Gets the amount of output links in operator
+ * 
+ * @param[in] opId IR operator ID
+ * @param[in] links Vector of IR links
+ * 
+ * @retval int Amount of output links
+ */
 int getNumOutputLink(std::string opId, std::vector<IrLink> &links);
+
+/**
+ * @brief Creates the APE Configs from IR objects  
+ * 
+ * @param[in] irObjects IR objects
+ * 
+ * @retval APE_Config* Pointer to APE Configs
+ */
 APE_Config *getApeConfig(IrObjects &irObjects);
+
+/**
+ * @brief Gets the number of data connections from APE
+ * 
+ * @param[in] opId IR operator ID
+ * @param[in] irObjects IR objects
+ * 
+ * @retval uint8_t Number of data connections
+ */
 uint8_t getApeNumPorts(std::string opId, IrObjects &irObjects);
+
+/**
+ * @brief Creates the Access Type for ports of operator
+ * 
+ * @param[in] apeNumPorts   Number of data connections
+ * @param[in] opId          IR operator ID
+ * @param[in] irObjects     IR objects
+ * 
+ * @retval uint8_t* Pointer to Access Type for ports
+ */
 uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects);
+
+/**
+ * @brief Checks the mismatch between the number of input/output ports of the operator in radiolib
+ * 
+ * @param[in] irOperator IR operator
+ * @param[in] irObjects IR objects
+ * 
+ * @retval true Input/output ports are matched
+ * @retval false Input/output ports don't match
+ */
 bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects);
 
-/*  */
+/**
+ * @brief Gets the file length
+ * 
+ * @param[in] fileName Name of file
+ * 
+ * @retval size_t File length
+ */
 size_t getFileLen(std::string fileName);
+
+/**
+ * @brief Gets the file data
+ * 
+ * @param[in] fileName Name of file
+ * 
+ * @retval uint8_t* Pointer to data from file
+ */
 uint8_t* getFileData(std::string fileName);
+
+/**
+ * @brief Gets size of data depending on type
+ * 
+ * @param[in] dataType Type of data
+ * @param[in] dataValSize Number of characters. Additional argument of type string.
+ * @retval uint32_t Size of data 
+ */
 uint32_t detectSize(int dataType, size_t dataValSize);
 
 #endif // FC_HELP_FUNC_HPP

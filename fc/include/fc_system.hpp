@@ -1,3 +1,10 @@
+/**
+ * @file fc_system.hpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief System endians
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
 #ifndef FC_SYSTEM_HPP
 #define FC_SYSTEM_HPP

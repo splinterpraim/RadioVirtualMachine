@@ -1,6 +1,11 @@
-//
-// Created by Елена on 15.05.2022.
-//
+/**
+ * @file frontend_compiler.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Front-end compiler
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "frontend_compiler.hpp"
 #include <string>
 #include <map>
@@ -13,10 +18,6 @@
 #define MASK_LS_2_BIT 0x03 /* 0000 0011 */
 #define MASK_LS_3_BIT 0x07 /* 0000 0111 */
 #define MASK_1_BYTE 0xff   /* 1111 1111 */
-
-int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects);
-int fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects);
-int fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects);
 
 int fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {

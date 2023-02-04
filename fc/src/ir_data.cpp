@@ -1,3 +1,11 @@
+/**
+ * @file ir_data.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Intermediate representation of data
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "ir_data.hpp"
 
 

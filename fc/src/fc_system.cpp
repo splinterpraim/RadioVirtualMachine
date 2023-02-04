@@ -1,3 +1,11 @@
+/**
+ * @file fc_system.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief System endians
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_system.hpp"
 #include <cstddef>
 bool endianIsLittle()
