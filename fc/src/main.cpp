@@ -27,20 +27,21 @@
 #include "config_code_structure.hpp"
 #include "fc_glob.hpp"
 
-// #include "../tests/include/test_ir_objects.h"
-
 RadioLibrary radioLib;
 
-///******************************
+/**
+ * @brief Main function
+ * 
+ * @param[in] argc Amount of arguments
+ * @param[in] argv Values of arguments
+ * @retval int return code
+ */
 int main(int argc, char *argv[])
 {
-
     try
     {
-
         /* Set global var */
         fc_glob_set();
-
 
         std::string file_nameSWIR = "./XML_files/AlgScalar2.xml";
         std::string file_nameBin = "./config_codes/cfgcode1.bin";
@@ -49,7 +50,6 @@ int main(int argc, char *argv[])
         {
             file_nameSWIR = argv[1];
         }
-
 
         FC_LOG("----- parseSWIR");
         struct IrObjects irObjects = parseSWIR(file_nameSWIR);

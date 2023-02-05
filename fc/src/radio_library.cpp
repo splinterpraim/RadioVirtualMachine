@@ -70,9 +70,6 @@ RadioLibrary::RadioLibrary()
         multFloat.ports.out.push_back({3, RL_TYPE_FLOAT});
     }
     operators.push_back(multFloat);
-
-    // opCodeTable[2] = {2,1};
-    // opCodeTable[1] = {2,1};
 }
 
 rl_Operator RadioLibrary::findByOpCode(int opcode)
@@ -87,13 +84,6 @@ rl_Operator RadioLibrary::findByOpCode(int opcode)
 
     rl_Operator nullOp;
     return nullOp;
-}
-
-
-int RadioLibrary::getOpCode(std::string operatorId)
-{
-    // todo: exception hendler
-    return 0;
 }
 
 IOPortsCnt RadioLibrary::getIOPortsCnt(int opcode)
