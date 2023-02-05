@@ -1,8 +1,8 @@
 #include "rvm_data_path.hpp"
 
 #include "DO/data_object.h"
-#include "APE/abstract_processing_element.h"
-#include "ASF/abstract_switch_fabric.h"
+#include "APE/abstract_processing_element.hpp"
+#include "ASF/abstract_switch_fabric.hpp"
 #include <iostream>
 
 void rvm_DataPathShow(rvm_DataPath &dataPath)

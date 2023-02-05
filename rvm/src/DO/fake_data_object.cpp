@@ -23,7 +23,5 @@ int rvm::FakeDataObject::set(const uint8_t &id, const uint32_t &size, const uint
     /* Set status */
     status.id = id;
 
-    //! need to confirm to CU?
-    // cu->sendStatusFromDataObject(status);
     return 0;
 }

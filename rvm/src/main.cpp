@@ -8,7 +8,7 @@
 #include "rvm.hpp"
 
 #include "rvm_program_mem.hpp"
-#include "CU/control_unit.h"
+#include "CU/rvm_control_unit.hpp"
 #include "CU/rvm_cfg_code_fetcher.hpp"
 #include "DO/data_object.h"
 #include "log_manager.h"
@@ -55,29 +55,20 @@ int test()
 
         // struct StatusFromDataObject s;
         // ControlUnit mainCU, slaveCU;
-        // mainCU.configuringDataObjects();
-        // mainCU.configuringAbstractProcessingElements();
-        // mainCU.configuringAbstractSwitchFabric();
 
         /// -->>>>>>>>>>>>>>>>>
 
         // mainCU.setStatus(s);
         // slaveCU.setStatus(s);
 
-        // mainCU.showStatus();
-        // slaveCU.showStatus();
 
         // DataObject mainDO;
         // mainDO.set(1, 0, 3);
         // mainDO.setSendControlUnit(mainCU);
-        // // mainDO.setSendStatusFunction(sendStatusDO);
         // mainDO.checkCallBack();
         // s.id = 2;
         // sendStatusDO(slaveCU, s);
-        // mainCU.showStatus();
-        // slaveCU.showStatus();
 
-        // mainCU.configuringDataObjects();
     }
     catch (const std::invalid_argument &e)
     {

@@ -1,18 +1,28 @@
-#include "APE/abstract_processing_element.h"
+/**
+ * @file abstract_processing_element.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Abstract Processing Element
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
+#include "APE/abstract_processing_element.hpp"
 
 #include <algorithm>
-/* Exception Headers */
 #include <exception>
 #include <stdexcept>
 
 #include "common.hpp"
 #include "radiolib/functions.h"
 
+/* State of ports */
 #define APE_PORT_BLOCKED 1
 #define APE_PORT_ALLOWED 0
-APEportManager::APEportManager()
-{
-}
+
+/* APEportManager */
+
+APEportManager::APEportManager() { }
+
 void APEportManager::init(uint8_t numPorts)
 {
     this->numPorts = numPorts;
@@ -89,10 +99,13 @@ uint8_t &APEportManager::loadData(uint8_t portNumber)
     return *portsDataBuffer[portNumber];
 }
 
+/* AbstractProcessingElement */
+
 AbstractProcessingElement::AbstractProcessingElement()
 {
     portsMngr.associate(ports);
 }
+
 AbstractProcessingElement::~AbstractProcessingElement()
 {
     // delete[] ports;
@@ -219,11 +232,6 @@ void AbstractProcessingElement::run()
     }
 }
 
-void AbstractProcessingElement::setSendControlUnit(ControlUnit &cu)
-{
-    this->cu = &cu;
-}
-
 void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
 {
     this->cfgnBlock = &cfgnBlock;
@@ -269,24 +277,6 @@ uint16_t AbstractProcessingElement::getId()
     return id;
 }
 
-int AbstractProcessingElement::checkCallBack()
-{
-    std::cout << "d" << std::endl;
-    // status.id = id;
-    // status.state = inactive;
-    // status.exception = 0;
-    // cu->sendStatusFromAbstractProcessingElement(status);
-    int result = 0;
-    operation(3, 1, 2, result);
-    return 0;
-}
-
-void AbstractProcessingElement::doOperation()
-{
-    int rez = 0;
-    operation(3, 2, 2, 1, &rez);
-    LogManager().makeLog(std::to_string(rez));
-}
 std::string AbstractProcessingElement::to_str()
 {
     std::string result_str = "id " + std::to_string(id) + ", cost " + std::to_string(cost) +

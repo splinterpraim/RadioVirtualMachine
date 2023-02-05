@@ -17,7 +17,7 @@
 /* Project Headers */
 #include "class_definition.h"
 #include "rvm_structs.h"
-#include "CU/control_unit.h"
+#include "CU/rvm_control_unit.hpp"
 #include "CU/rvm_data_path_configuration_block.hpp"
 #include "DO/idata_object.h"
 

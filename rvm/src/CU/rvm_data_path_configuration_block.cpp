@@ -1,53 +1,26 @@
+/**
+ * @file rvm_data_path_configuration_block.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Data Path Configuration Block
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
 #include "CU/rvm_data_path_configuration_block.hpp"
+
 #include <iostream>
 #include <vector>
+
 #include "class_definition.h"
 #include "common.hpp"
 #include "system_func.hpp"
-
 #include "DO/data_object.h"
+#include "config_code_structure.hpp"
+#include "rvm_structs.h"
+#include "rvm_data_path.hpp"
+#include "CU/rvm_operation_fetcher.hpp"
 
-rvm_dataPathConfigurationBlock::rvm_dataPathConfigurationBlock()
-{
-}
-
-void rvm_dataPathConfigurationBlock::associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher)
-{
-    this->dataPath = &dataPath;
-    this->opFetcher = &opFetcher;
-}
-
-int rvm_dataPathConfigurationBlock::configure(ConfigObjects &cfgCode)
-{
-    configureDataObjects(cfgCode);
-    configureAbstractProcessingElements(cfgCode);
-    configureAbstractSwitchFabric(cfgCode);
-    //todo: collect status and check it
-    return 0;
-}
-
-void rvm_dataPathConfigurationBlock::runDataPath()
-{
-    dataPath->asf->run();
-}
-
-void rvm_dataPathConfigurationBlock::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
-{
-    if (statusDO.exception != 0)
-    {
-        errorHand = true;
-        std::cout << RVM_ERR_STR("Status error") << std::endl;
-    }
-}
-void rvm_dataPathConfigurationBlock::sendStatusFromAbstractProcessingElement(const StatusFromAbstractProcessingElement &statusAPE)
-{
-    if (statusAPE.exception != 0)
-    {
-        errorHand = true;
-        std::cout << RVM_ERR_STR("Status error") << std::endl;
-    }
-}
+/* Private */
 
 void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode)
 {
@@ -77,6 +50,7 @@ void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode
         }
     }
 }
+
 void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigObjects &cfgCode)
 {
     APE_Section &apeSec = cfgCode.apeSection;
@@ -92,6 +66,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigO
         {
             portsAccessType.push_back(apeSec.APEs[i].access_type[j]);
         }
+
         /* Gets operation func */
         int (*operation)(uint8_t argc, ...);
         opFetcher->getOpFunc(apeSec.APEs[i].op_code, &operation);
@@ -107,6 +82,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigO
 
 
 }
+
 void rvm_dataPathConfigurationBlock::configureAbstractSwitchFabric(ConfigObjects &cfgCode)
 {
     DO_Section &doSec = cfgCode.doSection;
@@ -211,4 +187,45 @@ int rvm_dataPathConfigurationBlock::getDirectionFromAPE(ConfigObjects &cfgCode, 
     }
     throw std::runtime_error(RVM_ERR_STR("Cannot find APE id "));
     
+}
+
+/* Public */
+
+rvm_dataPathConfigurationBlock::rvm_dataPathConfigurationBlock() { }
+
+void rvm_dataPathConfigurationBlock::associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher)
+{
+    this->dataPath = &dataPath;
+    this->opFetcher = &opFetcher;
+}
+
+void rvm_dataPathConfigurationBlock::configure(ConfigObjects &cfgCode)
+{
+    configureDataObjects(cfgCode);
+    configureAbstractProcessingElements(cfgCode);
+    configureAbstractSwitchFabric(cfgCode);
+    //todo: collect status and check it
+}
+
+void rvm_dataPathConfigurationBlock::runDataPath()
+{
+    dataPath->asf->run();
+}
+
+void rvm_dataPathConfigurationBlock::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
+{
+    if (statusDO.exception != 0)
+    {
+        errorHand = true;
+        std::cout << RVM_ERR_STR("Status error") << std::endl;
+    }
+}
+
+void rvm_dataPathConfigurationBlock::sendStatusFromAbstractProcessingElement(const StatusFromAbstractProcessingElement &statusAPE)
+{
+    if (statusAPE.exception != 0)
+    {
+        errorHand = true;
+        std::cout << RVM_ERR_STR("Status error") << std::endl;
+    }
 }

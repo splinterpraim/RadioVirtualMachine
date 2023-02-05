@@ -70,4 +70,5 @@ struct StatusFromAbstractProcessingElement
         return result_str;
     }
 };
+
 #endif // RVM_STRUCTS_H

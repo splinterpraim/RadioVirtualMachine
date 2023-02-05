@@ -4,7 +4,6 @@
 #include "class_definition.h"
 #include <vector>
 
-
 struct rvm_DataPath_s
 {
     std::vector<DataObject> dataObjs;

@@ -1,13 +1,27 @@
-#include "ASF/abstract_switch_fabric.h"
+/**
+ * @file abstract_switch_fabric.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Abstract Switch Fabric
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
+#include "ASF/abstract_switch_fabric.hpp"
 
 #include <exception>
 #include <stdexcept>
 #include <string>
+
 #include "common.hpp"
 #include "rvm_structs.h"
+#include "DO/data_object.h"
+#include "APE/abstract_processing_element.hpp"
+
+
 
 /* Private */
-Connector &AbstractSwitchFabric::searchConnectorByProccessingPortId(uint32_t processingPortId)
+
+Connector &AbstractSwitchFabric::findConnectorByProccessingPortId(uint32_t processingPortId)
 {
     for (auto &contr : connectors)
     {
@@ -18,6 +32,23 @@ Connector &AbstractSwitchFabric::searchConnectorByProccessingPortId(uint32_t pro
     }
     throw std::runtime_error("Connector not found");
 }
+
+void AbstractSwitchFabric::createDataPorts(uint8_t numberPorts)
+{
+    dataPorts.resize(numberPorts);
+}
+
+void AbstractSwitchFabric::createProcessingPorts(uint32_t numberPorts)
+{
+    processingPorts.resize(numberPorts);
+}
+
+void AbstractSwitchFabric::allocConnectors(int numConnectors)
+{
+    connectors.resize(numConnectors);
+}
+
+/* Public */
 
 AbstractSwitchFabric::~AbstractSwitchFabric()
 {
@@ -40,22 +71,6 @@ void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
     createDataPorts(numPortsDO);
     createProcessingPorts(numPortsAPE);
     allocConnectors(numPortsAPE);
-}
-
-void AbstractSwitchFabric::createDataPorts(uint8_t numberPorts)
-{
-    dataPorts.resize(numberPorts);
-}
-
-void AbstractSwitchFabric::createProcessingPorts(uint32_t numberPorts)
-{
-    processingPorts.resize(numberPorts);
-}
-
-/* Create connectors */
-void AbstractSwitchFabric::allocConnectors(int numConnectors)
-{
-    connectors.resize(numConnectors);
 }
 
 void AbstractSwitchFabric::createConnector(int DataPortsId, int ProcessingPortsId, int dir)
@@ -90,14 +105,11 @@ void AbstractSwitchFabric::associateProccessingPort(int processingPortId, Abstra
 
 void AbstractSwitchFabric::run()
 {
-
     bool finish = false;
 
     int zeroWork = 0;
     while (!finish)
     {
-        
-
         /* Data Enable */
         /* Iterate over all data ports */
         size_t port_i = 0;
@@ -149,7 +161,7 @@ void AbstractSwitchFabric::run()
                     if (pPort.relatedAPE->accessType(pPort.port_number, acType))
                     {
                         /* Search connector by processing port id */
-                        auto &contr = searchConnectorByProccessingPortId(port_i);
+                        auto &contr = findConnectorByProccessingPortId(port_i);
 
                         /* Access type matching check */
                         if (acType != contr.dir)
@@ -186,7 +198,7 @@ void AbstractSwitchFabric::run()
                         if (acType == APE_ACCESS_TYPE_W)
                         {
                             /* Search connector by processing port id */
-                            auto &contr = searchConnectorByProccessingPortId(port_i);
+                            auto &contr = findConnectorByProccessingPortId(port_i);
                             auto & ptrTmpData = readyAPE->write(pPort.port_number); 
                             dataPorts[contr.dataPortId].relatedDO->write(ptrTmpData);
                             

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "CU/control_unit.h"
+#include "CU/rvm_control_unit.hpp"
 #include "rvm_program_mem.hpp"
 #include "rvm_basic_operations.hpp"
 #include "rvm_data_path.hpp"
