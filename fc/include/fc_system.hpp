@@ -20,8 +20,9 @@ bool endianIsLittle();
 /**
  * @brief Reverses byte order
  * 
- * @param val Input value
- * @return Reversed value
+ * @param[in] val Input value
+ * 
+ * @retval Reversed value
  */
 int reverseEndian(int val);
 

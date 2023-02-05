@@ -8,6 +8,7 @@
 
 #ifndef FC_HELP_FUNC_HPP
 #define FC_HELP_FUNC_HPP
+
 /* C++ headers */
 #include <iostream>
 #include <string>

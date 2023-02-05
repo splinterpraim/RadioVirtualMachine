@@ -8,6 +8,7 @@
 
 #ifndef RADIO_LIBRARY_HPP
 #define RADIO_LIBRARY_HPP
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -44,20 +45,38 @@ struct rl_Operator_s
 };
 using rl_Operator = struct rl_Operator_s;
 
+/**
+ * @brief Class for describing of Reference Radio Library
+ */
 class RadioLibrary
 {
 
 public:
+    /**
+     * @brief Constructs a new Radio Library object
+     */
     RadioLibrary();
 
+    /**
+     * @brief Finds by opcode corresponding description of the operator in Radio Library
+     * 
+     * @param[in] opcode Opcode of operator
+     * 
+     * @retval rl_Operator Description of the operator in Radio Library
+     */
     rl_Operator findByOpCode(int opcode);
 
-    int getOpCode(std::string operatorId);
+    /**
+     * @brief Gets the amount of input and output ports of operator 
+     * 
+     * @param[in] opcode Opcode of operator
+     * 
+     * @retval IOPortsCnt Amount of input and output ports of operator
+     */
     IOPortsCnt getIOPortsCnt(int opcode);
 
 private:
-    std::vector<rl_Operator> operators;
-
-    // std::map<int, IOPortsCnt> opCodeTable;
+    std::vector<rl_Operator> operators; /* Vector of operators from Radio Library */
 };
+
 #endif // RADIO_LIBRARY_HPP

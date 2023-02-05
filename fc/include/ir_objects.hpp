@@ -23,9 +23,9 @@
  */
 struct IrObjects
 {
-    std::vector<IrOperator> operators;
-    std::vector<IrData> data;
-    std::vector<IrLink> links;
+    std::vector<IrOperator> operators;  /* Vector of IR Operators */
+    std::vector<IrData> data;           /* Vector of IR Data */
+    std::vector<IrLink> links;          /* Vector of IR Links */
 };
 using IrObjects = struct IrObjects;
 

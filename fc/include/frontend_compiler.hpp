@@ -24,39 +24,37 @@
 #include "ir_link.hpp"
 #include "config_code_structure.hpp"
 
-
-
 /**
- * @brief Parse XML file to Intermediate representation
+ * @brief Parses XML file to Intermediate representation
  * 
- * @param fileNameSWIR File name where store xml algorithm
- * @return IrObjects 
+ * @param[in] fileNameSWIR File name where store xml algorithm
+ * 
+ * @retval IrObjects IR objects
  */
 IrObjects parseSWIR(const std::string &fileNameSWIR);
 
 /**
  * @brief Shows IR objects in standart output
  * 
- * @param irObjects IR objects for output
+ * @param[in] irObjects IR objects for output
  */
 void showIrObjects(const IrObjects &irObjects);
 
 /**
- * @brief Convert from Ir Objects to RVM IR (config structs) 
+ * @brief Converts from Ir Objects to RVM IR (config structs) 
  * 
- * @param irObjects IR Objects
- * @return ConfigObjects 
+ * @param[in] irObjects IR Objects
+ * 
+ * @retval ConfigObjects Config Objects
  */
 ConfigObjects convert2rvmIr(IrObjects &irObjects); 
 
 /**
- * @brief Create RVM binary config code from Config Objects 
+ * @brief Creates RVM binary config code from Config Objects 
  * 
  * @param[in] cfgObj Reference to Config Objects
  * @param[in] fileNameBin File name where will be binary config code
  */
 void createRVMcfgcode(ConfigObjects & cfgObj, const std::string &fileNameBin);
-
-
 
 #endif // FC_FRONTEND_COMPILER_H

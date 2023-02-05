@@ -8,7 +8,6 @@
 
 #include "ir_data.hpp"
 
-
 void IrData::setId(const string &id) {
     if (id == "")
         throw std::invalid_argument("setId function failed, argument 'id' is empty");
@@ -19,7 +18,6 @@ void IrData::setId(const string &id) {
 string IrData::getId() {
     return id;
 }
-
 
 void IrData::setType(const int &type) {
     // if (type == "")
@@ -41,7 +39,6 @@ string IrData::getPath() {
     return path;
 }
 
-
 void IrData::setAccessTime(const string &accessTime) {
     // if (accessTime < 0)
     //     throw std::invalid_argument("setAccessTime function failed, argument 'accessTime' is negative");
@@ -60,7 +57,6 @@ void IrData::setValue(const string &value) {
 string IrData::getValue() {
     return value;
 }
-
 
 bool IrData::operator==(const IrData &rData) {
     if (id == rData.id)

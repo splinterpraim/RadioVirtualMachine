@@ -8,6 +8,7 @@
 
 #include "fc_system.hpp"
 #include <cstddef>
+
 bool endianIsLittle()
 {
     short int word = 0x0001;
