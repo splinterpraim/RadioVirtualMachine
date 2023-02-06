@@ -14,7 +14,7 @@
 
 #include "common.hpp"
 #include "rvm_structs.h"
-#include "DO/data_object.h"
+#include "DO/data_object.hpp"
 #include "APE/abstract_processing_element.hpp"
 
 

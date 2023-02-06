@@ -1,5 +1,5 @@
 /**
- * @file control_unit.cpp
+ * @file rvm_control_unit.cpp
  * @author Potapov Veniamin (venya99fox@inbox.ru)
  * @brief Control Unit
  * @version 0.1
@@ -9,8 +9,13 @@
 #include "CU/rvm_control_unit.hpp"
 
 #include "config_code_structure.hpp"
+#include "rvm_glob_define.hpp"
 
-#include "rvm_glob_define.h"
+#include "rvm_program_mem.hpp"
+#include "rvm_basic_operations.hpp"
+#include "rvm_data_path.hpp"
+
+
 
 
 ControlUnit::~ControlUnit() { }

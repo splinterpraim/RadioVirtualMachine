@@ -1,18 +1,93 @@
+/**
+ * @file data_object.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Data Object
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
-#include "DO/data_object.h"
+#include "DO/data_object.hpp"
 
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include <iterator>
+#include <cstring>
+#include <fstream>
+#include <exception>
+#include <stdexcept>
+#include <new>
 
 #include "common.hpp"
+#include "CU/rvm_data_path_configuration_block.hpp"
 
-// using namespace rvm;
-DataObject::DataObject()
+
+/* Private */
+
+std::string DataObject::to_strData()
 {
+    std::stringstream resStream;
+
+    for (size_t i = 0; i < size; i++)
+    {
+        resStream << std::hex << (int)data[i] << std::dec << " ";
+    }
+    resStream << std::endl;
+    return resStream.str();
 }
+
+std::string DataObject::convertToFilename(const uint8_t &dataFromMem)
+{
+    std::string filename;
+    char symbol = ' ';
+    for (size_t i = 0; i < 255; i++)
+    {
+        symbol = static_cast<char>((&dataFromMem)[i]);
+        if (symbol == '\n')
+        {
+            break;
+        }
+        filename += symbol;
+    }
+    return filename;
+}
+
+void DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t length)
+{
+    for (size_t i = 0; i < length; i++)
+    {
+        this->data[i] = (&dataFromMem)[i];
+    }
+}
+
+void DataObject::readDataFromFile(std::string fileName)
+{
+    /* Open file */
+    std::ifstream infile(fileName);
+    if (!infile.is_open())
+    {
+        throw std::string(RVM_ERR_STR("Error DO_" + std::to_string(id) + ": in init(), file can't open"));
+    }
+
+    /* Read Data */
+    std::string symbolDataFromFile;
+    for (size_t i = 0; (i < size) && (!infile.eof()); i++)
+    {
+        infile >> symbolDataFromFile;
+        if (symbolDataFromFile == "")
+        {
+            break;
+        }
+        data[i] = std::stoi(symbolDataFromFile); //! ex stoi (if symbol is not a integer)
+        symbolDataFromFile = "";
+    }
+
+    infile.close();
+}
+
+/* Public */
+
+DataObject::DataObject() { }
 
 DataObject::~DataObject()
 {
@@ -116,11 +191,6 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
     return 0;
 }
 
-// void DataObject::setSendControlUnit(ControlUnit &cu)
-// {
-//     this->cu = &cu;
-// }
-
 void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
 {
     this->cfgnBlock = &cfgnBlock;
@@ -186,68 +256,4 @@ std::string DataObject::to_str()
                              "status: " + status.to_str() + "\n" +
                              "data: " + to_strData();
     return result_str;
-}
-
-std::string DataObject::to_strData()
-{
-    std::stringstream resStream;
-
-    for (size_t i = 0; i < size; i++)
-    {
-        resStream << std::hex << (int)data[i] << std::dec << " ";
-    }
-    resStream << std::endl;
-    return resStream.str();
-}
-
-/* Other functions */
-std::string DataObject::convertToFilename(const uint8_t &initData)
-{
-    std::string filename;
-    char symbol = ' ';
-    for (size_t i = 0; i < 255; i++)
-    {
-        symbol = static_cast<char>((&initData)[i]);
-        if (symbol == '\n')
-        {
-            break;
-        }
-        filename += symbol;
-    }
-    return filename;
-}
-
-int DataObject::readDataFromMemory(const uint8_t &dataFromMem, uint32_t length)
-{
-    for (size_t i = 0; i < length; i++)
-    {
-        this->data[i] = (&dataFromMem)[i];
-    }
-    return 0;
-}
-
-int DataObject::readDataFromFile(std::string fileName)
-{
-    /* Open file */
-    std::ifstream infile(fileName);
-    if (!infile.is_open())
-    {
-        throw std::string(RVM_ERR_STR("Error DO_" + std::to_string(id) + ": in init(), file can't open"));
-    }
-
-    /* Read Data */
-    std::string symbolDataFromFile;
-    for (size_t i = 0; (i < size) && (!infile.eof()); i++)
-    {
-        infile >> symbolDataFromFile;
-        if (symbolDataFromFile == "")
-        {
-            break;
-        }
-        data[i] = std::stoi(symbolDataFromFile); //! ex stoi (if symbol is not a integer)
-        symbolDataFromFile = "";
-    }
-
-    infile.close();
-    return 0;
 }

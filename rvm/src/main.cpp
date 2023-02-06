@@ -10,10 +10,9 @@
 #include "rvm_program_mem.hpp"
 #include "CU/rvm_control_unit.hpp"
 #include "CU/rvm_cfg_code_fetcher.hpp"
-#include "DO/data_object.h"
-#include "log_manager.h"
+#include "DO/data_object.hpp"
 
-#include "rvm_glob_define.h"
+#include "rvm_glob_define.hpp"
 #include "common.hpp"
 #include "config_code_structure.hpp"
 
@@ -64,7 +63,6 @@ int test()
 
         // DataObject mainDO;
         // mainDO.set(1, 0, 3);
-        // mainDO.setSendControlUnit(mainCU);
         // mainDO.checkCallBack();
         // s.id = 2;
         // sendStatusDO(slaveCU, s);

@@ -9,25 +9,16 @@
 #ifndef RVM_CONTROL_UNIT_CLASS
 #define RVM_CONTROL_UNIT_CLASS
 
-/* C++ Headers */
 #include <iostream>
 
-/* Project Headers */
-#include "class_definition.h"
-#include "rvm_structs.h"
 #include "CU/rvm_cfg_code_fetcher.hpp"
 #include "CU/rvm_data_path_configuration_block.hpp"
 #include "CU/rvm_operation_fetcher.hpp"
 
-#include "DO/data_object.h"
-#include "APE/abstract_processing_element.hpp"
-#include "ASF/abstract_switch_fabric.hpp"
-
-
-#include "rvm_program_mem.hpp"
-#include "rvm_basic_operations.hpp"
-#include "rvm_data_path.hpp"
-
+class rvm_ProgramMemory;    /* Forward declaration of rvm_ProgramMemory class */
+class rvm_BasicOperations;  /* Forward declaration of rvm_BasicOperations class */
+struct rvm_DataPath_s;                          /* Forward declaration of rvm_DataPath struct */
+using rvm_DataPath = struct rvm_DataPath_s;
 
 /**
  * @brief Control Unit class implementation
