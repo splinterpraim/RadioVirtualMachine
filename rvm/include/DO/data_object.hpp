@@ -101,7 +101,7 @@ public:
 
 private:
 
-    uint8_t id = 0;                 /* Unique Data Object identifier  */
+    uint8_t id = 0;                 /* Unique Data Object identifier */
     uint32_t size = 0;              /* The size of the memory area(in bytes) for storing data to Data Object */
     uint32_t accessTime = 0;        /* Access time to data in ns */
     uint8_t *data = nullptr;        /* Pointer to start of data to Data Object */

@@ -11,7 +11,7 @@
 #include "config_code_structure.hpp"
 #include "rvm_glob_define.hpp"
 
-#include "rvm_program_mem.hpp"
+#include "rvm_program_memory.hpp"
 #include "rvm_basic_operations.hpp"
 #include "rvm_data_path.hpp"
 

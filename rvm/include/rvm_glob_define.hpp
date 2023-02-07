@@ -1,7 +1,7 @@
 /**
- * @file rvm_dlob_define.hpp
+ * @file rvm_glob_define.hpp
  * @author Potapov Veniamin (venya99fox@inbox.ru)
- * @brief Abstract Processing Element
+ * @brief Global variables
  * @version 0.1
  * @copyright Copyright (c) 2023
  */
@@ -28,7 +28,8 @@ typedef struct rvm_glob_s
     LogLevels log_levl;     /* level of log */
 } rvm_glob_t;
 
-extern rvm_glob_t rvm_glob;
+
+extern rvm_glob_t rvm_glob; /* Radio Virtual Machine global variable */
 
 /**
  * @brief Fills the global variables with default values

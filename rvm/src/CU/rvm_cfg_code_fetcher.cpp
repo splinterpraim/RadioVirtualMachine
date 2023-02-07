@@ -12,7 +12,7 @@
 
 #include "common.hpp"
 #include "config_code_structure.hpp"
-#include "rvm_program_mem.hpp"
+#include "rvm_program_memory.hpp"
 
 /**
  * @brief Control section parsing stages

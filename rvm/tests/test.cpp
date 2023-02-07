@@ -3,7 +3,7 @@
 #include <iostream>
 #include <exception>
 #include <stdexcept>
-#include "rvm_program_mem.hpp"
+#include "rvm_program_memory.hpp"
 #include "rvm_glob_define.hpp"
 #include "common.hpp"
 
