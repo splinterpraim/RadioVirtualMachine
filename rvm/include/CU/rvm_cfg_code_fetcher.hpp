@@ -118,7 +118,7 @@ public:
     /**
      * @brief Associates Config Code Fetcher with related Program memory
      *
-     * @param[in]       programMemory           Related Program memory
+     * @param[in]       programMemory           Related to related Program memory
      */
     void associate(rvm_ProgramMemory &programMemory);
 
@@ -140,12 +140,10 @@ public:
 
 private:
 
-    ConfigObjects *cfgCode = nullptr;   /* Pointer on temporary config code object */
-    ParseCfgCodeFlags parseFlags;       /* Stores state flags for parsing config code  */
-    uint64_t lAddress;                  /* Last used address */
-
-    /* External Relations */
-    rvm_ProgramMemory *programMemory;   /* Externally related Program memory */
+    ConfigObjects *cfgCode = nullptr;               /* Pointer on temporary config code object */
+    ParseCfgCodeFlags parseFlags;                   /* Stores state flags for parsing config code  */
+    uint64_t lAddress;                              /* Last used address */
+    rvm_ProgramMemory *programMemory = nullptr;     /* Externally related Program memory */
 
     /**
      * @brief Parses the Config code byte by byte

@@ -3,8 +3,8 @@
 #include <iostream>
 #include <exception>
 #include <stdexcept>
-#include "rvm_program_mem.hpp"
-#include "rvm_glob_define.h"
+#include "rvm_program_memory.hpp"
+#include "rvm_glob_define.hpp"
 #include "common.hpp"
 
 #define TEST_GOOD std::cout << __func__ << " is " << SET_GREEN("GOOD") << std::endl;

@@ -8,7 +8,7 @@
 
 #include "CU/rvm_operation_fetcher.hpp"
 
-#include "radiolib/functions.h"
+#include "radiolib/functions.hpp"
 
 void rvm_operationFetcher::getOpFunc(uint32_t opCode, int (**operation)(uint8_t argc, ...))
 {

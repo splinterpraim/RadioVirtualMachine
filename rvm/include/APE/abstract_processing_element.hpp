@@ -142,7 +142,7 @@ public:
     /**
      * @brief Associates Abstract Processing Element with related Data path configuration block
      * 
-     * @param[in]       cfgnBlock               Reference to Data path configuration block
+     * @param[in]       cfgnBlock               Reference to related Data path configuration block
      */
     void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
 
@@ -204,7 +204,7 @@ private:
     uint8_t T = 0;          /* Flag dynamic operations. 1 - dynamic, 0 -not dynamic */
     uint32_t opcode = 0;    /* Opcode of APE */
     int (*operation)(uint8_t argc, ...);                    /* Specific operation */
-    rvm_dataPathConfigurationBlock *cfgnBlock = nullptr;    /* Related Data path configuration block */
+    rvm_dataPathConfigurationBlock *cfgnBlock = nullptr;    /* Externally related Data path configuration block */
     StatusFromAbstractProcessingElement status;             /* Current status of APE */
     APEportManager portsMngr;                               /* Manager for port of APE */
     std::vector<PortAPE> ports;                             /* Ports of APE */

@@ -31,10 +31,11 @@ RadioLibrary radioLib;
 
 /**
  * @brief Main function
- * 
- * @param[in] argc Amount of arguments
- * @param[in] argv Values of arguments
- * @retval int return code
+ *
+ * @param[in]       argc                    Amount of command line arguments
+ * @param[in]       argv                    Values of command line arguments
+ *
+ * @retval          int                     Return code
  */
 int main(int argc, char *argv[])
 {

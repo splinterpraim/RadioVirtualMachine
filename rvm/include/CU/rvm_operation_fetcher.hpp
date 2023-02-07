@@ -16,7 +16,7 @@
  */
 class rvm_operationFetcher
 {
-    public:
+public:
 
     /**
      * @brief Gets a function pointer to the specified operation

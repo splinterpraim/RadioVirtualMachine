@@ -10,15 +10,17 @@
 
 #include <iostream>
 #include <vector>
+#include <cstring>
 
-#include "class_definition.h"
 #include "common.hpp"
 #include "system_func.hpp"
-#include "DO/data_object.h"
 #include "config_code_structure.hpp"
 #include "rvm_structs.h"
 #include "rvm_data_path.hpp"
 #include "CU/rvm_operation_fetcher.hpp"
+#include "DO/data_object.hpp"
+#include "APE/abstract_processing_element.hpp"
+#include "ASF/abstract_switch_fabric.hpp"
 
 /* Private */
 

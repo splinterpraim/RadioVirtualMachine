@@ -1,7 +1,14 @@
-#include "rvm_glob_define.h"
+/**
+ * @file rvm_glob_define.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Global variables
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
+#include "rvm_glob_define.hpp"
 
-rvm_glob_t rvm_glob;
+rvm_glob_t rvm_glob;    /* Radio Virtual Machine global variable */
 
 void rvm_globDefaultFill()
 {

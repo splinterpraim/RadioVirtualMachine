@@ -13,7 +13,7 @@
 #include <stdexcept>
 
 #include "common.hpp"
-#include "radiolib/functions.h"
+#include "radiolib/functions.hpp"
 
 /* State of ports */
 #define APE_PORT_BLOCKED 1

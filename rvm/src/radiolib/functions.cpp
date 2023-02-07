@@ -1,24 +1,14 @@
-#include "radiolib/functions.h"
-#include <vector>
-int radiolib::sum(uint8_t argc, ...)
-{
-    int result = 0;
-    int currParam = 0;
+/**
+ * @file function.сpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Radio Library function declaration
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
-    std::va_list factor;
-    va_start(factor, argc);
-    for (int i = 0; i < argc; i++)
-    {
-        currParam = va_arg(factor, int);
-        result += currParam;
-    }
+#include "radiolib/functions.hpp"
 
-    int *realResult = va_arg(factor, int *);
-    *realResult = result;
-
-    va_end(factor);
-    return 0;
-}
+#include <stdexcept>
 
 int radiolib::add_i(uint8_t argc, ...) /* 1 [ptr_data1, ptr_data2, ptr_resdata]  */
 {

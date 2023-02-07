@@ -1,4 +1,13 @@
+/**
+ * @file rvm.cpp
+ * @author Potapov Veniamin (venya99fox@inbox.ru)
+ * @brief Radio Virtual Machine
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "rvm.hpp"
+
 Rvm::Rvm(std::vector<std::string> &cfgFileNames)
 {
    this->cfgFileNames = cfgFileNames;
