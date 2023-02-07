@@ -1,3 +1,11 @@
+## Project description
+The European Telecommunications Standards Institute has proposed
+a software method for implementing a reconfigurable radio, providing
+use in architecture Radio Virtual Machine (RVM).
+
+This project includes front-end compiler (fc) application for RVM and rvm application.
+
+The front-end compiler takes an XML file with the algorithm as input and creates a binary input file for rvm, which runs it
 ## Project tree:
 ```
 .
@@ -77,3 +85,7 @@
 
 </details>
 
+## Platforms
+
++ macOS Monterey Version 12.5.1
++ Debian GNU/Linux 11 (bullseye) 
