@@ -15,6 +15,8 @@ FC_TESTS := $(CUR_DIR)/tests
 FC_INC_DIR := $(INC_DIR)/fc
 FC_OBJ_DIR := $(OBJ_DIR)/fc
 FC_CXXFLAGS := $(DEBUG_FLAGS) -std=c++14 -I$(INC_DIR)/common -I$(FC_INC_DIR)
+FC_LDFLAGS :=   -std=c++14 -L$(LIB_DIR) -lcommon
+
 
 FC_TEMPLATE_FIND_CPP := $(FC_SRC)/*.cpp $(FC_SRC)/*/*.cpp
 FC_ALL_CPP := $(wildcard $(FC_TEMPLATE_FIND_CPP))
@@ -43,7 +45,7 @@ fc-build: $(ECHO_FC_BUILD) $(MKDIR_BUILD) $(CP_INC) $(FC_BIN)
 
 $(FC_BIN):  $(FC_OBJ)
 	@echo "$(PURPLE)[LN]$(RESET) $@ <- ($(FC_OBJ))"
-	@g++ -o $@ $(FC_OBJ)
+	@g++ -o $@ $(FC_OBJ) $(FC_LDFLAGS)
 
 
 $(FC_OBJ_DIR)/%.o: $(FC_SRC)/%.cpp
