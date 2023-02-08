@@ -31,57 +31,70 @@ The front-end compiler takes an XML file with the algorithm as input and creates
 └── readme.md
 
 ```
-## Building and running
+## Build and run
+
 
 <details>
-<summary><b>Building</b></summary>
+<summary><b>Build</b></summary>
 
-> ### Build Radio Virtual Machine and Front-end compiler
-> ```bash
-> make
-> ```
-> ### Build Radio Virtual Machine
-> ```bash
-> make rvm
-> ```
-> ### Build Front-end compiler
-> ```bash
-> make fc
-> ```
+<blockquote>
+
+  ### Build Radio Virtual Machine and Front-end compiler
+  ```
+  make
+  ```
+  ### Build Radio Virtual Machine
+  ```
+  make rvm
+  ```
+  ### Build Front-end compiler
+  ```
+  make fc
+  ```
+</blockquote>
 
 </details>
 
-<details>
-<summary><b>Running</b></summary>
 
-> ### Run rvm
-> ```bash
-> ./build/bin/rvm
-> ```
-> ### Run Front-end compiler
-> ```bash
-> ./build/bin/fc
->  ```
+<details>
+<summary><b>Run</b></summary>
+
+<blockquote>
+
+  ### Run rvm
+  ```
+  ./build/bin/rvm
+  ```
+  ### Run Front-end compiler
+  ```
+  ./build/bin/fc
+   ```
+
+</blockquote>
 
 </details>
 
 <details>
 <summary><b>Cleaning</b></summary>
 
-> ### Remove all builds
-> ```bash
-> make clean
-> ```
+<blockquote>
 
-> ### Delete Radio Virtual Machine builds
-> ```bash
-> make rvm-clean
-> ```
+  ### Delete all builds
+  ```bash
+  make clean
+  ```
 
-> ### Delete Front-end compiler builds
-> ```bash
-> make fc-clean
-> ```
+  ### Delete Radio Virtual Machine builds
+  ```bash
+  make rvm-clean
+  ```
+
+  ### Delete Front-end compiler builds
+  ```bash
+  make fc-clean
+  ```
+
+</blockquote>
 
 </details>
 
