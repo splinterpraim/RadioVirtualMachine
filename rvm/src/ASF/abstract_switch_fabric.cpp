@@ -17,6 +17,11 @@
 #include "DO/data_object.hpp"
 #include "APE/abstract_processing_element.hpp"
 
+/* Iterates over the processing ports related with a specific data port 
+    dPort_i - Input Index of specific data port 
+    pPort_i - Output Index of related processing ports */
+#define ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_DATA_PORT(dPort_i, pPort_i) \
+        for (pPort_i = getFirstRelatedProcessingPort(dPort_i);  pPort_i < processingPorts.size() ; pPort_i = getNextRelatedProcessingPort(dPort_i, pPort_i))
 
 
 /* Private */
@@ -48,11 +53,69 @@ void AbstractSwitchFabric::allocConnectors(int numConnectors)
     connectors.resize(numConnectors);
 }
 
+size_t AbstractSwitchFabric::getFirstRelatedProcessingPort(size_t dPort_i)
+{
+    /* Find the first connector related with an data port */
+    for (auto &contr : connectors)
+    {
+        /* Return processing port id from founded connector */
+        if (contr.dataPortId == dPort_i)
+        {
+            return contr.processingPortId;
+        }
+    }
+    return processingPorts.size();
+}
+
+size_t AbstractSwitchFabric::getNextRelatedProcessingPort(size_t dPort_i, size_t pPort_i)
+{
+    bool startConnectorFound = false;
+
+    /* Find the connector related with an data port since of specific processing port */
+    for (auto &contr : connectors)
+    {
+        /* Find start connector that contains a specific data port and a specific processing port */
+        if ( !startConnectorFound )
+        {
+            if ( ( contr.dataPortId == dPort_i) && (contr.processingPortId == pPort_i) )
+            {
+                startConnectorFound = true;
+            }
+        }
+        /* Return next processing port id from founded connector */
+        else if ( contr.dataPortId == dPort_i )
+        {
+             return contr.processingPortId;
+        }
+    }
+    return processingPorts.size();
+}
+
+void AbstractSwitchFabric::askDOAndNotifyAPE_DataEnable()
+{
+    size_t dPort_i = 0;     /* Data ports index */
+    size_t pPort_i = 0;     /* Processing ports index */
+
+    /* Ask DOs */
+    for (auto &dPort : dataPorts)
+    {
+        /* Get data enable */
+        auto dEnable = dPort.relatedDO->dataEnable();
+
+        /* Notify related APEs */
+        ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_DATA_PORT(dPort_i, pPort_i)
+        {
+            ProcessingPort &pPort = processingPorts[pPort_i];
+            pPort.relatedAPE->dataEnable(pPort.port_number, dEnable);
+        }
+        dPort_i++;
+    }
+}
+
+
 /* Public */
 
-AbstractSwitchFabric::~AbstractSwitchFabric()
-{
-}
+AbstractSwitchFabric::~AbstractSwitchFabric() { }
 
 void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
 {
@@ -111,27 +174,10 @@ void AbstractSwitchFabric::run()
     while (!finish)
     {
         /* Data Enable */
-        /* Iterate over all data ports */
-        size_t port_i = 0;
-        for (auto &dPort : dataPorts)
-        {
-            /* Get current data enable */
-            auto dEnable = dPort.relatedDO->dataEnable();
-
-            /* Find related processing ports */
-            for (auto &contr : connectors)
-            {
-                if (contr.dataPortId == port_i)
-                {
-                    auto &pPort = processingPorts[contr.processingPortId];
-
-                    pPort.relatedAPE->dataEnable(pPort.port_number, dEnable);
-                }
-            }
-            port_i++;
-        }
+        askDOAndNotifyAPE_DataEnable();
 
         /* Access type */
+        size_t port_i = 0;
         AbstractProcessingElement * readyAPE = nullptr;
         uint16_t readyAPEId = 0;
         bool readyFlag = false;

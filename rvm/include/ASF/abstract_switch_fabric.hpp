@@ -132,9 +132,33 @@ private:
     /**
      * @brief Allocates connestors
      *
-     * @param[in]       numConnectors             Number of connestors
+     * @param[in]       numConnectors           Number of connestors
      */
     void allocConnectors(int numConnectors);
+
+    /**
+     * @brief Asks Data Objects for their Data Enable state and notifies related Abstract Processing Elements
+     */
+    void askDOAndNotifyAPE_DataEnable();
+
+    /**
+     * @brief Gets the first processing port related with specific data port
+     *
+     * @param[in]       dPort_i                 Index of specific data port
+     *
+     * @retval          size_t                  Index of first processing port or if port don`t exist size of processing ports 
+     */
+    size_t getFirstRelatedProcessingPort(size_t dPort_i);
+
+    /**
+     * @brief Gets the next processing port related with specific data port since of specific processing port
+     *
+     * @param[in]       dPort_i                 Index of specific data port
+     * @param[in]       pPort_i                 Index of specific processing port
+     *
+     * @retval          size_t                  Index of next processing port or if port don`t exist size of processing ports 
+     */
+    size_t getNextRelatedProcessingPort(size_t dPort_i, size_t pPort_i);
 };
 
 #endif // ABSTRACT_SWITCH_FABRIC_CLASS
