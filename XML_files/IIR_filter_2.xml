@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<program name="IIR filter second order">
+
+    <!-- Y0 -->
+    <operator id="mult_y0" type="Terminal" opcode="3">
+        <data id="b0" path="" connect_type="input" order="1" access_time="10" value="1" />
+        <data id="x0" path="" connect_type="input" order="2" access_time="10" value="5" />
+        <data id="y0" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+
+    <!-- Y1 -->
+    <operator id="mult_y1_1" type="Terminal" opcode="3">
+        <data id="b0" path="" connect_type="input" order="1" access_time="10" value="1" />
+        <data id="x1" path="" connect_type="input" order="2" access_time="10" value="6" />
+        <data id="tmp_b0_x1" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="mult_y1_2" type="Terminal" opcode="3">
+        <data id="b1" path="" connect_type="input" order="1" access_time="10" value="4" />
+        <data id="x0" path="" connect_type="input" order="2" access_time="10" value="5" />
+        <data id="tmp_b1_x0" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="add_y1_1" type="Terminal" opcode="1">
+        <data id="tmp_b0_x1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="tmp_b1_x0" path="" connect_type="input" order="2" access_time="10" value="" />
+        <data id="tmp_y1_x" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="mult_y1_3" type="Terminal" opcode="3">
+        <data id="a1" path="" connect_type="input" order="1" access_time="10" value="-4" />
+        <data id="y0" path="" connect_type="input" order="2" access_time="10" value="" />
+        <data id="tmp_a1_y0" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="add_y1_2" type="Terminal" opcode="1">
+        <data id="tmp_y1_x" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="tmp_a1_y0" path="" connect_type="input" order="2" access_time="10" value="" />
+        <data id="y1" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+</program>
