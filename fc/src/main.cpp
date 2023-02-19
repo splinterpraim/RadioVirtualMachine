@@ -19,6 +19,7 @@
 #include "pugixml/pugixml.hpp"
 
 /* Project headers */
+#include "common.hpp"
 #include "ir_data.hpp"
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
@@ -28,6 +29,39 @@
 #include "fc_glob.hpp"
 
 RadioLibrary radioLib;
+
+/**
+ * @brief Parses the command line arguments
+ *
+ * @param[in]       argc                    Amount of command line arguments
+ * @param[in]       argv                    Values of command line arguments
+ */
+void parseArg(int argc, char *argv[])
+{
+    if (argc > 3)
+    {
+        throw std::runtime_error(FC_ERR_STR("invalid program argument"));
+    }
+    switch (argc)
+    {
+    /* Using default names of files */    
+    case 1: 
+        break;
+    /* Change name for XML file */
+    case 2:
+        fc_glob.file_nameSWIR = argv[1];
+        break;
+    /* Change names for XML and result configcode files */
+    case 3:
+        fc_glob.file_nameSWIR = argv[1];
+        fc_glob.file_nameBin = argv[2];
+        break;
+    default:
+        throw std::runtime_error(FC_ERR_STR("invalid program argument"));
+        break;
+    }
+}
+
 
 /**
  * @brief Main function
@@ -44,16 +78,10 @@ int main(int argc, char *argv[])
         /* Set global var */
         fc_glob_set();
 
-        std::string file_nameSWIR = "./XML_files/AlgScalar2.xml";
-        std::string file_nameBin = "./config_codes/cfgcode1.bin";
-
-        if (argc == 2)
-        {
-            file_nameSWIR = argv[1];
-        }
+        parseArg(argc, argv);
 
         FC_LOG("----- parseSWIR");
-        struct IrObjects irObjects = parseSWIR(file_nameSWIR);
+        struct IrObjects irObjects = parseSWIR(fc_glob.file_nameSWIR);
         showIrObjects(irObjects);
 
         FC_LOG("----- convert2rvmIr");
@@ -61,7 +89,7 @@ int main(int argc, char *argv[])
         showConfigObjects(configObjects);
 
         FC_LOG("----- create RVM configcode");
-        createRVMcfgcode(configObjects, file_nameBin);
+        createRVMcfgcode(configObjects, fc_glob.file_nameBin);
 
         clearConfigObjects(configObjects);
     }
