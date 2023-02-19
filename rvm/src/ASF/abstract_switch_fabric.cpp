@@ -17,11 +17,16 @@
 #include "DO/data_object.hpp"
 #include "APE/abstract_processing_element.hpp"
 
+#define NOT_FOUND_APE -1
+
 /* Iterates over the processing ports related with a specific data port 
     dPort_i - Input Index of specific data port 
     pPort_i - Output Index of related processing ports */
 #define ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_DATA_PORT(dPort_i, pPort_i) \
         for (pPort_i = getFirstRelatedProcessingPort(dPort_i);  pPort_i < processingPorts.size() ; pPort_i = getNextRelatedProcessingPort(dPort_i, pPort_i))
+
+#define ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_APE(APE_id, pPort_i) \
+        for (pPort_i = getFirstProcessingPortRelatedWithAPE(APE_id);  pPort_i < processingPorts.size() ; pPort_i = getNextProcessingPortRelatedWithAPE(APE_id, pPort_i))
 
 
 /* Private */
@@ -91,6 +96,37 @@ size_t AbstractSwitchFabric::getNextRelatedProcessingPort(size_t dPort_i, size_t
     return processingPorts.size();
 }
 
+size_t AbstractSwitchFabric::getFirstProcessingPortRelatedWithAPE(size_t APE_id)
+{
+    /* Find the first processing port related with an APE */
+    for (size_t pPort_i = 0; pPort_i < processingPorts.size(); pPort_i++)
+    {
+        /* Return processing port index */
+        if (processingPorts[pPort_i].relatedAPE->getId() == APE_id)
+        {
+            return pPort_i;
+        }
+    }
+    return processingPorts.size();
+}
+
+size_t AbstractSwitchFabric::getNextProcessingPortRelatedWithAPE(size_t APE_id, size_t pPort_i)
+{
+    bool startPPortFound = false;
+
+    /* Find the processing port related with an APE since of specific processing port */
+    for (size_t i = pPort_i + 1; i < processingPorts.size(); i++)
+    {
+        /* Return processing port index */
+        if (processingPorts[i].relatedAPE->getId() == APE_id)
+        {
+             return i;
+        }
+    }
+    return processingPorts.size();
+}
+
+
 void AbstractSwitchFabric::askDOAndNotifyAPE_DataEnable()
 {
     size_t dPort_i = 0;     /* Data ports index */
@@ -109,6 +145,44 @@ void AbstractSwitchFabric::askDOAndNotifyAPE_DataEnable()
             pPort.relatedAPE->dataEnable(pPort.port_number, dEnable);
         }
         dPort_i++;
+    }
+}
+
+int32_t AbstractSwitchFabric::findAPEReadyToDataTransfer()
+{
+    for (auto &pPort : processingPorts)
+    {
+        if(pPort.relatedAPE->portsReadyToTransfer())
+        {
+            return pPort.relatedAPE->getId();
+        }
+    }
+    return NOT_FOUND_APE;
+}
+
+
+
+void AbstractSwitchFabric::askAPEAndNotifyDO_AccessType(int32_t APE_id)
+{
+    size_t pPort_i = 0;     /* Processing ports index */
+
+    ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_APE(APE_id, pPort_i)
+    {
+        ProcessingPort &pPort = processingPorts[pPort_i];
+
+        /* Ask APE access type */
+        auto at = pPort.relatedAPE->accessType(pPort.port_number);
+
+        auto &contr = findConnectorByProccessingPortId(pPort_i);
+
+        /* Access type matching check */
+        if (at != contr.dir)
+        {
+            throw std::runtime_error(RVM_ERR_STR("access type and direction of connector mismatch for found APE"));
+        }
+
+        /* Notify DO about access type */
+        dataPorts[contr.dataPortId].relatedDO->accessType(at);
     }
 }
 
@@ -170,13 +244,33 @@ void AbstractSwitchFabric::run()
 {
     bool finish = false;
 
-    int zeroWork = 0;
     while (!finish)
     {
         /* Data Enable */
         askDOAndNotifyAPE_DataEnable();
 
-        /* Access type */
+        auto APE_id = findAPEReadyToDataTransfer();
+
+        if (APE_id != NOT_FOUND_APE)
+        {
+            /* Access type */
+            askAPEAndNotifyDO_AccessType(APE_id);
+
+            /* Read */
+            transferToAPE(APE_id);
+
+            runAPE(APE_id);
+
+            /* Write */
+            transferFromAPE(APE_id);
+        }
+        else
+        {
+            finish = true;
+        }
+        
+
+
         size_t port_i = 0;
         AbstractProcessingElement * readyAPE = nullptr;
         uint16_t readyAPEId = 0;
@@ -226,7 +320,6 @@ void AbstractSwitchFabric::run()
                     }
                 }
             }
-           
             port_i++;
         }
 
@@ -247,7 +340,6 @@ void AbstractSwitchFabric::run()
                             auto &contr = findConnectorByProccessingPortId(port_i);
                             auto & ptrTmpData = readyAPE->write(pPort.port_number); 
                             dataPorts[contr.dataPortId].relatedDO->write(ptrTmpData);
-                            
                         }
                     }
 

@@ -245,17 +245,19 @@ void AbstractProcessingElement::dataEnable(uint8_t portNumber, uint8_t dEnable)
     portsMngr.commitDataEnable(portNumber, dEnable);
 }
 
-bool AbstractProcessingElement::accessType(uint8_t portNumber, uint8_t &acType)
+uint8_t AbstractProcessingElement::accessType(uint8_t portNumber)
 {
     if (portNumber >= numPorts)
-        throw std::invalid_argument(RVM_ERR_STR("Out of range ports of operator"));
-
-    bool ret = portsMngr.portsReady();
-    if (ret)
     {
-        acType = ports[portNumber].accessTypes;
+        throw std::invalid_argument(RVM_ERR_STR("Out of range ports of operator"));
     }
-    return ret;
+
+    return ports[portNumber].accessTypes;
+}
+
+bool AbstractProcessingElement::portsReadyToTransfer()
+{
+    return portsMngr.portsReady();
 }
 
 void AbstractProcessingElement::read(uint8_t portNumber, uint8_t &ptrTmpData)

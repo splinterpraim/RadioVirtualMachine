@@ -141,6 +141,10 @@ private:
      */
     void askDOAndNotifyAPE_DataEnable();
 
+    int32_t findAPEReadyToDataTransfer();
+
+    void askAPEAndNotifyDO_AccessType(int32_t APE_id);
+
     /**
      * @brief Gets the first processing port related with specific data port
      *
@@ -159,6 +163,25 @@ private:
      * @retval          size_t                  Index of next processing port or if port don`t exist size of processing ports 
      */
     size_t getNextRelatedProcessingPort(size_t dPort_i, size_t pPort_i);
+
+        /**
+     * @brief Gets the first processing port related with specific APE
+     *
+     * @param[in]       APE_id                  Index of specific APE
+     *
+     * @retval          size_t                  Index of first processing port or if port don`t exist size of processing ports 
+     */
+    size_t getFirstProcessingPortRelatedWithAPE(size_t APE_id);
+
+    /**
+     * @brief Gets the next processing port related with specific APE since of specific processing port
+     *
+     * @param[in]       APE_id                  Index of specific APE
+     * @param[in]       pPort_i                 Index of specific processing port
+     *
+     * @retval          size_t                  Index of next processing port or if port don`t exist size of processing ports 
+     */
+    size_t getNextProcessingPortRelatedWithAPE(size_t APE_id, size_t pPort_i);
 };
 
 #endif // ABSTRACT_SWITCH_FABRIC_CLASS

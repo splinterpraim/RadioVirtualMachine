@@ -72,6 +72,13 @@ public:
     uint8_t dataEnable(); 
 
     /**
+     * @brief Notifies about Access Type 
+     * 
+     * @param[in]       at                      Access Type form APE
+     */
+    void accessType(uint8_t at);
+
+    /**
      * @brief Returns reference to temporary data from Data Object
      *
      * @retval          uint8_t&                Reference to temporary data
