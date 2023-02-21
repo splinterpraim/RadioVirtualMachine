@@ -70,6 +70,17 @@ RadioLibrary::RadioLibrary()
         multFloat.ports.out.push_back({3, RL_TYPE_FLOAT});
     }
     operators.push_back(multFloat);
+
+    rl_Operator AdderInt;
+    {
+        AdderInt.name = "AdderInt";
+        AdderInt.opcode = 5;
+        AdderInt.cost = 10;
+        AdderInt.time = 10;
+        AdderInt.ports.in.push_back({0, RL_TYPE_INT}); // todo: fix, because not work for undefined num of inputs
+        AdderInt.ports.out.push_back({3, RL_TYPE_INT});
+    }
+    operators.push_back(AdderInt);
 }
 
 rl_Operator RadioLibrary::findByOpCode(int opcode)

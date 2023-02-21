@@ -96,9 +96,11 @@ IrObjects parseSWIR(const std::string &fileNameSWIR)
         /* If terminal */
         else
         {
+            std::string input_s = "input";
+            std::string output_s = "output";
             /* Take input/output data from operator tag */
-            auto inputData = takeIrData(curOperator, "input");
-            auto outputData = takeIrData(curOperator, "output");
+            auto inputData = takeIrData(curOperator, input_s);
+            auto outputData = takeIrData(curOperator, output_s);
     
 
             /* Add input/output Ir data in Ir objects  */

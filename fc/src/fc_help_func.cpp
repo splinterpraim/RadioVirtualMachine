@@ -86,7 +86,9 @@ std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conn
     /* Gets description of operator in Radio lib */
     rl_Operator op_rl = radioLib.findByOpCode(op_xml.attribute("opcode").as_int());
     if (op_rl.name.length() == 0)
+    {
         throw std::runtime_error(FC_ERR_STR("Unknown opcode for operator"));
+    }
 
     /* Loop for finding and converting Data from xml to IR */
     for (auto data : op_xml)
@@ -101,7 +103,7 @@ std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &conn
             int dataType = -1;
             if (dataConnectType.compare("input") == 0)
             {
-                dataType = op_rl.ports.in[order - 1].type;
+                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
             }
             else if (dataConnectType.compare("output") == 0)
             {
