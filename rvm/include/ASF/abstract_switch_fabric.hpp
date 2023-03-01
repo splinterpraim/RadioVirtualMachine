@@ -106,11 +106,13 @@ private:
     std::vector<DataPort> dataPorts;                /* Array of data ports */
     std::vector<ProcessingPort> processingPorts;    /* Array of processing ports */
     std::vector<Connector> connectors;              /* Array of connectors */
+    uint32_t connectorCount = 0;                    /* Number of connectors */
 
     /**
      * @brief Finds connector by processing port ID
      *
      * @param[in]       processingPortId        Processing port ID
+     *
      * @retval          Connector&              Reference to the found connector
      */
     Connector & findConnectorByProccessingPortId(uint32_t processingPortId);
@@ -141,9 +143,41 @@ private:
      */
     void askDOAndNotifyAPE_DataEnable();
 
+    /**
+     * @brief Finds an operator ready for data transfer
+     *
+     * @retval          int32_t                 Unique APE identifier
+     * @retval          NOT_FOUND_APE           If unique APE identifier not found
+     */
     int32_t findAPEReadyToDataTransfer();
 
-    void askAPEAndNotifyDO_AccessType(int32_t APE_id);
+    /**
+     * @brief Asks Abstract Processing Element for Access type and notifies related Data Objects
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void askAPEAndNotifyDO_AccessType(uint16_t APE_id);
+
+    /**
+     * @brief Transfers data from Data Objects to the input ports of a specific Abstract Processing Element
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void transferToAPE(uint16_t APE_id);
+
+    /**
+     * @brief Transfers data from output ports of specific Abstract Processing Element to the Data Objects
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void transferFromAPE(uint16_t APE_id);
+
+    /**
+     * @brief Launches a Abstract Processing Element for execution
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void runAPE(uint16_t APE_id);
 
     /**
      * @brief Gets the first processing port related with specific data port

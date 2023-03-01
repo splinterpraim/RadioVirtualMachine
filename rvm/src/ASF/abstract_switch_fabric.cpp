@@ -17,6 +17,7 @@
 #include "DO/data_object.hpp"
 #include "APE/abstract_processing_element.hpp"
 
+/*Uunique APE identifier not found */
 #define NOT_FOUND_APE -1
 
 /* Iterates over the processing ports related with a specific data port 
@@ -112,8 +113,6 @@ size_t AbstractSwitchFabric::getFirstProcessingPortRelatedWithAPE(size_t APE_id)
 
 size_t AbstractSwitchFabric::getNextProcessingPortRelatedWithAPE(size_t APE_id, size_t pPort_i)
 {
-    bool startPPortFound = false;
-
     /* Find the processing port related with an APE since of specific processing port */
     for (size_t i = pPort_i + 1; i < processingPorts.size(); i++)
     {
@@ -160,9 +159,7 @@ int32_t AbstractSwitchFabric::findAPEReadyToDataTransfer()
     return NOT_FOUND_APE;
 }
 
-
-
-void AbstractSwitchFabric::askAPEAndNotifyDO_AccessType(int32_t APE_id)
+void AbstractSwitchFabric::askAPEAndNotifyDO_AccessType(uint16_t APE_id)
 {
     size_t pPort_i = 0;     /* Processing ports index */
 
@@ -186,10 +183,64 @@ void AbstractSwitchFabric::askAPEAndNotifyDO_AccessType(int32_t APE_id)
     }
 }
 
+void AbstractSwitchFabric::transferToAPE(uint16_t APE_id)
+{
+    size_t pPort_i = 0;     /* Processing ports index */
+
+    /* Read data from Data Objects and send to APE ports */
+    ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_APE(APE_id, pPort_i)
+    {
+        ProcessingPort &pPort = processingPorts[pPort_i];
+
+        /* Read data only from connectors with "read" direction */
+        auto &contr = findConnectorByProccessingPortId(pPort_i);
+        if (contr.dir == APE_ACCESS_TYPE_R)
+        {
+            auto &ptrTmpData = dataPorts[contr.dataPortId].relatedDO->read();
+            pPort.relatedAPE->read(pPort.port_number, ptrTmpData);
+        }
+    }
+}
+
+void AbstractSwitchFabric::transferFromAPE(uint16_t APE_id)
+{
+    size_t pPort_i = 0;     /* Processing ports index */
+
+    /* Read data from Data Objects and send to APE ports */
+    ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_APE(APE_id, pPort_i)
+    {
+        ProcessingPort &pPort = processingPorts[pPort_i];
+
+        /* Write data only to connectors with "write" direction */
+        auto &contr = findConnectorByProccessingPortId(pPort_i);
+        if (contr.dir == APE_ACCESS_TYPE_W)
+        {
+            auto & ptrTmpData = pPort.relatedAPE->write(pPort.port_number); 
+            dataPorts[contr.dataPortId].relatedDO->write(ptrTmpData);
+        }
+    }
+}
+void AbstractSwitchFabric::runAPE(uint16_t APE_id)
+{
+    size_t pPort_i = 0;     /* Processing ports index */
+
+    /* Find first processing ports related with APE and Run related APE */
+    ITERATE_OVER_PROCESSING_PORTS_RELATED_WITH_APE(APE_id, pPort_i)
+    {
+        ProcessingPort &pPort = processingPorts[pPort_i];
+
+        pPort.relatedAPE->run();
+        break;
+    }
+
+}
+
+
+
 
 /* Public */
 
-AbstractSwitchFabric::~AbstractSwitchFabric() { }
+AbstractSwitchFabric::~AbstractSwitchFabric() { } /* todo */
 
 void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
 {
@@ -212,12 +263,11 @@ void AbstractSwitchFabric::set(int numPortsDO, int numPortsAPE)
 
 void AbstractSwitchFabric::createConnector(int DataPortsId, int ProcessingPortsId, int dir)
 {
-    static int i = 0;
-    connectors[i].dataPortId = DataPortsId;
-    connectors[i].processingPortId = ProcessingPortsId;
-    connectors[i].dir = dir;
-    connectors[i].set = 1;
-    i++;
+    connectors[connectorCount].dataPortId = DataPortsId;
+    connectors[connectorCount].processingPortId = ProcessingPortsId;
+    connectors[connectorCount].dir = dir;
+    connectors[connectorCount].set = 1;
+    connectorCount++;
 }
 
 void AbstractSwitchFabric::associateDataPort(int dataPortId, DataObject &DO)
@@ -267,95 +317,6 @@ void AbstractSwitchFabric::run()
         else
         {
             finish = true;
-        }
-        
-
-
-        size_t port_i = 0;
-        AbstractProcessingElement * readyAPE = nullptr;
-        uint16_t readyAPEId = 0;
-        bool readyFlag = false;
-
-        /* Iterate over all processing ports */
-        port_i = 0;
-        uint8_t acType = 0;
-        for (auto &pPort : processingPorts)
-        {
-
-            /* Ready APE is  not found */
-            if(!readyFlag)
-            {
-                if (pPort.relatedAPE->accessType(pPort.port_number, acType))
-                {
-                    readyAPE = pPort.relatedAPE;
-                    readyAPEId = pPort.relatedAPE->getId();
-                    readyFlag = true;
-                }
-            }
-
-            /* Ready APE is found */
-            if (readyFlag)
-            {
-                if (readyAPEId == pPort.relatedAPE->getId())
-                {
-                    if (pPort.relatedAPE->accessType(pPort.port_number, acType))
-                    {
-                        /* Search connector by processing port id */
-                        auto &contr = findConnectorByProccessingPortId(port_i);
-
-                        /* Access type matching check */
-                        if (acType != contr.dir)
-                        {
-                            throw std::runtime_error(RVM_ERR_STR("access type and direction of connector mismatch for found APE"));
-                        }
-                        if (acType == APE_ACCESS_TYPE_R)
-                        {
-                            auto &ptrTmpData = dataPorts[contr.dataPortId].relatedDO->read();
-                            pPort.relatedAPE->read(pPort.port_number, ptrTmpData);
-                        }
-                    }
-                    else
-                    {
-                        throw std::runtime_error(RVM_ERR_STR("found APE for transfer is failed"));
-                    }
-                }
-            }
-            port_i++;
-        }
-
-        if (readyFlag)
-        {
-            zeroWork++;
-            readyAPE->run();
-            port_i = 0;
-            for (auto &pPort : processingPorts)
-            {
-                if (readyAPEId == pPort.relatedAPE->getId())
-                {
-                    if (pPort.relatedAPE->accessType(pPort.port_number, acType))//? mb not ready after running 
-                    {
-                        if (acType == APE_ACCESS_TYPE_W)
-                        {
-                            /* Search connector by processing port id */
-                            auto &contr = findConnectorByProccessingPortId(port_i);
-                            auto & ptrTmpData = readyAPE->write(pPort.port_number); 
-                            dataPorts[contr.dataPortId].relatedDO->write(ptrTmpData);
-                        }
-                    }
-
-                }
-                port_i++;
-            }
-
-        }
-        
-        if (zeroWork == 0)
-        {
-            finish = true;
-        }
-        else if( zeroWork > 0)
-        {
-            zeroWork = 0;
         }
     }
 
