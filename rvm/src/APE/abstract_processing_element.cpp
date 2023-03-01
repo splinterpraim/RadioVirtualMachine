@@ -220,7 +220,6 @@ void AbstractProcessingElement::run()
     operation(numPorts, &argArray);
 
     /* Processing result output data */
-    /* Clear after run */
     int outCnt = 0;
     for (int i = 0; i < numPorts; i++)
     {
@@ -230,6 +229,10 @@ void AbstractProcessingElement::run()
             outCnt++;
         }
     }
+
+    /* Clear after run */
+    delete [] argArray.inPorts;
+    delete [] argArray.outPorts;
 }
 
 void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
