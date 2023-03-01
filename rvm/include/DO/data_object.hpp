@@ -113,7 +113,7 @@ private:
     uint32_t accessTime = 0;        /* Access time to data in ns */
     uint8_t *data = nullptr;        /* Pointer to start of data to Data Object */
     rvm_dataPathConfigurationBlock * cfgnBlock = nullptr; /* Externally related Data path congiguration block */
-    StatusFromDataObject status;    /* Current status of Data Object */
+    StatusFromDataObject status = {};    /* Current status of Data Object */
 
     /**
      * @brief Converts data of Data Object to string hex format

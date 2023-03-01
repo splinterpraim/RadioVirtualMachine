@@ -201,6 +201,8 @@ uint8_t DataObject::dataEnable()
     return status.state;
 }
 
+void DataObject::accessType(uint8_t at) { }
+
 uint8_t &DataObject::read()
 {
     if (!data)
