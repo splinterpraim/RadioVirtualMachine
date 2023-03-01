@@ -51,7 +51,7 @@ $(CMN_BIN):  $(CMN_OBJ)
 
 $(CMN_OBJ_DIR)/%.o: $(CMN_SRC)/%.cpp
 	@echo "$(GREEN)[CP]$(RESET) $@ <- $<"
-	@g++ $(CMN_CXXFLAGS) -c $< -o $@ 
+	@g++ -c $< -o $@ $(CMN_CXXFLAGS)
 
 $(ECHO_CMN_BUILD):
 	@echo "$(YELLOW)BUILD COMMON LIB$(RESET)"

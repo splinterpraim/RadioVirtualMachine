@@ -1,12 +1,19 @@
 
 DEBUG := 1
-
+SANITIZER := 1
 
 
 # --------------
 
 
 DEBUG_FLAGS :=
-ifeq ($(DEBUG),1)
-DEBUG_FLAGS := -Wall -g
+LDFLAGS := 
+ifeq ($(SANITIZER),1)
+DEBUG_FLAGS += -fsanitize=address
+LDFLAGS += -fsanitize=address -static-libasan
 endif
+
+ifeq ($(DEBUG),1)
+DEBUG_FLAGS += -Wall -g
+endif
+
