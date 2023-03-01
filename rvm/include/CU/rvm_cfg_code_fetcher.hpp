@@ -10,6 +10,7 @@
 #define RVM_CFG_CODE_FETCHER_CLASS
 
 #include <cstdint>
+#include "config_code_structure.hpp"
 
 #define SET_FLAG 1      /* Flag is set */
 #define RESET_FLAG 0    /* Flag is reset */
@@ -18,8 +19,6 @@
 #define PARSE_STATE_FINISH 0    /* Parsing the config code is finished */
 
 class rvm_ProgramMemory;    /* Forward declaration of rvm_ProgramMemory class */
-struct ConfigObjects;       /* Forward declaration of ConfigObjects struct */
-using ControlSection = struct ControlSection;
 
 /**
  * @brief Describes state flags for parsing config code 
@@ -129,7 +128,7 @@ public:
      *
      * @retval          Config Objects *        Pointer to Config Objects
      */
-    ConfigObjects *fetch(uint64_t cfgAddr);
+    ConfigObjects& fetch(uint64_t cfgAddr);
 
     /**
      * @brief Gets the address in Program memory that was last accessed
@@ -140,7 +139,7 @@ public:
 
 private:
 
-    ConfigObjects *cfgCode = nullptr;               /* Pointer on temporary config code object */
+    ConfigObjects cfgCode;                          /* Pointer on temporary config code object */
     ParseCfgCodeFlags parseFlags;                   /* Stores state flags for parsing config code  */
     uint64_t lAddress;                              /* Last used address */
     rvm_ProgramMemory *programMemory = nullptr;     /* Externally related Program memory */
