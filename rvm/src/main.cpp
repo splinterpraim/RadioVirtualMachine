@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
         std::vector<std::string> cfgFileNames;
         cfgFileNames.push_back("./config_codes/cfgcode1.bin");
-        cfgFileNames.push_back("./config_codes/cfgcode1.bin");
+        cfgFileNames.push_back("./config_codes/cfgcode2.bin");
         Rvm rvm1(cfgFileNames);
         rvm1.run();
     }
