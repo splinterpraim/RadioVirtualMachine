@@ -26,7 +26,10 @@ void ControlUnit::work()
         LLOG(LogLevels::FIRST, std::cout << "STAGE FETCH" << std::endl)
         ConfigObjects &cfgCode = cfgFetcher.fetch(cfgCounter);
         uint64_t lastCfgAddr = cfgFetcher.getLastAddress();
+        uint32_t sizeCC = lastCfgAddr - cfgCounter;
         uint8_t f_LCF = cfgCode.controlSection.LCF;
+        uint8_t f_NAF = cfgCode.controlSection.NAF;
+        uint16_t NCAO = cfgCode.NCAO;
         LLOG(LogLevels::SECOND, showConfigObjects(cfgCode))
 
         /* Stage Configure */
@@ -50,7 +53,15 @@ void ControlUnit::work()
         }
         else
         {
-            cfgCounter += lastCfgAddr + 1;
+            /* Next CC address offset */
+            if (f_NAF)
+            {
+                cfgCounter += NCAO;
+            }
+            else
+            {
+                cfgCounter += sizeCC + 1;  /* incorrect */
+            }
         }
 
         

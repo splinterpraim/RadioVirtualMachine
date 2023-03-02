@@ -74,6 +74,7 @@ struct ConfigObjects{
     ControlSection controlSection;
     DO_Section doSection;
     APE_Section apeSection;
+    uint16_t NCAO;
 };
 using ConfigObjects = struct ConfigObjects;
 
