@@ -23,6 +23,18 @@
 
 APEportManager::APEportManager() { }
 
+APEportManager::~APEportManager()
+{
+    for(auto el : portsDataBuffer)
+    {
+        if (el)
+        {
+            delete[] el;
+        }
+    }
+}
+
+
 void APEportManager::init(uint8_t numPorts)
 {
     this->numPorts = numPorts;

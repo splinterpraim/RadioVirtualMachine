@@ -40,6 +40,11 @@ public:
     APEportManager();
 
     /**
+     * @brief Destroy the APEportManager object
+     */
+    ~APEportManager();
+
+    /**
      * @brief Initializes manager of ports of APE
      *
      * @param[in]       numPorts                Number of ports APE
