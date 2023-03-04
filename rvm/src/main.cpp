@@ -25,16 +25,19 @@
  */
 void parseArg(int argc, char *argv[])
 {
+    /* Arguments must be less than 2 */
     if (argc > 2)
     {
         throw std::runtime_error(RVM_ERR_STR("invalid program argument"));
     }
+
+    /* Handling the log level argument */
     else if (argc == 2)
     {
         rvm_glob_t newGlob;
         int logLevel = -1;
         std::sscanf(argv[1], "%d", &logLevel);
-        if (logLevel > static_cast<int>(LogLevels::SECOND) || logLevel == -1)
+        if (logLevel > static_cast<int>(LogLevels::SECOND) || logLevel < 0)
         {
             throw std::runtime_error(RVM_ERR_STR("invalid program argument - logLevel"));
         }
@@ -60,6 +63,8 @@ int main(int argc, char *argv[])
 
         std::vector<std::string> cfgFileNames;
         cfgFileNames.push_back("./config_codes/cfgcode1.bin");
+        cfgFileNames.push_back("./config_codes/cfgcode2.bin");
+        cfgFileNames.push_back("./config_codes/cfgcode3.bin");
         Rvm rvm1(cfgFileNames);
         rvm1.run();
     }

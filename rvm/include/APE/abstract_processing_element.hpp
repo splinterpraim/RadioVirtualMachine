@@ -40,6 +40,11 @@ public:
     APEportManager();
 
     /**
+     * @brief Destroy the APEportManager object
+     */
+    ~APEportManager();
+
+    /**
      * @brief Initializes manager of ports of APE
      *
      * @param[in]       numPorts                Number of ports APE
@@ -155,15 +160,19 @@ public:
     void dataEnable(uint8_t portNumber, uint8_t dEnable);
 
     /**
-     * @brief Returns access type for specific ports of APE and ports readiness
-     * 
+     * @brief Returns access type for specific port of APE
+     *
      * @param[in]       portNumber              Port number of APE
-     * @param[out]      acType                  Access type
-     * 
+     */
+    uint8_t accessType(uint8_t portNumber);
+
+    /**
+     * @brief Returns ports readiness
+     *
      * @retval          true                    if ports of APE ready to transfer data
      * @retval          false                   if ports of APE not ready to transfer data
      */
-    bool accessType(uint8_t portNumber, uint8_t &acType);
+    bool portsReadyToTransfer();
 
     /**
      * @brief Reads data on specific ports of APE

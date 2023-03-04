@@ -39,9 +39,8 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
     /* Start Parse */
     if (parseFlags.start == RESET_FLAG)
     {
-        cfgCode = new ConfigObjects[1];
         // todo: check bad_alloc
-        initConfigObjects(*cfgCode);
+        clearConfigObjects(cfgCode);
         parseFlags.start = SET_FLAG;
     }
     /* End Parse */
@@ -60,48 +59,48 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
 
         case CtrlSecParseStages::LCF_NAF: /* LCF, NAF */
         {
-            cfgCode->controlSection.LCF = (cfgByte >> 7) & (MASK_LOW_BIT);
-            cfgCode->controlSection.NAF = (cfgByte >> 6) & (MASK_LOW_BIT);
+            cfgCode.controlSection.LCF = (cfgByte >> 7) & (MASK_LOW_BIT);
+            cfgCode.controlSection.NAF = (cfgByte >> 6) & (MASK_LOW_BIT);
             break;
         }
         case CtrlSecParseStages::TASK_ID: /* Task_ID */
         {
-            cfgCode->controlSection.Task_ID = cfgByte;
+            cfgCode.controlSection.Task_ID = cfgByte;
             break;
         }
         case CtrlSecParseStages::RPI_VERSION: /* RPI_version */
         {
-            cfgCode->controlSection.RPI_version = cfgByte;
+            cfgCode.controlSection.RPI_version = cfgByte;
             break;
         }
         case CtrlSecParseStages::REFERENCE_ID: /* Reference_ID */
         {
-            cfgCode->controlSection.Reference_ID = cfgByte;
+            cfgCode.controlSection.Reference_ID = cfgByte;
             break;
         }
         case CtrlSecParseStages::IMPL_VERSION: /* Implementation_version */
         {
-            cfgCode->controlSection.Implementation_version = cfgByte;
+            cfgCode.controlSection.Implementation_version = cfgByte;
             break;
         }
         case CtrlSecParseStages::DEVELOPER_ID_FIRST: /* Developer_ID (first byte) */
         {
-            cfgCode->controlSection.Developer_ID = cfgByte << 8;
+            cfgCode.controlSection.Developer_ID = cfgByte << 8;
             break;
         }
         case CtrlSecParseStages::DEVELOPER_ID_SECOND: /* Developer_ID (second byte) */
         {
-            cfgCode->controlSection.Developer_ID |= cfgByte;
+            cfgCode.controlSection.Developer_ID |= cfgByte;
             break;
         }
         case CtrlSecParseStages::CREATION_DATE_FIRST: /* Creation_Date (first byte) */
         {
-            cfgCode->controlSection.Creation_Date = cfgByte << 8;
+            cfgCode.controlSection.Creation_Date = cfgByte << 8;
             break;
         }
         case CtrlSecParseStages::CREATION_DATE_SECOND: /* Creation_Date (second byte) */
         {
-            cfgCode->controlSection.Creation_Date |= cfgByte;
+            cfgCode.controlSection.Creation_Date |= cfgByte;
             parseFlags.ctrlSec = SET_FLAG;
             break;
         }
@@ -121,16 +120,16 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         if (parseFlags.doSec.start == RESET_FLAG)
         {
             /* N_DO */
-            cfgCode->doSection.N_DO = cfgByte;
+            cfgCode.doSection.N_DO = cfgByte;
 
             /* Create DO_configs & ASF_configs */
-            cfgCode->doSection.DOs = new DO_Config[cfgCode->doSection.N_DO];
-            cfgCode->doSection.ASFs = new ASF_Config[cfgCode->doSection.N_DO];
+            cfgCode.doSection.DOs = new DO_Config[cfgCode.doSection.N_DO];
+            cfgCode.doSection.ASFs = new ASF_Config[cfgCode.doSection.N_DO];
 
-            for (int i = 0; i < cfgCode->doSection.N_DO; ++i)
+            for (int i = 0; i < cfgCode.doSection.N_DO; ++i)
             {
-                std::memset(&(cfgCode->doSection.DOs[i]), 0, sizeof(cfgCode->doSection.DOs[i]));
-                std::memset(&(cfgCode->doSection.ASFs[i]), 0, sizeof(cfgCode->doSection.DOs[i]));
+                std::memset(&(cfgCode.doSection.DOs[i]), 0, sizeof(cfgCode.doSection.DOs[i]));
+                std::memset(&(cfgCode.doSection.ASFs[i]), 0, sizeof(cfgCode.doSection.ASFs[i]));
             }
             parseFlags.doSec.start = SET_FLAG;
         }
@@ -138,7 +137,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         /* DO_config parse */
         else if (parseFlags.doSec.doCfg.start == RESET_FLAG)
         {
-            DO_Config &curDO_cfg = cfgCode->doSection.DOs[index];
+            DO_Config &curDO_cfg = cfgCode.doSection.DOs[index];
 
             /* DO_config.DO_ID parse */
             if (parseFlags.doSec.doCfg.DO_ID == RESET_FLAG)
@@ -212,7 +211,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         /* ASF_config parse */
         else if (parseFlags.doSec.asfCfg.start == RESET_FLAG)
         {
-            ASF_Config &curASF_cfg = cfgCode->doSection.ASFs[index];
+            ASF_Config &curASF_cfg = cfgCode.doSection.ASFs[index];
 
             /* ASF_config.DO parse */
             if (parseFlags.doSec.asfCfg.DO == RESET_FLAG)
@@ -263,7 +262,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         {
             parseFlags.doSec.Ncnt++;
             /* Check End DO section parse */
-            if (parseFlags.doSec.Ncnt >= cfgCode->doSection.N_DO)
+            if (parseFlags.doSec.Ncnt >= cfgCode.doSection.N_DO)
             {
                 parseFlags.doSec.end = SET_FLAG;
             }
@@ -297,17 +296,17 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         if (parseFlags.apeSec.start == RESET_FLAG)
         {
             /* N_APE */
-            uint8_t shift = 8 * (sizeof(cfgCode->apeSection.N_APE) - (parseFlags.apeSec.byteCnt + 1));
-            cfgCode->apeSection.N_APE |= cfgByte << shift;
+            uint8_t shift = 8 * (sizeof(cfgCode.apeSection.N_APE) - (parseFlags.apeSec.byteCnt + 1));
+            cfgCode.apeSection.N_APE |= cfgByte << shift;
 
             parseFlags.apeSec.byteCnt++;
             if (shift == 0)
             {
                 /* Create APE_configs */
-                cfgCode->apeSection.APEs = new APE_Config[cfgCode->apeSection.N_APE];
-                for (int i = 0; i < cfgCode->apeSection.N_APE; ++i)
+                cfgCode.apeSection.APEs = new APE_Config[cfgCode.apeSection.N_APE];
+                for (int i = 0; i < cfgCode.apeSection.N_APE; ++i)
                 {
-                    std::memset(&(cfgCode->apeSection.APEs[i]), 0, sizeof(cfgCode->apeSection.APEs[i]));
+                    std::memset(&(cfgCode.apeSection.APEs[i]), 0, sizeof(cfgCode.apeSection.APEs[i]));
                 }
                 parseFlags.apeSec.start = SET_FLAG;
             }
@@ -316,7 +315,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         /* APE_Config parse */
         else if (parseFlags.apeSec.apeCfg.start == RESET_FLAG)
         {
-            APE_Config &curAPE_cfg = cfgCode->apeSection.APEs[index];
+            APE_Config &curAPE_cfg = cfgCode.apeSection.APEs[index];
 
             /* APE_ID */
             if (parseFlags.apeSec.apeCfg.APE_ID == RESET_FLAG)
@@ -419,7 +418,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
         {
             parseFlags.apeSec.Ncnt++;
             /* Check End DO section parse */
-            if (parseFlags.apeSec.Ncnt >= cfgCode->apeSection.N_APE)
+            if (parseFlags.apeSec.Ncnt >= cfgCode.apeSection.N_APE)
             {
                 parseFlags.apeSec.end = SET_FLAG;
 
@@ -450,6 +449,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
 
 void rvm_cfgCodeFetcher::clearParseFlags()
 {
+    std::memset((void*)&parseFlags, 0, sizeof(ParseCfgCodeFlags_s));
     parseFlags.start = RESET_FLAG;
     parseFlags.end = RESET_FLAG;
     parseFlags.stageCnt = RESET_FLAG;
@@ -460,13 +460,16 @@ void rvm_cfgCodeFetcher::clearParseFlags()
     parseFlags.doSec.end = RESET_FLAG;
     parseFlags.doSec.Ncnt = RESET_FLAG;
 
+    /* DO config */
     parseFlags.doSec.doCfg.start = RESET_FLAG;
     parseFlags.doSec.doCfg.DO_ID = RESET_FLAG;
     parseFlags.doSec.doCfg.size = RESET_FLAG;
     parseFlags.doSec.doCfg.access_time = RESET_FLAG;
     parseFlags.doSec.doCfg.length = RESET_FLAG;
     parseFlags.doSec.doCfg.data = RESET_FLAG;
+    parseFlags.doSec.doCfg.byteCnt = RESET_FLAG;
 
+    /* ASF config */
     parseFlags.doSec.asfCfg.start = RESET_FLAG;
     parseFlags.doSec.asfCfg.DO = RESET_FLAG;
     parseFlags.doSec.asfCfg.N = RESET_FLAG;
@@ -485,10 +488,12 @@ void rvm_cfgCodeFetcher::clearParseFlags()
 
 rvm_cfgCodeFetcher::rvm_cfgCodeFetcher()
 {
+    initConfigObjects(cfgCode);
 }
 
 rvm_cfgCodeFetcher::~rvm_cfgCodeFetcher()
 {
+    clearConfigObjects(cfgCode);
 }
 
 void rvm_cfgCodeFetcher::associate(rvm_ProgramMemory &programMemory)
@@ -496,7 +501,7 @@ void rvm_cfgCodeFetcher::associate(rvm_ProgramMemory &programMemory)
     this->programMemory = &programMemory;
 }
 
-ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
+ConfigObjects& rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
 {
     uint64_t progMemSize = programMemory->getSize();
 
@@ -523,6 +528,7 @@ ConfigObjects *rvm_cfgCodeFetcher::fetch(uint64_t cfgAddr)
         lAddress = addr;
         
     }
+    clearParseFlags();
 
     return cfgCode;
 }

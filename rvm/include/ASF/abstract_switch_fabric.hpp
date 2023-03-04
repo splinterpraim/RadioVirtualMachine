@@ -106,11 +106,13 @@ private:
     std::vector<DataPort> dataPorts;                /* Array of data ports */
     std::vector<ProcessingPort> processingPorts;    /* Array of processing ports */
     std::vector<Connector> connectors;              /* Array of connectors */
+    uint32_t connectorCount = 0;                    /* Number of connectors */
 
     /**
      * @brief Finds connector by processing port ID
      *
      * @param[in]       processingPortId        Processing port ID
+     *
      * @retval          Connector&              Reference to the found connector
      */
     Connector & findConnectorByProccessingPortId(uint32_t processingPortId);
@@ -132,9 +134,88 @@ private:
     /**
      * @brief Allocates connestors
      *
-     * @param[in]       numConnectors             Number of connestors
+     * @param[in]       numConnectors           Number of connestors
      */
     void allocConnectors(int numConnectors);
+
+    /**
+     * @brief Asks Data Objects for their Data Enable state and notifies related Abstract Processing Elements
+     */
+    void askDOAndNotifyAPE_DataEnable();
+
+    /**
+     * @brief Finds an operator ready for data transfer
+     *
+     * @retval          int32_t                 Unique APE identifier
+     * @retval          NOT_FOUND_APE           If unique APE identifier not found
+     */
+    int32_t findAPEReadyToDataTransfer();
+
+    /**
+     * @brief Asks Abstract Processing Element for Access type and notifies related Data Objects
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void askAPEAndNotifyDO_AccessType(uint16_t APE_id);
+
+    /**
+     * @brief Transfers data from Data Objects to the input ports of a specific Abstract Processing Element
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void transferToAPE(uint16_t APE_id);
+
+    /**
+     * @brief Transfers data from output ports of specific Abstract Processing Element to the Data Objects
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void transferFromAPE(uint16_t APE_id);
+
+    /**
+     * @brief Launches a Abstract Processing Element for execution
+     *
+     * @param[in]       APE_id                  Unique APE identifier
+     */
+    void runAPE(uint16_t APE_id);
+
+    /**
+     * @brief Gets the first processing port related with specific data port
+     *
+     * @param[in]       dPort_i                 Index of specific data port
+     *
+     * @retval          size_t                  Index of first processing port or if port don`t exist size of processing ports 
+     */
+    size_t getFirstRelatedProcessingPort(size_t dPort_i);
+
+    /**
+     * @brief Gets the next processing port related with specific data port since of specific processing port
+     *
+     * @param[in]       dPort_i                 Index of specific data port
+     * @param[in]       pPort_i                 Index of specific processing port
+     *
+     * @retval          size_t                  Index of next processing port or if port don`t exist size of processing ports 
+     */
+    size_t getNextRelatedProcessingPort(size_t dPort_i, size_t pPort_i);
+
+        /**
+     * @brief Gets the first processing port related with specific APE
+     *
+     * @param[in]       APE_id                  Index of specific APE
+     *
+     * @retval          size_t                  Index of first processing port or if port don`t exist size of processing ports 
+     */
+    size_t getFirstProcessingPortRelatedWithAPE(size_t APE_id);
+
+    /**
+     * @brief Gets the next processing port related with specific APE since of specific processing port
+     *
+     * @param[in]       APE_id                  Index of specific APE
+     * @param[in]       pPort_i                 Index of specific processing port
+     *
+     * @retval          size_t                  Index of next processing port or if port don`t exist size of processing ports 
+     */
+    size_t getNextProcessingPortRelatedWithAPE(size_t APE_id, size_t pPort_i);
 };
 
 #endif // ABSTRACT_SWITCH_FABRIC_CLASS

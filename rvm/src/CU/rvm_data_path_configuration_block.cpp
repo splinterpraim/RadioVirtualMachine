@@ -214,6 +214,14 @@ void rvm_dataPathConfigurationBlock::runDataPath()
     dataPath->asf->run();
 }
 
+void rvm_dataPathConfigurationBlock::clear()
+{
+    delete dataPath->asf;
+    dataPath->dataObjs.resize(0); /* clear */
+    dataPath->apes.resize(0);
+}
+
+
 void rvm_dataPathConfigurationBlock::sendStatusFromDataObject(const StatusFromDataObject &statusDO)
 {
     if (statusDO.exception != 0)

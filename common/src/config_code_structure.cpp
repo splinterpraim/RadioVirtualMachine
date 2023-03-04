@@ -95,17 +95,48 @@ void showConfigObjects(ConfigObjects &cfgObj)
 void clearConfigObjects(ConfigObjects & cfgObj)
 {
     std::memset(&(cfgObj.controlSection), 0, sizeof(ControlSection));
-    for (uint8_t i = 0; i < cfgObj.doSection.N_DO; ++i)
+
+    /* Clear DO_Section */
+    /* Clear DO_Config */
+    if ( cfgObj.doSection.DOs != nullptr )
     {
-        delete[] cfgObj.doSection.DOs[i].data;
-        delete[] cfgObj.doSection.ASFs[i].APE_KP;
+        for (uint8_t i = 0; i < cfgObj.doSection.N_DO; ++i)
+        {
+            if ( cfgObj.doSection.DOs[i].data != nullptr )
+            {
+                delete[] cfgObj.doSection.DOs[i].data;
+            }
+        }
+        delete[] cfgObj.doSection.DOs;
     }
-    std::memset(&(cfgObj.doSection), 0, sizeof(DO_Section));
-    for (uint8_t i = 0; i < cfgObj.apeSection.N_APE; ++i)
+    /* Clear ASF_Config */
+    if ( cfgObj.doSection.ASFs != nullptr )
     {
-        delete[] cfgObj.apeSection.APEs[i].access_type ;
+        for (uint8_t i = 0; i < cfgObj.doSection.N_DO; ++i)
+        {
+            if ( cfgObj.doSection.ASFs[i].APE_KP != nullptr )
+            {
+                delete[] cfgObj.doSection.ASFs[i].APE_KP;
+            }
+        }
+        delete[] cfgObj.doSection.ASFs;
     }
-    std::memset(&(cfgObj.apeSection), 0, sizeof(APE_Section));
+
+    /* Clear APE_Section */
+    /* Clear APE_Config */
+    if ( cfgObj.apeSection.APEs != nullptr )
+    {
+        for (uint8_t i = 0; i < cfgObj.apeSection.N_APE; ++i)
+        {
+            if ( cfgObj.apeSection.APEs[i].access_type != nullptr )
+            {
+                delete[] cfgObj.apeSection.APEs[i].access_type;
+            }
+        }
+        delete[] cfgObj.apeSection.APEs;
+    }
+
+    std::memset(&(cfgObj), 0, sizeof(ConfigObjects));
 }
 
 

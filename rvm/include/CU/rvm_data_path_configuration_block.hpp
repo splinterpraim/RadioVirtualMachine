@@ -53,6 +53,11 @@ public:
     void runDataPath();
 
     /**
+     * @brief Clears Data Path configured by configure()
+     */
+    void clear();
+
+    /**
      * @brief Sends status from Data Object
      *
      * @param[in]       statusDO                Status of Data Object
