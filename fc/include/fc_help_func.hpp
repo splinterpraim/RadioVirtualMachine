@@ -29,24 +29,6 @@
 /* ************************** parseSWIR */
 
 /**
- * @brief Converts operator in XML format to IR operator format
- * 
- * @param[in] op_xml Operator in XML format
- * 
- * @retval IrOperator IR operator format
- */
-IrOperator convertToIrOperator(pugi::xml_node &op_xml);
-
-/**
- * @brief Converts data in XML format to IR data format
- * 
- * @param[in] data_xml Data in XML format
- * 
- * @retval IrData IR data format
- */
-IrData convertToIrData(pugi::xml_node &data_xml);
-
-/**
  * @brief Shows IR operators
  * 
  * @param[in] operators Vector of IR operators
@@ -67,36 +49,6 @@ void showIrData(const std::vector<IrData> &data);
  */
 void showIrLinks(const std::vector<IrLink> &links);
 
-/**
- * Takes all data connected with specific operator and specific connect type.
- * Converts data to key-value array where the key is order and value is IR data.
- * 
- * @param[in] op_xml Operator in XML format
- * @param[in] connectType Type of connection operator with data
- * 
- * @retval std::map<int, IrData> Key-value array of IR data
- */
-std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType);
-
-/**
- * @brief Adds IR data from key-value array to IR data vector if data is not exist 
- * 
- * @param[in,out] data Vector of IR data
- * @param[in] newData Key-value array of IR data
- */
-void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData);
-
-/**
- * Creates a links with using key-value array of IR data and IR operator.
- * Adds created links in vector of IR links.
- * 
- * @param[in,out] links Vector of IR links
- * @param[in] data Vector of IR data
- * @param[in] op IR operator
- * @param[in] dir Direction of data to operator
- */
-void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
-
 /* ************************** convert2rvmIr */
 
 /**
@@ -116,6 +68,13 @@ DO_Config *getDoConfig(IrObjects &irObjects);
  * @retval uint32_t Data size
  */
 uint32_t getDoConfig_size(IrData &irData);
+
+/**
+ * @brief Gets flag of external data
+ * 
+ * @return uint8_t flag of external data
+ */
+uint8_t getExternal();
 
 /**
  * @brief Gets real data length from IR data for the DO Config field

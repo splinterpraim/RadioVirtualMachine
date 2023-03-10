@@ -27,27 +27,6 @@
 extern fc_glob_t fc_glob;
 extern RadioLibrary radioLib;
 
-IrOperator convertToIrOperator(pugi::xml_node &op_xml)
-{
-    IrOperator op;
-    op.setId(op_xml.attribute("id").value());
-    op.setType(op_xml.attribute("type").value());
-    op.setOpcode(op_xml.attribute("opcode").value());
-    return op;
-}
-
-IrData convertToIrData(pugi::xml_node &data_xml)
-{
-    IrData data;
-    data.setId(data_xml.attribute("id").as_string());
-    // data.setType(data_xml.attribute("type").as_string());
-    data.setPath(data_xml.attribute("path").as_string());
-    data.setAccessTime(data_xml.attribute("access_time").as_string());
-    data.setValue(data_xml.attribute("value").as_string());
-
-    return data;
-}
-
 void showIrOperators(const std::vector<IrOperator> &operators)
 {
     for (auto el : operators)
@@ -78,68 +57,6 @@ void showIrLinks(const std::vector<IrLink> &links)
     }
 }
 
-std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType)
-{
-    //    std::vector<IrData> dataResult;
-    std::map<int, IrData> dataResult;
-
-    /* Gets description of operator in Radio lib */
-    rl_Operator op_rl = radioLib.findByOpCode(op_xml.attribute("opcode").as_int());
-    if (op_rl.name.length() == 0)
-    {
-        throw std::runtime_error(FC_ERR_STR("Unknown opcode for operator"));
-    }
-
-    /* Loop for finding and converting Data from xml to IR */
-    for (auto data : op_xml)
-    {
-        std::string dataConnectType = data.attribute("connect_type").as_string();
-        if (dataConnectType.compare(connectType) == 0)
-        {
-            IrData currData = convertToIrData(data);
-
-            /* Finds data type */
-            int order = data.attribute("order").as_int();
-            int dataType = -1;
-            if (dataConnectType.compare("input") == 0)
-            {
-                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
-            }
-            else if (dataConnectType.compare("output") == 0)
-            {
-                dataType = op_rl.ports.out[order - 1].type;
-            }
-            else
-            {
-                // err
-            }
-            currData.setType(dataType);
-            dataResult[order] = currData;
-        }
-    }
-    return dataResult;
-}
-
-void addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData)
-{
-    for (auto el : newData)
-    {
-        /* If not exist */
-        if (std::find(data.begin(), data.end(), el.second) == data.end())
-        {
-            data.push_back(el.second);
-        }
-    }
-}
-
-void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir)
-{
-    for (auto el : data)
-    {
-        links.push_back(IrLink(el.second.getId(), op.getId(), dir, el.first));
-    }
-}
-
 /* ************************** convert2rvmIr */
 
 DO_Config *getDoConfig(IrObjects &irObjects)
@@ -149,8 +66,9 @@ DO_Config *getDoConfig(IrObjects &irObjects)
     for (auto &elem : irObjects.data)
     {
         doConfigRes[i].DO_ID = i;
-        doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
         doConfigRes[i].size = getDoConfig_size(elem);
+        doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
+        doConfigRes[i].external = getExternal();
         doConfigRes[i].length = getDoConfig_length(elem, doConfigRes[i].size);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
@@ -179,6 +97,11 @@ uint32_t getDoConfig_size(IrData &irData)
         std::cout << "Error: Mismatch of type!" << std::endl;
     }
     return res;
+}
+
+uint8_t getExternal()
+{
+    
 }
 
 uint8_t getDoConfig_length(IrData &irData, uint32_t size)

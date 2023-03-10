@@ -195,6 +195,7 @@ void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
             CFG_WRITE(doSec.DOs[i].DO_ID);
             CFG_WRITE(doSec.DOs[i].size);
             CFG_WRITE(doSec.DOs[i].access_time);
+            CFG_WRITE(doSec.DOs[i].external);
             CFG_WRITE(doSec.DOs[i].length);
             for (uint8_t j = 0; j < doSec.DOs[i].length; j++)
             {
