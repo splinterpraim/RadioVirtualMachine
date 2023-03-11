@@ -8,7 +8,7 @@
 
 #include "fc_glob.hpp"
 
-#include "fc_system.hpp"
+#include "system_func.hpp"
 #include "common.hpp"
 
 fc_glob_t fc_glob;

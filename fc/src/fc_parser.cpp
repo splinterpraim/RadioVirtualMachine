@@ -11,7 +11,7 @@ void fc_Parser::parse(std::string progFileName, std::string ccFileName)
     showIrObjects(irObjects);
 
     FC_LOG("----- convert2rvmIr");
-    ConfigObjects configObjects = convert2rvmIr(irObjects);
+    ConfigObjects configObjects = converterIR.convert(irObjects);
     showConfigObjects(configObjects);
 
     FC_LOG("----- create RVM configcode");

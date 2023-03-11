@@ -13,6 +13,7 @@
 #include "ir_objects.hpp"
 #include "config_code_structure.hpp"
 #include "fc_parser_swir.hpp"
+#include "fc_converter_ir.hpp"
 
 class fc_Parser
 {
@@ -25,6 +26,7 @@ private:
     IrObjects IrObj;
     fc_Parser* insideParsers;
     fc_Parser_SWIR parserSWIR;
+    fc_Converter_IR converterIR;
 
     /**
      * @brief Shows IR objects in standart output

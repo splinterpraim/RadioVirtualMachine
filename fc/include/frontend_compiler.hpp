@@ -41,15 +41,6 @@ IrObjects parseSWIR(const std::string &fileNameSWIR);
 void showIrObjects(const IrObjects &irObjects);
 
 /**
- * @brief Converts from Ir Objects to RVM IR (config structs) 
- * 
- * @param[in] irObjects IR Objects
- * 
- * @retval ConfigObjects Config Objects
- */
-ConfigObjects convert2rvmIr(IrObjects &irObjects); 
-
-/**
  * @brief Creates RVM binary config code from Config Objects 
  * 
  * @param[in] cfgObj Reference to Config Objects

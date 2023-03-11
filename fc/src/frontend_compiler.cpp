@@ -23,53 +23,6 @@
 
 /* Private */
 
-/**
- * @brief Fills fields of Control Section for Config code objects
- * 
- * @param[in] configObjects Config code objects
- * @param[in] irObjects IR objects
- */
-void fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
-{
-    ControlSection &ctrlSec = configObjects.controlSection;
-    ctrlSec.LCF = 1; // means that this is the last Configcode in the task
-    ctrlSec.NAF = 0; 
-    ctrlSec.Task_ID = 1;
-    ctrlSec.RPI_version = 1;  // version number of supported general radio programming interface
-    ctrlSec.Reference_ID = 1; // identifier of the reference Radio Library
-    ctrlSec.Implementation_version = 1;
-    ctrlSec.Developer_ID = 1;
-    ctrlSec.Creation_Date = 2022;
-}
-
-/**
- * @brief Fills fields of DO Section for Config code objects
- * 
- * @param[in] configObjects Config code objects
- * @param[in] irObjects IR objects
- */
-void fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
-{
-    DO_Section &doSec = configObjects.doSection;
-
-    doSec.N_DO = irObjects.data.size();
-    doSec.DOs = getDoConfig(irObjects);
-    doSec.ASFs = getAsfConfig(irObjects);
-}
-
-/**
- * @brief Fills fields of APE Section for Config code objects
- * 
- * @param[in] configObjects Config code objects
- * @param[in] irObjects IR objects
- */
-void fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
-{
-    APE_Section &apeSec = configObjects.apeSection;
-    apeSec.N_APE = irObjects.operators.size();
-    apeSec.APEs = getApeConfig(irObjects);
-}
-
 /* Public */
 IrObjects parseSWIR(const std::string &fileNameSWIR)
 {
@@ -148,15 +101,6 @@ void showIrObjects(const struct IrObjects &irObjects)
     std::cout << "link" << std::endl;
     showIrLinks(irObjects.links);
     std::cout << " - " << std::endl;
-}
-
-ConfigObjects convert2rvmIr(IrObjects &irObjects)
-{
-    ConfigObjects configObjects;
-    fillControlSection(configObjects, irObjects);
-    fillDoSection(configObjects, irObjects);
-    fillApeSection(configObjects, irObjects);
-    return configObjects;
 }
 
 #define CFG_WRITE(v)                                                \
