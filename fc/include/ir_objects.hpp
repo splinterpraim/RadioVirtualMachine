@@ -29,4 +29,11 @@ struct IrObjects
 };
 using IrObjects = struct IrObjects;
 
+/**
+ * @brief Shows IR objects in standart output
+ * 
+ * @param[in] irObjects IR objects for output
+ */
+void showIrObjects(const IrObjects &irObjects);
+
 #endif // FC_IR_OBJECTS_HPP

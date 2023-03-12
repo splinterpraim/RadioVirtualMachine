@@ -18,6 +18,12 @@
 class fc_Parser
 {
 public:
+    /**
+     * @brief Parses XML program file and generates configcode file
+     * 
+     * @param progFileName Input XML program file
+     * @param ccFileName Output configcode file
+     */
     void parse(std::string progFileName, std::string ccFileName);
 
 private:
@@ -28,21 +34,7 @@ private:
     fc_Parser_SWIR parserSWIR;
     fc_Converter_IR converterIR;
 
-    /**
-     * @brief Shows IR objects in standart output
-     *
-     * @param[in] irObjects IR objects for output
-     */
-    void showIrObjects(const IrObjects &irObjects);
-
-    /**
-     * @brief Converts from Ir Objects to RVM IR (config structs)
-     *
-     * @param[in] irObjects IR Objects
-     *
-     * @retval ConfigObjects Config Objects
-     */
-    ConfigObjects convert2rvmIr(IrObjects &irObjects);
+    void processComplexOperator(IrObjects &irObj);
 
     /**
      * @brief Creates RVM binary config code from Config Objects

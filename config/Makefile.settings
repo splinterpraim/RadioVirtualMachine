@@ -1,7 +1,7 @@
 
 DEBUG := 1
 SANITIZER := 1
-
+CC := clang
 
 # --------------
 
@@ -10,7 +10,11 @@ DEBUG_FLAGS :=
 LDFLAGS := 
 ifeq ($(SANITIZER),1)
 DEBUG_FLAGS += -fsanitize=address
+ifeq ($(CC),clang)
+LDFLAGS += -fsanitize=address -static-libsan
+else
 LDFLAGS += -fsanitize=address -static-libasan
+endif
 endif
 
 ifeq ($(DEBUG),1)

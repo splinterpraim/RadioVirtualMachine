@@ -1,5 +1,7 @@
 #include "fc_parser_swir.hpp"
 
+#include <exception>
+#include <stdexcept>
 
 #include "radio_library.hpp"
 #include "common.hpp"
@@ -78,7 +80,15 @@ IrOperator fc_Parser_SWIR::convertToIrOperator(pugi::xml_node &op_xml)
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
+    if (op.getType().compare("Complex") == 0)
+    {
+        pugi::xml_node subprog_xml;
+        subprog_xml = op_xml.child("subprogram");
+        op.setSubname(subprog_xml.attribute("name").value());
+        op.setSubpath(subprog_xml.attribute("path").value());
+    }
     op.setOpcode(op_xml.attribute("opcode").value());
+
     return op;
 }
 
@@ -108,51 +118,44 @@ IrObjects fc_Parser_SWIR::parse(const std::string &fileNameSWIR)
     /* Parse tag inside */
     while (true)
     {
-        std::string operatorType = curOperator.attribute("type").as_string();
-        /* If Complex */
-        if (operatorType.compare("Complex") == 0)
+        std::string input_s = "input";
+        std::string output_s = "output";
+        /* Take input/output data from operator tag */
+        auto inputData = takeIrData(curOperator, input_s);
+        auto outputData = takeIrData(curOperator, output_s);
+
+        /* Add input/output Ir data in Ir objects  */
+        addIrDataToVector(irObjects.data, inputData);
+        addIrDataToVector(irObjects.data, outputData);
+
+        IrOperator currOp = convertToIrOperator(curOperator);
+
+        /* Add current operator in Ir vector */
+        irObjects.operators.push_back(currOp);
+
+        /* Create link objects from input/output IR data and IR operator */
+        createLinksFromVectorData(irObjects.links, inputData, currOp, LINK_INPUT);
+        createLinksFromVectorData(irObjects.links, outputData, currOp, LINK_OUTPUT);
+
+        auto xmlNodeType = curOperator.next_sibling().type();
+
+        /* Check end of sibling operator list */
+        if (xmlNodeType == pugi::node_null)
         {
-            curOperator = curOperator.child("operator");
-        }
-        /* If terminal */
-        else
-        {
-            std::string input_s = "input";
-            std::string output_s = "output";
-            /* Take input/output data from operator tag */
-            auto inputData = takeIrData(curOperator, input_s);
-            auto outputData = takeIrData(curOperator, output_s);
-    
+            curOperator = curOperator.parent();
+            std::string xmlNodeName = curOperator.name();
 
-            /* Add input/output Ir data in Ir objects  */
-            addIrDataToVector(irObjects.data, inputData);
-            addIrDataToVector(irObjects.data, outputData);
-
-            IrOperator currOp = convertToIrOperator(curOperator);
-
-            /* Add current operator in Ir vector */
-            irObjects.operators.push_back(currOp);
-
-            /* Create link objects from input/output IR data and IR operator */
-            createLinksFromVectorData(irObjects.links, inputData, currOp, LINK_INPUT);
-            createLinksFromVectorData(irObjects.links, outputData, currOp, LINK_OUTPUT);
-
-            auto xmlNodeType = curOperator.next_sibling().type();
-
-            /* Check end of sibling operator list */
-            if (xmlNodeType == pugi::node_null)
+            /* Check end of xml operator list */
+            if (xmlNodeName.compare("program") == 0)
             {
-                curOperator = curOperator.parent();
-                std::string xmlNodeName = curOperator.name();
-
-                /* Check end of xml operator list */
-                if (xmlNodeName.compare("program") == 0)
-                {
-                    break;
-                }
+                break;
             }
-            curOperator = curOperator.next_sibling();
+            else
+            {
+                throw std::runtime_error(FC_ERR_STR("unknown tag during XML parsing"));
+            }
         }
+        curOperator = curOperator.next_sibling();
     }
     return irObjects;
 }

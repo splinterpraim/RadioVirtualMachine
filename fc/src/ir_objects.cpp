@@ -1,32 +1,12 @@
+#include "ir_objects.hpp"
+
+/* Private */
+
 /**
- * @file fc_help_func.cpp
- * @author Elena Potapova (krylelena99@yandex.ru)
- * @brief Help functions for front-end compiler
- * @version 0.1
- * @copyright Copyright (c) 2023
+ * @brief Shows IR operators
+ * 
+ * @param[in] operators Vector of IR operators
  */
-
-#include "fc_help_func.hpp"
-#include "common.hpp"
-#include "fc_glob.hpp"
-#include "fc_system.hpp"
-
-#include "radio_library.hpp"
-
-#include <fstream>
-#include <cstring>
-#include <exception>
-#include <stdexcept>
-
-#define XML_TYPE_INT "int"
-#define XML_TYPE_FLOAT "float"
-#define XML_TYPE_STRING "string"
-
-#define DO_CFG_LEN_FOR_FILE 255
-
-extern fc_glob_t fc_glob;
-extern RadioLibrary radioLib;
-
 void showIrOperators(const std::vector<IrOperator> &operators)
 {
     for (auto el : operators)
@@ -37,6 +17,11 @@ void showIrOperators(const std::vector<IrOperator> &operators)
     }
 }
 
+/**
+ * @brief Shows IR data
+ * 
+ * @param[in] data Vector of IR data
+ */
 void showIrData(const std::vector<IrData> &data)
 {
     for (auto el : data)
@@ -49,11 +34,31 @@ void showIrData(const std::vector<IrData> &data)
     }
 }
 
+/**
+ * @brief Shows IR links
+ * 
+ * @param[in] links Vector of IR links 
+ */
 void showIrLinks(const std::vector<IrLink> &links)
 {
     for (auto el : links)
     {
         std::cout << el.to_str() << std::endl;
     }
+}
+
+/* Public */
+void showIrObjects(const struct IrObjects &irObjects)
+{
+    /* Show result Ir objects */
+    std::cout << "Operators" << std::endl;
+    showIrOperators(irObjects.operators);
+    std::cout << " - " << std::endl;
+    std::cout << "Data" << std::endl;
+    showIrData(irObjects.data);
+    std::cout << " - " << std::endl;
+    std::cout << "link" << std::endl;
+    showIrLinks(irObjects.links);
+    std::cout << " - " << std::endl;
 }
 

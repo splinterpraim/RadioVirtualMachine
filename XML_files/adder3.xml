@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<program name="adder3" path="">
+
+    <data id="x1" path="" connect_type="input" order="1" access_time="10" value="" />
+    <data id="x2" path="" connect_type="input" order="2" access_time="10" value="" />
+    <data id="x3" path="" connect_type="input" order="3" access_time="10" value="" />
+    <data id="x" path="" connect_type="output" order="1" access_time="10" value="" />
+
+    <operator id="add1" type="Terminal" opcode="1">
+        <data id="x1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x2" path="" connect_type="input" order="2" access_time="10" value="" />
+        <data id="add_x1_x2" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="add2" type="Terminal" opcode="1">
+        <data id="add_x1_x2" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x3" path="" connect_type="input" order="2" access_time="10" value="" />
+        <data id="x" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+</program>

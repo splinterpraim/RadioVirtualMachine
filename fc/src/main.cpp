@@ -23,10 +23,10 @@
 #include "ir_data.hpp"
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
-#include "frontend_compiler.hpp"
 #include "radio_library.hpp"
 #include "config_code_structure.hpp"
 #include "fc_glob.hpp"
+#include "fc_parser.hpp"
 
 RadioLibrary radioLib;
 
@@ -80,18 +80,9 @@ int main(int argc, char *argv[])
 
         parseArg(argc, argv);
 
-        FC_LOG("----- parseSWIR");
-        struct IrObjects irObjects = parseSWIR(fc_glob.file_nameSWIR);
-        showIrObjects(irObjects);
+        fc_Parser parcer;
+        parcer.parse(fc_glob.file_nameSWIR, fc_glob.file_nameBin);
 
-        FC_LOG("----- convert2rvmIr");
-        ConfigObjects configObjects = convert2rvmIr(irObjects);
-        showConfigObjects(configObjects);
-
-        FC_LOG("----- create RVM configcode");
-        createRVMcfgcode(configObjects, fc_glob.file_nameBin);
-
-        clearConfigObjects(configObjects);
     }
     catch (const std::exception &e)
     {
