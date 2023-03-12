@@ -117,16 +117,19 @@ void fc_Parser::createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileN
 
 void fc_Parser::parse(std::string progFileName, std::string ccFileName)
 {
-    FC_LOG("----- parseSWIR");
+    
+
     struct IrObjects irObjects = parserSWIR.parse(progFileName);
-    showIrObjects(irObjects);
-
-    FC_LOG("----- convert2rvmIr");
+    processComplexOperator(irObjects);
     ConfigObjects configObjects = converterIR.convert(irObjects);
-    showConfigObjects(configObjects);
-
-    FC_LOG("----- create RVM configcode");
     createRVMcfgcode(configObjects, ccFileName);
+
+    FC_LOG(GN << "> " << RT << "Parse '" << progFileName << "' in '"<< ccFileName << "'");
+    FC_LOG("----- IR objects");
+    showIrObjects(irObjects);
+    FC_LOG("----- CC objects");
+    showConfigObjects(configObjects);
+    FC_LOG("CC written in " << ccFileName << std::endl);
 
     clearConfigObjects(configObjects);
 }

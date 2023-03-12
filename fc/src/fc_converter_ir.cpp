@@ -1,6 +1,7 @@
 #include "fc_converter_ir.hpp"
 
 #include <fstream>
+#include <cstring>
 
 #include "common.hpp"
 #include "system_func.hpp"
@@ -386,7 +387,11 @@ bool fc_Converter_IR::checkNumPorts(IrOperator &irOperator, IrObjects &irObjects
 
     IOPortsCnt numIOPortsLib = radioLib.getIOPortsCnt(std::stoul(irOperator.getOpcode()));
 
-    if ((numInputLink == numIOPortsLib.input) && (numOutputLink == numIOPortsLib.output))
+    if ((numIOPortsLib.input == RL_PORTS_INF) && (numOutputLink == numIOPortsLib.output))
+    {
+        return true;
+    }
+    else if ((numInputLink == numIOPortsLib.input) && (numOutputLink == numIOPortsLib.output))
     {
         return true;
     }

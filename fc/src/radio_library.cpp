@@ -77,6 +77,7 @@ RadioLibrary::RadioLibrary()
         AdderInt.opcode = 5;
         AdderInt.cost = 10;
         AdderInt.time = 10;
+        AdderInt.ports.fInfinityInPorts = RL_YES;
         AdderInt.ports.in.push_back({0, RL_TYPE_INT}); // todo: fix, because not work for undefined num of inputs
         AdderInt.ports.out.push_back({3, RL_TYPE_INT});
     }
@@ -85,9 +86,9 @@ RadioLibrary::RadioLibrary()
 
 rl_Operator RadioLibrary::findByOpCode(int opcode)
 {
-    for(auto &oneOp : operators)
+    for (auto &oneOp : operators)
     {
-        if(oneOp.opcode == opcode) 
+        if (oneOp.opcode == opcode)
         {
             return oneOp;
         }
@@ -99,15 +100,24 @@ rl_Operator RadioLibrary::findByOpCode(int opcode)
 
 IOPortsCnt RadioLibrary::getIOPortsCnt(int opcode)
 {
-    for (auto &oneOp: operators)
+    for (auto &oneOp : operators)
     {
-        if ( oneOp.opcode == opcode)
+        if (oneOp.opcode == opcode)
         {
-            IOPortsCnt cntPorts = {(int)oneOp.ports.in.size(), (int)oneOp.ports.out.size()};
+            IOPortsCnt cntPorts;
+            if (oneOp.ports.fInfinityInPorts == RL_YES)
+            {
+                cntPorts.input = RL_PORTS_INF;
+                cntPorts.output = (int)oneOp.ports.out.size();
+            }
+            else
+            {
+                cntPorts.input = (int)oneOp.ports.in.size();
+                cntPorts.output = (int)oneOp.ports.out.size();
+            }
             return cntPorts;
         }
     }
 
     throw std::runtime_error(FC_ERR_STR("Operator not found!"));
 }
-

@@ -14,6 +14,9 @@
 #include <vector>
 #include <map>
 
+#define RL_NO 0
+#define RL_YES 1
+#define RL_PORTS_INF -1
 struct IOPortsCnt_s
 {
     int input;
@@ -35,6 +38,8 @@ struct rl_Operator_s
     
     struct Ports_s
     {
+        uint8_t fInfinityInPorts = RL_NO;
+        uint8_t fInfinityOutPorts = RL_NO;
         std::vector<OpPort> in;
         std::vector<OpPort> out;
 

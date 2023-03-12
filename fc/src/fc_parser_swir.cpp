@@ -1,5 +1,6 @@
 #include "fc_parser_swir.hpp"
 
+#include <algorithm>
 #include <exception>
 #include <stdexcept>
 
@@ -15,10 +16,12 @@ std::map<int, IrData> fc_Parser_SWIR::takeIrData(pugi::xml_node &op_xml, const s
     std::map<int, IrData> dataResult;
 
     /* Gets description of operator in Radio lib */
-    rl_Operator op_rl = radioLib.findByOpCode(op_xml.attribute("opcode").as_int());
+    int opcode = op_xml.attribute("opcode").as_int();
+    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    /* If opcode doesn't found */
     if (op_rl.name.length() == 0)
     {
-        throw std::runtime_error(FC_ERR_STR("Unknown opcode for operator"));
+        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
     }
 
     /* Loop for finding and converting Data from xml to IR */
@@ -34,7 +37,14 @@ std::map<int, IrData> fc_Parser_SWIR::takeIrData(pugi::xml_node &op_xml, const s
             int dataType = -1;
             if (dataConnectType.compare("input") == 0)
             {
-                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
+                if (op_rl.ports.fInfinityInPorts == RL_YES)
+                {
+                    dataType = op_rl.ports.in[0].type; // todo: fix, because not work for undefined num of inputs
+                }
+                else
+                {
+                    dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
+                }
             }
             else if (dataConnectType.compare("output") == 0)
             {
@@ -113,7 +123,7 @@ IrObjects fc_Parser_SWIR::parse(const std::string &fileNameSWIR)
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
-    pugi::xml_node curOperator = program.first_child();
+    pugi::xml_node curOperator = program.child("operator");
 
     /* Parse tag inside */
     while (true)
