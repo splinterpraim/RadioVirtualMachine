@@ -8,10 +8,13 @@
 #include "fc_glob.hpp"
 #include "radio_library.hpp"
 
+#define PROGRAM_ID 0
+#define APE_ID_START 1
+
 extern RadioLibrary radioLib;
 
 /* Private */
-void fc_Converter_IR::fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
+void fc_ConverterIR::fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {
     ControlSection &ctrlSec = configObjects.controlSection;
     ctrlSec.LCF = 1; // means that this is the last Configcode in the task
@@ -24,7 +27,7 @@ void fc_Converter_IR::fillControlSection(ConfigObjects &configObjects, IrObjects
     ctrlSec.Creation_Date = 2022;
 }
 
-void fc_Converter_IR::fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
+void fc_ConverterIR::fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {
     DO_Section &doSec = configObjects.doSection;
 
@@ -33,7 +36,7 @@ void fc_Converter_IR::fillDoSection(ConfigObjects &configObjects, IrObjects &irO
     doSec.ASFs = getAsfConfig(irObjects);
 }
 
-DO_Config* fc_Converter_IR::getDoConfig(IrObjects &irObjects)
+DO_Config* fc_ConverterIR::getDoConfig(IrObjects &irObjects)
 {
     DO_Config *doConfigRes = new DO_Config[irObjects.data.size()];
     int i = 0;
@@ -42,7 +45,7 @@ DO_Config* fc_Converter_IR::getDoConfig(IrObjects &irObjects)
         doConfigRes[i].DO_ID = i;
         doConfigRes[i].size = getDoConfig_size(elem);
         doConfigRes[i].access_time = std::stoul(elem.getAccessTime(), nullptr, 0);
-        doConfigRes[i].external = getExternal();
+        doConfigRes[i].external = elem.getExternal();
         doConfigRes[i].length = getDoConfig_length(elem, doConfigRes[i].size);
         doConfigRes[i].data = getDoConfig_data(elem, doConfigRes[i].length);
 
@@ -51,7 +54,7 @@ DO_Config* fc_Converter_IR::getDoConfig(IrObjects &irObjects)
     return doConfigRes;
 }
 
-uint32_t fc_Converter_IR::getDoConfig_size(IrData &irData)
+uint32_t fc_ConverterIR::getDoConfig_size(IrData &irData)
 {
     uint32_t res = 0;
     if (irData.getType() == RL_TYPE_INT)
@@ -68,16 +71,12 @@ uint32_t fc_Converter_IR::getDoConfig_size(IrData &irData)
     }
     else
     {
-        std::cout << "Error: Mismatch of type!" << std::endl;
+        std::cout << FC_ERR_STR("Error: Mismatch of type!") << std::endl;
     }
     return res;
 }
 
-uint8_t fc_Converter_IR::getExternal()
-{
-}
-
-uint8_t fc_Converter_IR::getDoConfig_length(IrData &irData, uint32_t size)
+uint8_t fc_ConverterIR::getDoConfig_length(IrData &irData, uint32_t size)
 {
     uint8_t res = 0;
     std::string doVal = irData.getValue();
@@ -116,7 +115,7 @@ uint8_t fc_Converter_IR::getDoConfig_length(IrData &irData, uint32_t size)
     return res;
 }
 
-uint32_t fc_Converter_IR::detectSize(int dataType, size_t dataValSize)
+uint32_t fc_ConverterIR::detectSize(int dataType, size_t dataValSize)
 {
     uint32_t res;
 
@@ -139,7 +138,7 @@ uint32_t fc_Converter_IR::detectSize(int dataType, size_t dataValSize)
     return res;
 }
 
-size_t fc_Converter_IR::getFileLen(std::string fileName)
+size_t fc_ConverterIR::getFileLen(std::string fileName)
 {
     size_t res = 0;
     std::ifstream dataFile;
@@ -153,7 +152,7 @@ size_t fc_Converter_IR::getFileLen(std::string fileName)
     return res;
 }
 
-uint8_t* fc_Converter_IR::getDoConfig_data(IrData &irData, uint8_t len)
+uint8_t* fc_ConverterIR::getDoConfig_data(IrData &irData, uint8_t len)
 {
     uint8_t *res = nullptr;
     std::string doVal = irData.getValue();
@@ -236,7 +235,7 @@ uint8_t* fc_Converter_IR::getDoConfig_data(IrData &irData, uint8_t len)
     return res;
 }
 
-uint8_t* fc_Converter_IR::getFileData(std::string fileName)
+uint8_t* fc_ConverterIR::getFileData(std::string fileName)
 {
     uint8_t *res = nullptr;
     size_t fSize = 0;
@@ -260,7 +259,7 @@ uint8_t* fc_Converter_IR::getFileData(std::string fileName)
     return res;
 }
 
-ASF_Config* fc_Converter_IR::getAsfConfig(IrObjects &irObjects)
+ASF_Config* fc_ConverterIR::getAsfConfig(IrObjects &irObjects)
 {
     ASF_Config *asfConfigRes = new ASF_Config[irObjects.data.size()];
     int i = 0;
@@ -275,7 +274,7 @@ ASF_Config* fc_Converter_IR::getAsfConfig(IrObjects &irObjects)
     return asfConfigRes;
 }
 
-uint8_t fc_Converter_IR::getAsfConfig_numApe(IrData &irData, IrObjects &irObjects)
+uint8_t fc_ConverterIR::getAsfConfig_numApe(IrData &irData, IrObjects &irObjects)
 {
     uint8_t res = 0;
     std::string dataId = irData.getId();
@@ -289,7 +288,7 @@ uint8_t fc_Converter_IR::getAsfConfig_numApe(IrData &irData, IrObjects &irObject
     return res;
 }
 
-ASF_variable_part* fc_Converter_IR::getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects)
+ASF_variable_part* fc_ConverterIR::getAsfConfig_APE_KP(IrData &irData, uint8_t N, IrObjects &irObjects)
 {
     ASF_variable_part *res = nullptr;
     std::string dataId = irData.getId();
@@ -303,7 +302,7 @@ ASF_variable_part* fc_Converter_IR::getAsfConfig_APE_KP(IrData &irData, uint8_t 
         /* Finds a link with a dataId field equal to IR dataId */
         if (dataId.compare(link.getDataId()) == 0)
         {
-            res[i].APE_number = getApeIdForCfgCode(link.getOperatorId(), irObjects);
+            res[i].APE_number = getApeIdForCfgCode(link.getOperatorId(), irObjects.operators);
 
             /* input */
             if (link.getDir() == 0)
@@ -322,12 +321,17 @@ ASF_variable_part* fc_Converter_IR::getAsfConfig_APE_KP(IrData &irData, uint8_t 
     return res;
 }
 
-uint8_t fc_Converter_IR::getApeIdForCfgCode(std::string apeId, IrObjects &irObjects)
+uint8_t fc_ConverterIR::getApeIdForCfgCode(std::string apeId, std::vector<IrOperator> &operators)
 {
-    uint8_t apeOrderNum = 0;
+    /* "" in apeId means Program ID */
+    if (apeId == "")
+    {
+        return PROGRAM_ID;
+    }
+    uint8_t apeOrderNum = APE_ID_START;
 
     /* Iterations on operators */
-    for (auto &op : irObjects.operators)
+    for (auto &op : operators)
     {
         /* Finds a operator */
         if (apeId.compare(op.getId()) == 0)
@@ -335,11 +339,12 @@ uint8_t fc_Converter_IR::getApeIdForCfgCode(std::string apeId, IrObjects &irObje
             break;
         }
         apeOrderNum++;
+
     }
     return apeOrderNum;
 }
 
-int fc_Converter_IR::getNumInputLink(std::string opId, std::vector<IrLink> &links)
+int fc_ConverterIR::getNumInputLink(std::string opId, std::vector<IrLink> &links)
 {
     int res = 0;
 
@@ -351,14 +356,14 @@ int fc_Converter_IR::getNumInputLink(std::string opId, std::vector<IrLink> &link
     return res;
 }
 
-void fc_Converter_IR::fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
+void fc_ConverterIR::fillApeSection(ConfigObjects &configObjects, IrObjects &irObjects)
 {
     APE_Section &apeSec = configObjects.apeSection;
     apeSec.N_APE = irObjects.operators.size();
     apeSec.APEs = getApeConfig(irObjects);
 }
 
-APE_Config* fc_Converter_IR::getApeConfig(IrObjects &irObjects)
+APE_Config* fc_ConverterIR::getApeConfig(IrObjects &irObjects)
 {
     APE_Config *apeConfigRes = new APE_Config[irObjects.operators.size()];
     int i = 0;
@@ -368,7 +373,7 @@ APE_Config* fc_Converter_IR::getApeConfig(IrObjects &irObjects)
         {
             throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in XML and radiolib!"));
         }
-        apeConfigRes[i].APE_ID = i;
+        apeConfigRes[i].APE_ID = getApeIdForCfgCode(op.getId(), irObjects.operators);
         apeConfigRes[i].op_code = std::stoul(op.getOpcode());
         apeConfigRes[i].T = APE_T_STATIC;
         apeConfigRes[i].NN = getApeNumPorts(op.getId(), irObjects);
@@ -380,7 +385,7 @@ APE_Config* fc_Converter_IR::getApeConfig(IrObjects &irObjects)
     return apeConfigRes;
 }
 
-bool fc_Converter_IR::checkNumPorts(IrOperator &irOperator, IrObjects &irObjects)
+bool fc_ConverterIR::checkNumPorts(IrOperator &irOperator, IrObjects &irObjects)
 {
     int numInputLink = getNumInputLink(irOperator.getId(), irObjects.links);
     int numOutputLink = getNumOutputLink(irOperator.getId(), irObjects.links);
@@ -399,7 +404,7 @@ bool fc_Converter_IR::checkNumPorts(IrOperator &irOperator, IrObjects &irObjects
     return false;
 }
 
-uint8_t fc_Converter_IR::getApeNumPorts(std::string opId, IrObjects &irObjects)
+uint8_t fc_ConverterIR::getApeNumPorts(std::string opId, IrObjects &irObjects)
 {
     // todo: check max size (3 bits available)
     // todo: get result from refference radiolibrary (example: operator "multiple" => number of ports = 3 )
@@ -417,7 +422,7 @@ uint8_t fc_Converter_IR::getApeNumPorts(std::string opId, IrObjects &irObjects)
     return apeNumPorts;
 }
 
-int fc_Converter_IR::getNumOutputLink(std::string opId, std::vector<IrLink> &links)
+int fc_ConverterIR::getNumOutputLink(std::string opId, std::vector<IrLink> &links)
 {
     int res = 0;
 
@@ -429,7 +434,7 @@ int fc_Converter_IR::getNumOutputLink(std::string opId, std::vector<IrLink> &lin
     return res;
 }
 
-uint8_t* fc_Converter_IR::getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
+uint8_t* fc_ConverterIR::getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects)
 {
     uint8_t *accessType = new uint8_t[apeNumPorts];
 
@@ -449,13 +454,31 @@ uint8_t* fc_Converter_IR::getAccessType(uint8_t apeNumPorts, std::string opId, I
     return accessType;
 }
 
+void fc_ConverterIR::generateIdMapFile(std::vector<IrOperator> &operators)
+{
+    ofstream fin;
+    fin.open(idMapFile,std::ios::out);
+    for(auto & el : operators)
+    {
+        std::string row = std::to_string(getApeIdForCfgCode(el.getId(),operators)) + "," + el.getId();
+        fin << row << std::endl;
+    }
+    fin.close();
+}
+
 
 /* Public */
-ConfigObjects fc_Converter_IR::convert(IrObjects &irObjects)
+ConfigObjects fc_ConverterIR::convert(IrObjects &irObjects)
 {
     ConfigObjects configObjects;
     fillControlSection(configObjects, irObjects);
     fillDoSection(configObjects, irObjects);
     fillApeSection(configObjects, irObjects);
+    generateIdMapFile(irObjects.operators);
     return configObjects;
+}
+
+void fc_ConverterIR::setIdMapFile(const std::string &fileName)
+{
+    idMapFile = fileName;
 }

@@ -8,11 +8,12 @@
 
 #ifndef FC_CONVERTER_IR_CLASS
 #define FC_CONVERTER_IR_CLASS
+#include <string>
 
 #include "ir_objects.hpp"
 #include "config_code_structure.hpp"
 
-class fc_Converter_IR
+class fc_ConverterIR
 {
 public:
     /**
@@ -24,7 +25,15 @@ public:
      */
     ConfigObjects convert(IrObjects &irObjects);
 
+    /**
+     * @brief Sets the Id Map File 
+     *
+     * @param[in] fileName File name of id mapping file
+     */
+    void setIdMapFile(const std::string &fileName);
+
 private:
+    std::string idMapFile;
     /**
      * @brief Fills fields of Control Section for Config code objects
      *
@@ -58,13 +67,6 @@ private:
      * @retval uint32_t Data size
      */
     uint32_t getDoConfig_size(IrData &irData);
-
-    /**
-     * @brief Gets flag of external data
-     *
-     * @return uint8_t flag of external data
-     */
-    uint8_t getExternal();
 
     /**
      * @brief Gets real data length from IR data for the DO Config field
@@ -151,7 +153,7 @@ private:
      *
      * @retval uint8_t Operator ID
      */
-    uint8_t getApeIdForCfgCode(std::string apeId, IrObjects &irObjects);
+    uint8_t getApeIdForCfgCode(std::string apeId, std::vector<IrOperator> &operators);
 
     /**
      * @brief Gets the amount of input links in operator
@@ -221,6 +223,13 @@ private:
      * @retval uint8_t* Pointer to Access Type for ports
      */
     uint8_t *getAccessType(uint8_t apeNumPorts, std::string opId, IrObjects &irObjects);
+
+    /**
+     * @brief Generates file with id-name maps
+     *
+     * @param[in] operators Vector of IR operators
+     */
+    void generateIdMapFile(std::vector<IrOperator> &operators);
 };
 
 #endif // FC_CONVERTER_IR_CLASS
