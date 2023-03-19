@@ -55,7 +55,7 @@ struct DO_Section {
 using DO_Section = struct DO_Section;
 
 struct APE_Config{
-    uint16_t APE_ID;
+    uint8_t APE_ID;
     uint32_t  op_code; //* 20 bits (but 32 bits)
     uint8_t T; //* flag for static (=0) or dynamic (=1) operations
     uint8_t NN; //* number of ports (3 bits)
