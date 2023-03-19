@@ -142,9 +142,14 @@ void fc_ParserSWIR::addIrDataToVector(std::vector<IrData> &data, std::map<int, I
     for (auto el : newData)
     {
         /* If not exist */
-        if (std::find(data.begin(), data.end(), el.second) == data.end())
+        std::vector<IrData>::iterator it= std::find(data.begin(), data.end(), el.second);
+        if (it == data.end())
         {
             data.push_back(el.second);
+        }
+        else if (it->getType() == RL_TYPE_NOT_SET)
+        {
+            it->setType(el.second.getType());
         }
     }
 }
@@ -201,6 +206,8 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
     /* Parse tag inside */
     while (true)
     {
+        IrOperator currOp = convertToIrOperator(curOperator);
+
         /* Take input/output data from operator tag */
         auto inputData = takeIrDataInput(curOperator);
         auto outputData = takeIrDataOutput(curOperator);
@@ -209,8 +216,6 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
         addIrDataToVector(irObjects.data, inputData);
         addIrDataToVector(irObjects.data, outputData);
 
-        IrOperator currOp = convertToIrOperator(curOperator);
-
         /* Add current operator in Ir vector */
         irObjects.operators.push_back(currOp);
 
@@ -218,7 +223,7 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
         createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), LINK_INPUT);
         createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), LINK_OUTPUT);
 
-        auto xmlNodeType = curOperator.next_sibling().type();
+        auto xmlNodeType = curOperator.next_sibling("operator").type();
 
         /* Check end of sibling operator list */
         if (xmlNodeType == pugi::node_null)
@@ -236,7 +241,7 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
                 throw std::runtime_error(FC_ERR_STR("unknown tag during XML parsing"));
             }
         }
-        curOperator = curOperator.next_sibling();
+        curOperator = curOperator.next_sibling("operator");
     }
     return irObjects;
 }
