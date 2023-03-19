@@ -2,9 +2,12 @@
 
 #include <fstream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "common.hpp"
 
-#define MASK_1_BYTE 0xff   /* 1111 1111 */
+#define MASK_1_BYTE 0xff /* 1111 1111 */
 
 #define FC_LOG(s) std::cout << s << std::endl
 
@@ -15,17 +18,44 @@
         cfgF.write((char *)&(new_v), sizeof(char));                 \
     }
 
+/* Private */
+
 void fc_Parser::processComplexOperator(IrObjects &irObj)
 {
+    bool flagFirstEnter = 0;
+    std::string targetComplexDir;
     for (IrOperator &op : irObj.operators)
     {
         if (op.getType().compare("Complex") == 0)
         {
-            fc_Parser parserComplex;
-            parserComplex.parse(op.getSubpath(), op.getSubname() + ".bin");
+            if (flagFirstEnter == 0)
+            {
+                if (noChangeTargetDirectory == true)
+                {
+                    targetComplexDir = targetDir;
+                }
+                else
+                {
+                    targetComplexDir = targetDir + "/" + "complex";
+                    // create targetDir + "/" + "complex"
+                    if (mkdir(targetComplexDir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP) != 0)
+                    {   
+                        int e = errno;
+                        if (e != EEXIST)
+                        {
+                            std::string errMsg = std::string("Cann't create directory") + std::string("'") + targetComplexDir + std::string("'");
+                            throw std::runtime_error(errMsg.c_str());
+                        }
+                    }
+                }
+                flagFirstEnter = 1;
+            }
+            // create complex dir first
+
+            fc_Parser parserComplex(settingBlock, targetComplexDir, true);
+            parserComplex.parse(op.getSubpath());
         }
-    } 
-    
+    }
 }
 
 void fc_Parser::createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin)
@@ -115,21 +145,50 @@ void fc_Parser::createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileN
     cfgF.close();
 }
 
-void fc_Parser::parse(std::string progFileName, std::string ccFileName)
+/* Public */
+fc_Parser::fc_Parser(fc_SettingBlock &settingBlock, const std::string &targetDir, bool noChangeTargetDirectory)
+    : settingBlock(settingBlock), targetDir(targetDir), noChangeTargetDirectory(noChangeTargetDirectory) {}
+
+void fc_Parser::parse(std::string progFileName)
 {
-    
+    std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
+    std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
+    std::string mapFilePath = targetDir + "/" + progFileName + ".map";
 
-    struct IrObjects irObjects = parserSWIR.parse(progFileName);
+    struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
     processComplexOperator(irObjects);
+    converterIR.setIdMapFile(mapFilePath);
     ConfigObjects configObjects = converterIR.convert(irObjects);
-    createRVMcfgcode(configObjects, ccFileName);
+    createRVMcfgcode(configObjects, fullFilePathCC);
 
-    FC_LOG(GN << "> " << RT << "Parse '" << progFileName << "' in '"<< ccFileName << "'");
+    FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
     FC_LOG("----- IR objects");
     showIrObjects(irObjects);
     FC_LOG("----- CC objects");
     showConfigObjects(configObjects);
-    FC_LOG("CC written in " << ccFileName << std::endl);
+    FC_LOG("CC written in " << fullFilePathCC << std::endl);
+
+    clearConfigObjects(configObjects);
+}
+
+void fc_Parser::parseComplex(std::string progFileName)
+{
+    std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
+    std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
+    std::string mapFilePath = targetDir + "/" + progFileName + ".map";
+
+    struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
+    processComplexOperator(irObjects);
+    converterIR.setIdMapFile(mapFilePath);
+    ConfigObjects configObjects = converterIR.convert(irObjects);
+    createRVMcfgcode(configObjects, fullFilePathCC);
+
+    FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
+    FC_LOG("----- IR objects");
+    showIrObjects(irObjects);
+    FC_LOG("----- CC objects");
+    showConfigObjects(configObjects);
+    FC_LOG("CC written in " << fullFilePathCC << std::endl);
 
     clearConfigObjects(configObjects);
 }

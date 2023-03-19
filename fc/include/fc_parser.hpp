@@ -14,25 +14,41 @@
 #include "config_code_structure.hpp"
 #include "fc_parser_swir.hpp"
 #include "fc_converter_ir.hpp"
+#include "fc_setting_block.hpp"
+
+#define PROGRAM_MODE 0
+#define COMPLEX_MODE 1
 
 class fc_Parser
 {
 public:
     /**
+     * @brief Constructs a new fc Parser object with parametr
+     */
+    fc_Parser(fc_SettingBlock& settingBlock, const std::string& targetDir, bool noChangeTargetDirectory);
+
+    /**
      * @brief Parses XML program file and generates configcode file
      * 
      * @param progFileName Input XML program file
-     * @param ccFileName Output configcode file
      */
-    void parse(std::string progFileName, std::string ccFileName);
+    void parse(std::string progFileName);
+
+    /**
+     * @brief Parses XML program file for complex operator and generates configcode file
+     * 
+     * @param progFileName Input XML program file of complex operator
+     */
+    void parseComplex(std::string progFileName);
 
 private:
-    std::string programDir; /* Directory where the XML program file is located */
-    std::string ccDir;      /* Directory where the program configcode file is located */
+    fc_SettingBlock& settingBlock;
+    std::string targetDir; /* Directory where the program configcode file is located */
     IrObjects IrObj;
     fc_Parser* insideParsers;
-    fc_Parser_SWIR parserSWIR;
-    fc_Converter_IR converterIR;
+    fc_ParserSWIR parserSWIR;
+    fc_ConverterIR converterIR;
+    bool noChangeTargetDirectory {false};
 
     void processComplexOperator(IrObjects &irObj);
 
