@@ -10,9 +10,9 @@
 extern RadioLibrary radioLib;
 
 /* Private */
-std::map<int, IrData> fc_Parser_SWIR::takeIrData(pugi::xml_node &op_xml, const std::string &connectType)
+
+std::map<int, IrData> fc_ParserSWIR::takeIrDataInput(pugi::xml_node &op_xml)
 {
-    //    std::vector<IrData> dataResult;
     std::map<int, IrData> dataResult;
 
     /* Gets description of operator in Radio lib */
@@ -25,34 +25,24 @@ std::map<int, IrData> fc_Parser_SWIR::takeIrData(pugi::xml_node &op_xml, const s
     }
 
     /* Loop for finding and converting Data from xml to IR */
-    for (auto data : op_xml)
+    for (pugi::xml_node data = op_xml.child("data"); data; data = data.next_sibling("data"))
     {
         std::string dataConnectType = data.attribute("connect_type").as_string();
-        if (dataConnectType.compare(connectType) == 0)
+        if (dataConnectType.compare("input") == 0)
         {
             IrData currData = convertToIrData(data);
 
             /* Finds data type */
             int order = data.attribute("order").as_int();
             int dataType = -1;
-            if (dataConnectType.compare("input") == 0)
+
+            if (op_rl.ports.fInfinityInPorts == RL_YES)
             {
-                if (op_rl.ports.fInfinityInPorts == RL_YES)
-                {
-                    dataType = op_rl.ports.in[0].type; // todo: fix, because not work for undefined num of inputs
-                }
-                else
-                {
-                    dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
-                }
-            }
-            else if (dataConnectType.compare("output") == 0)
-            {
-                dataType = op_rl.ports.out[order - 1].type;
+                dataType = op_rl.ports.in[0].type; // todo: fix, because not work for undefined num of inputs
             }
             else
             {
-                // err
+                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
             }
             currData.setType(dataType);
             dataResult[order] = currData;
@@ -61,7 +51,81 @@ std::map<int, IrData> fc_Parser_SWIR::takeIrData(pugi::xml_node &op_xml, const s
     return dataResult;
 }
 
-IrData fc_Parser_SWIR::convertToIrData(pugi::xml_node &data_xml)
+std::map<int, IrData> fc_ParserSWIR::takeIrDataOutput(pugi::xml_node &op_xml)
+{
+    std::map<int, IrData> dataResult;
+
+    /* Gets description of operator in Radio lib */
+    int opcode = op_xml.attribute("opcode").as_int();
+    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    /* If opcode doesn't found */
+    if (op_rl.name.length() == 0)
+    {
+        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
+    }
+
+    /* Loop for finding and converting Data from xml to IR */
+    for (pugi::xml_node data = op_xml.child("data"); data; data = data.next_sibling("data"))
+    {
+        std::string dataConnectType = data.attribute("connect_type").as_string();
+        if (dataConnectType.compare("output") == 0)
+        {
+            IrData currData = convertToIrData(data);
+
+            /* Finds data type */
+            int order = data.attribute("order").as_int();
+            int dataType = -1;
+
+            dataType = op_rl.ports.out[order - 1].type;
+
+            currData.setType(dataType);
+            dataResult[order] = currData;
+        }
+    }
+    return dataResult;
+}
+
+std::map<int, IrData> fc_ParserSWIR::takeIrDataInputExternal(pugi::xml_node &op_xml)
+{
+    std::map<int, IrData> dataResult;
+
+    /* Loop for finding and converting Data from xml to IR */
+    for (pugi::xml_node data = op_xml.child("data"); data; data = data.next_sibling("data"))
+    {
+        std::string dataConnectType = data.attribute("connect_type").as_string();
+        if (dataConnectType.compare("input") == 0)
+        {
+            IrData currData = convertToIrData(data);
+            currData.setType(RL_TYPE_NOT_SET);
+            currData.setExternal(1);
+            int order = data.attribute("order").as_int();
+            dataResult[order] = currData;
+        }
+    }
+
+    return dataResult;
+}
+std::map<int, IrData> fc_ParserSWIR::takeIrDataOutputExternal(pugi::xml_node &op_xml)
+{
+    std::map<int, IrData> dataResult;
+
+    /* Loop for finding and converting Data from xml to IR */
+    for (pugi::xml_node data = op_xml.child("data"); data; data = data.next_sibling("data"))
+    {
+        std::string dataConnectType = data.attribute("connect_type").as_string();
+        if (dataConnectType.compare("output") == 0)
+        {
+            IrData currData = convertToIrData(data);
+            currData.setType(RL_TYPE_NOT_SET);
+            currData.setExternal(1);
+            int order = data.attribute("order").as_int();
+            dataResult[order] = currData;
+        }
+    }
+    return dataResult;
+}
+
+IrData fc_ParserSWIR::convertToIrData(pugi::xml_node &data_xml)
 {
     IrData data;
     data.setId(data_xml.attribute("id").as_string());
@@ -73,7 +137,7 @@ IrData fc_Parser_SWIR::convertToIrData(pugi::xml_node &data_xml)
     return data;
 }
 
-void fc_Parser_SWIR::addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData)
+void fc_ParserSWIR::addIrDataToVector(std::vector<IrData> &data, std::map<int, IrData> &newData)
 {
     for (auto el : newData)
     {
@@ -85,7 +149,7 @@ void fc_Parser_SWIR::addIrDataToVector(std::vector<IrData> &data, std::map<int, 
     }
 }
 
-IrOperator fc_Parser_SWIR::convertToIrOperator(pugi::xml_node &op_xml)
+IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
 {
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
@@ -102,17 +166,17 @@ IrOperator fc_Parser_SWIR::convertToIrOperator(pugi::xml_node &op_xml)
     return op;
 }
 
-void fc_Parser_SWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir)
+void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir)
 {
     for (auto el : data)
     {
-        links.push_back(IrLink(el.second.getId(), op.getId(), dir, el.first));
+        links.push_back(IrLink(el.second.getId(), opId, dir, el.first));
     }
 }
 
 /* Public */
 
-IrObjects fc_Parser_SWIR::parse(const std::string &fileNameSWIR)
+IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
 {
     /* Declaration IrObjects */
     IrObjects irObjects;
@@ -123,16 +187,23 @@ IrObjects fc_Parser_SWIR::parse(const std::string &fileNameSWIR)
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
+    auto inputDataExternal = takeIrDataInputExternal(program);
+    auto outputDataExternal = takeIrDataOutputExternal(program);
+
+    addIrDataToVector(irObjects.data, inputDataExternal);
+    addIrDataToVector(irObjects.data, outputDataExternal);
+
+    createLinksFromVectorData(irObjects.links, inputDataExternal, "", LINK_INPUT);
+    createLinksFromVectorData(irObjects.links, outputDataExternal, "", LINK_OUTPUT);
+
     pugi::xml_node curOperator = program.child("operator");
 
     /* Parse tag inside */
     while (true)
     {
-        std::string input_s = "input";
-        std::string output_s = "output";
         /* Take input/output data from operator tag */
-        auto inputData = takeIrData(curOperator, input_s);
-        auto outputData = takeIrData(curOperator, output_s);
+        auto inputData = takeIrDataInput(curOperator);
+        auto outputData = takeIrDataOutput(curOperator);
 
         /* Add input/output Ir data in Ir objects  */
         addIrDataToVector(irObjects.data, inputData);
@@ -144,8 +215,8 @@ IrObjects fc_Parser_SWIR::parse(const std::string &fileNameSWIR)
         irObjects.operators.push_back(currOp);
 
         /* Create link objects from input/output IR data and IR operator */
-        createLinksFromVectorData(irObjects.links, inputData, currOp, LINK_INPUT);
-        createLinksFromVectorData(irObjects.links, outputData, currOp, LINK_OUTPUT);
+        createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), LINK_INPUT);
+        createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), LINK_OUTPUT);
 
         auto xmlNodeType = curOperator.next_sibling().type();
 

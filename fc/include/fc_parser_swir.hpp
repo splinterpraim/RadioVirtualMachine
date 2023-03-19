@@ -19,7 +19,7 @@
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
 
-class fc_Parser_SWIR
+class fc_ParserSWIR
 {
 public:
     /**
@@ -33,15 +33,44 @@ public:
 
 private:
     /**
-     * Takes all data connected with specific operator and specific connect type.
+     * Takes all data connected with specific operator and has input connect type.
      * Converts data to key-value array where the key is order and value is IR data.
      *
      * @param[in] op_xml Operator in XML format
-     * @param[in] connectType Type of connection operator with data
      *
      * @retval std::map<int, IrData> Key-value array of IR data
      */
-    std::map<int, IrData> takeIrData(pugi::xml_node &op_xml, const std::string &connectType);
+    std::map<int, IrData> takeIrDataInput(pugi::xml_node &op_xml);
+
+    /**
+     * Takes all data connected with specific operator and has output connect type.
+     * Converts data to key-value array where the key is order and value is IR data.
+     *
+     * @param[in] op_xml Operator in XML format
+     *
+     * @retval std::map<int, IrData> Key-value array of IR data
+     */
+    std::map<int, IrData> takeIrDataOutput(pugi::xml_node &op_xml);
+
+    /**
+     * Takes all external data connected with program and has input connect type.
+     * Converts data to key-value array where the key is order and value is IR data.
+     *
+     * @param[in] op_xml Operator in XML format
+     *
+     * @retval std::map<int, IrData> Key-value array of IR data
+     */
+    std::map<int, IrData> takeIrDataInputExternal(pugi::xml_node &op_xml);
+
+    /**
+     * Takes all external data connected with program and has output connect type.
+     * Converts data to key-value array where the key is order and value is IR data.
+     *
+     * @param[in] op_xml Operator in XML format
+     *
+     * @retval std::map<int, IrData> Key-value array of IR data
+     */
+    std::map<int, IrData> takeIrDataOutputExternal(pugi::xml_node &op_xml);
 
     /**
      * @brief Converts data in XML format to IR data format
@@ -75,10 +104,10 @@ private:
      *
      * @param[in,out] links Vector of IR links
      * @param[in] data Vector of IR data
-     * @param[in] op IR operator
+     * @param[in] opId IR operator ID
      * @param[in] dir Direction of data to operator
      */
-    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, IrOperator &op, int dir);
+    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir);
 };
 
 #endif // FC_PARSER_SWIR_CLASS
