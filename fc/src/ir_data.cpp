@@ -8,57 +8,78 @@
 
 #include "ir_data.hpp"
 
-void IrData::setId(const string &id) {
+void IrData::setId(const string &id)
+{
     if (id == "")
         throw std::invalid_argument("setId function failed, argument 'id' is empty");
 
     this->id = id;
 }
 
-string IrData::getId() {
+string IrData::getId()
+{
     return id;
 }
 
-void IrData::setType(const int &type) {
+void IrData::setType(int type)
+{
     // if (type == "")
     //     throw std::invalid_argument("setType function failed, argument 'type' is empty");
 
     this->type = type;
 }
 
-int IrData::getType() {
+int IrData::getType()
+{
     return type;
 }
 
-void IrData::setPath(const string &path) {
+void IrData::setPath(const string &path)
+{
 
     this->path = path;
 }
 
-string IrData::getPath() {
+string IrData::getPath()
+{
     return path;
 }
 
-void IrData::setAccessTime(const string &accessTime) {
+void IrData::setAccessTime(const string &accessTime)
+{
     // if (accessTime < 0)
     //     throw std::invalid_argument("setAccessTime function failed, argument 'accessTime' is negative");
 
     this->accessTime = accessTime;
 }
 
-string IrData::getAccessTime() {
+string IrData::getAccessTime()
+{
     return accessTime;
 }
 
-void IrData::setValue(const string &value) {
+void IrData::setValue(const string &value)
+{
     this->value = value;
 }
 
-string IrData::getValue() {
+string IrData::getValue()
+{
     return value;
 }
 
-bool IrData::operator==(const IrData &rData) {
+void IrData::setExternal(bool external)
+{
+    this->external = external;
+}
+
+bool IrData::getExternal()
+{
+    return external;
+}
+
+bool IrData::operator==(const IrData &rData)
+{
     if (id == rData.id)
         return 1;
     return 0;
