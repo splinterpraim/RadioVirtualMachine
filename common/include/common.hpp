@@ -45,6 +45,7 @@
 #define MASK_LS_3_BIT 0x07 /* 0000 0111 */
 
 /* Radio Library types */
+#define RL_TYPE_NOT_SET -1
 #define RL_TYPE_INT 0
 #define RL_TYPE_FLOAT 1
 #define RL_TYPE_STRING 2
