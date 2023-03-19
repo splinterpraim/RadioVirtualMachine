@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<program name="adder3" path="">
+<program name="adder3" path="adder3.xml">
 
     <data id="x1" path="" connect_type="input" order="1" access_time="10" value="" />
     <data id="x2" path="" connect_type="input" order="2" access_time="10" value="" />
