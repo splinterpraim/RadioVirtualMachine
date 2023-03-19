@@ -13,6 +13,7 @@
 #include <cstring>
 
 #include "common.hpp"
+#include "rvm_glob_define.hpp"
 #include "system_func.hpp"
 #include "config_code_structure.hpp"
 #include "rvm_structs.h"
@@ -31,7 +32,7 @@ void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode
 
     for (size_t i = 0; i < doSec.N_DO; ++i)
     {
-        dataPath->dataObjs[i].associate(*this);
+        dataPath->dataObjs[i].associate(*this, *qDO);
         dataPath->dataObjs[i].set(doSec.DOs[i].DO_ID, doSec.DOs[i].size, doSec.DOs[i].access_time);
         if ( doSec.DOs[i].data )
         {
@@ -60,7 +61,7 @@ void rvm_dataPathConfigurationBlock::configureAbstractProcessingElements(ConfigO
 
     for (size_t i = 0; i < apeSec.N_APE; ++i)
     {
-        dataPath->apes[i].associate(*this);
+        dataPath->apes[i].associate(*this, *qAPE);
 
         /* Prepares portAccessType data */
         std::vector<uint8_t> portsAccessType;
@@ -195,23 +196,25 @@ int rvm_dataPathConfigurationBlock::getDirectionFromAPE(ConfigObjects &cfgCode, 
 
 rvm_dataPathConfigurationBlock::rvm_dataPathConfigurationBlock() { }
 
-void rvm_dataPathConfigurationBlock::associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher)
+void rvm_dataPathConfigurationBlock::associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher,rvm_ThreadsafeQueue<StatusFromDataObject> &qDO, rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement> &qAPE)
 {
     this->dataPath = &dataPath;
     this->opFetcher = &opFetcher;
+    this->qDO = &qDO;
+    this->qAPE = &qAPE;
 }
 
-void rvm_dataPathConfigurationBlock::configure(ConfigObjects &cfgCode)
+void rvm_dataPathConfigurationBlock::configureAndRun(ConfigObjects &cfgCode)
 {
     configureDataObjects(cfgCode);
     configureAbstractProcessingElements(cfgCode);
     configureAbstractSwitchFabric(cfgCode);
     //todo: collect status and check it
-}
-
-void rvm_dataPathConfigurationBlock::runDataPath()
-{
+    LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
+    LLOG(LogLevels::FIRST, std::cout << "STAGE RUN" << std::endl)
     dataPath->asf->run();
+    LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
+    LLOG(LogLevels::FIRST, std::cout << "STAGE FINISH" << std::endl)
 }
 
 void rvm_dataPathConfigurationBlock::clear()

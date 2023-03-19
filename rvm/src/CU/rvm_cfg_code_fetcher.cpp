@@ -162,13 +162,26 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
             /* DO_config.access_time parse 4 byte */
             else if (parseFlags.doSec.doCfg.access_time == RESET_FLAG)
             {
-                uint8_t shift = 8 * (sizeof(curDO_cfg.size) - (parseFlags.doSec.doCfg.byteCnt + 1));
+                uint8_t shift = 8 * (sizeof(curDO_cfg.access_time) - (parseFlags.doSec.doCfg.byteCnt + 1));
                 curDO_cfg.access_time |= cfgByte << shift;
                 parseFlags.doSec.doCfg.byteCnt++;
                 if (shift == 0)
                 {
                     parseFlags.doSec.doCfg.byteCnt = RESET_FLAG;
                     parseFlags.doSec.doCfg.access_time = SET_FLAG;
+                }
+            }
+
+            /* DO_config.external parse 1 byte */
+            else if (parseFlags.doSec.doCfg.external == RESET_FLAG)
+            {
+                uint8_t shift = 8 * (sizeof(curDO_cfg.external) - (parseFlags.doSec.doCfg.byteCnt + 1));
+                curDO_cfg.external |= cfgByte << shift;
+                parseFlags.doSec.doCfg.byteCnt++;
+                if (shift == 0)
+                {
+                    parseFlags.doSec.doCfg.byteCnt = RESET_FLAG;
+                    parseFlags.doSec.doCfg.external = SET_FLAG;
                 }
             }
 
@@ -273,6 +286,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
                 parseFlags.doSec.doCfg.DO_ID = RESET_FLAG;
                 parseFlags.doSec.doCfg.size = RESET_FLAG;
                 parseFlags.doSec.doCfg.access_time = RESET_FLAG;
+                parseFlags.doSec.doCfg.external = RESET_FLAG;
                 parseFlags.doSec.doCfg.length = RESET_FLAG;
                 parseFlags.doSec.doCfg.data = RESET_FLAG;
                 parseFlags.doSec.doCfg.byteCnt = RESET_FLAG;
@@ -355,7 +369,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
                 curAPE_cfg.access_type = new uint8_t[curAPE_cfg.NN]; 
                 for (size_t i = 0; i < curAPE_cfg.NN; ++i)
                 {
-                    curAPE_cfg.access_type[0] = 0;
+                    curAPE_cfg.access_type[i] = 0;
                 }
                 
                 parseFlags.apeSec.apeCfg.T = SET_FLAG;
@@ -394,7 +408,7 @@ int rvm_cfgCodeFetcher::parseCfgCode(uint8_t &cfgByte)
             /* access_type */
             else if(parseFlags.apeSec.apeCfg.access_type == RESET_FLAG)
             {
-                for(int shift = 6; shift > 0; shift-=2)
+                for(int shift = 6; shift >= 0; shift-=2)
                 {
                     curAPE_cfg.access_type[parseFlags.apeSec.apeCfg.byteCnt] = (cfgByte >> shift) & MASK_LS_2_BIT;
                     parseFlags.apeSec.apeCfg.byteCnt++;

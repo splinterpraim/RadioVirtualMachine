@@ -8,16 +8,18 @@
 
 #include "CU/rvm_control_unit.hpp"
 
+#include <thread>
+#include <functional>
+
 #include "config_code_structure.hpp"
 #include "rvm_glob_define.hpp"
-
 #include "rvm_program_memory.hpp"
 #include "rvm_basic_operations.hpp"
 #include "rvm_data_path.hpp"
 
-ControlUnit::~ControlUnit() { }
+rvm_ControlUnit::~rvm_ControlUnit() { }
 
-void ControlUnit::work()
+void rvm_ControlUnit::work()
 {
     bool finished = false;
     while (!finished)
@@ -34,17 +36,25 @@ void ControlUnit::work()
 
         /* Stage Configure */
         LLOG(LogLevels::FIRST, std::cout << "STAGE CONFIGURE" << std::endl)
-        cfgnBlock.configure(cfgCode);
-        LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
+        // запустить hendler 
+
+        bool f_terminateQueueDO = false;
+        bool f_terminateQueueAPE = false;
+        std::thread t_handleQueueDO(&rvm_ControlUnit::handleQueueDO, this, std::ref(f_terminateQueueDO));
+        std::thread t_handleQueueAPE(&rvm_ControlUnit::handleQueueAPE, this, std::ref(f_terminateQueueAPE));
+        std::thread t_configureAndRun(&rvm_dataPathConfigurationBlock::configureAndRun,&cfgnBlock, std::ref(cfgCode));
 
         /* Stage Run */
-        LLOG(LogLevels::FIRST, std::cout << "STAGE RUN" << std::endl)
-        cfgnBlock.runDataPath();
-        LLOG(LogLevels::SECOND, rvm_DataPathShow(*dataPath))
-        LLOG(LogLevels::FIRST, std::cout << "STAGE FINISH" << std::endl)
 
         cfgnBlock.clear();
+        t_configureAndRun.join();
         
+        f_terminateQueueDO = true;
+        f_terminateQueueAPE = true;
+        qDO.push(StatusFromDataObject()); /* notify queue DO */
+        qAPE.push(StatusFromAbstractProcessingElement()); /* notify queue DO */
+        t_handleQueueDO.join();
+        t_handleQueueAPE.join();
 
         /* Next Address Block */
         if (f_LCF)
@@ -69,7 +79,7 @@ void ControlUnit::work()
 
 }
 
-void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath &dataPath)
+void rvm_ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath &dataPath)
 {
     this->programMemory = &programMemory;
     this->basicOperations = &basicOperations;
@@ -77,5 +87,50 @@ void ControlUnit::associate(rvm_ProgramMemory &programMemory, rvm_BasicOperation
 
     /* Stage Associate */
     cfgFetcher.associate(*(this->programMemory));
-    cfgnBlock.associate(*(this->dataPath), opFetcher);
+    cfgnBlock.associate(*(this->dataPath), opFetcher, qDO, qAPE);
+}
+
+void rvm_ControlUnit::handleQueueDO(bool &terminateSignal)
+{
+    while(true)
+    {
+        StatusFromDataObject statusDO;
+        qDO.wait_and_pop(statusDO);
+
+        /* Exit on external signal */
+        if (terminateSignal == true)
+        {
+            return;
+        }
+        std::cout << "(DO status log) >" << statusDO.to_str() << std::endl;
+        /* Exit on DO errors */
+        if (statusDO.exception != 0)
+        {
+            std::string errMsg = std::string(RVM_ERR_STR("status DO err"));
+            throw std::runtime_error(errMsg);
+        }
+    }
+
+}
+
+void rvm_ControlUnit::handleQueueAPE(bool &terminateSignal)
+{
+        while(true)
+    {
+        StatusFromAbstractProcessingElement statusAPE;
+        qAPE.wait_and_pop(statusAPE);
+
+        /* Exit on external signal */
+        if (terminateSignal == true)
+        {
+            return;
+        }
+        std::cout << "(APE status log) >" << statusAPE.to_str() << std::endl;
+        /* Exit on DO errors */
+        if (statusAPE.exception != 0)
+        {
+            std::string errMsg = std::string(RVM_ERR_STR("status APE err"));
+            throw std::runtime_error(errMsg);
+        }
+    }
 }

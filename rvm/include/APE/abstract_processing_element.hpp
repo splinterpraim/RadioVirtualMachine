@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "CU/rvm_threadsafe_queue.hpp"
 #include "rvm_structs.h"
 
 class rvm_dataPathConfigurationBlock;   /* Forward declaration of rvm_dataPathConfigurationBlock class */
@@ -149,7 +150,7 @@ public:
      * 
      * @param[in]       cfgnBlock               Reference to related Data path configuration block
      */
-    void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
+    void associate(rvm_dataPathConfigurationBlock &cfgnBlock, rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement>& qAPE);
 
     /**
      * @brief Informs about the availability of data for a specific port of APE
@@ -214,6 +215,7 @@ private:
     uint32_t opcode = 0;    /* Opcode of APE */
     int (*operation)(uint8_t argc, ...);                    /* Specific operation */
     rvm_dataPathConfigurationBlock *cfgnBlock = nullptr;    /* Externally related Data path configuration block */
+    rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement>* qAPE = nullptr;
     StatusFromAbstractProcessingElement status;             /* Current status of APE */
     APEportManager portsMngr;                               /* Manager for port of APE */
     std::vector<PortAPE> ports;                             /* Ports of APE */

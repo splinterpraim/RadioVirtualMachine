@@ -10,6 +10,8 @@
 #define RVM_DATA_PATH_CONFIGURATION_BLOCK_CLASS
 
 #include <cstdint>
+#include <CU/rvm_threadsafe_queue.hpp>
+#include <rvm_structs.h>
 
 class rvm_operationFetcher;                     /* Forward declaration of rvm_operationFetcher class */
 struct StatusFromDataObject;                    /* Forward declaration of StatusFromDataObject struct */
@@ -38,22 +40,17 @@ public:
      * @param[in]       dataPath                Related Data path Block
      * @param[in]       opFetcher               Related Operation Fetcher Block
      */
-    void associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher);
+    void associate(rvm_DataPath &dataPath, rvm_operationFetcher &opFetcher, rvm_ThreadsafeQueue<StatusFromDataObject> &qDO, rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement> &qAPE);
 
     /**
-     * @brief Сonfigures data path using a config code objects
+     * @brief Сonfigures data path using a config code objects and Launches the DataPath for main work
      *
      * @param[in]       cfgCode                 Reference on Config code objects
      */
-    void configure(ConfigObjects &cfgCode);
+    void configureAndRun(ConfigObjects &cfgCode);
 
     /**
-     * @brief Launches the DataPath for main work
-     */
-    void runDataPath();
-
-    /**
-     * @brief Clears Data Path configured by configure()
+     * @brief Clears Data Path configured by configureAndRun()
      */
     void clear();
 
@@ -75,7 +72,10 @@ private:
 
     rvm_DataPath *dataPath = nullptr;           /* Externally related Data Path Block */
     rvm_operationFetcher *opFetcher = nullptr;  /* Externally related Operation Fetcher Block */
+    rvm_ThreadsafeQueue<StatusFromDataObject>* qDO = nullptr;
+    rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement>* qAPE = nullptr;
     bool errorHand = false;                     /* Error handle */
+
 
     /**
      * @brief Сonfigures data objects using a config code objects

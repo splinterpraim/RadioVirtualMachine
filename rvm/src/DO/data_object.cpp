@@ -178,8 +178,7 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
                 }
                 status.state = full;
             }
-
-            cfgnBlock->sendStatusFromDataObject(status);
+            qDO->push(status);
         }
         catch (const std::exception &e)
         {
@@ -191,9 +190,10 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
     return 0;
 }
 
-void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
+void DataObject::associate(rvm_dataPathConfigurationBlock &cfgnBlock, rvm_ThreadsafeQueue<StatusFromDataObject>& qDO)
 {
     this->cfgnBlock = &cfgnBlock;
+    this->qDO = &qDO;
 }
 
 uint8_t DataObject::dataEnable()
@@ -223,6 +223,7 @@ uint8_t &DataObject::read()
     }
 
     status.state = stDO::empty; // todo: notify DP_cfgBlock
+    qDO->push(status);
     return *tmpData;
 }
 

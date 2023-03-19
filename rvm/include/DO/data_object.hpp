@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 
+#include "CU/rvm_threadsafe_queue.hpp"
 #include "rvm_structs.h"
 
 class rvm_dataPathConfigurationBlock;   /* Forward declaration of rvm_dataPathConfigurationBlock class */
@@ -61,7 +62,7 @@ public:
      *
      * @param[in]       cfgnBlock               Reference to related Data path configuration block
      */
-    void associate(rvm_dataPathConfigurationBlock &cfgnBlock);
+    void associate(rvm_dataPathConfigurationBlock &cfgnBlock, rvm_ThreadsafeQueue<StatusFromDataObject>& qDO);
 
     /**
      * @brief Returns a value indicating the availability of the data
@@ -113,6 +114,7 @@ private:
     uint32_t accessTime = 0;        /* Access time to data in ns */
     uint8_t *data = nullptr;        /* Pointer to start of data to Data Object */
     rvm_dataPathConfigurationBlock * cfgnBlock = nullptr; /* Externally related Data path congiguration block */
+    rvm_ThreadsafeQueue<StatusFromDataObject>* qDO = nullptr;
     StatusFromDataObject status = {};    /* Current status of Data Object */
 
     /**

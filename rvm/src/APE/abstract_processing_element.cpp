@@ -116,6 +116,9 @@ uint8_t &APEportManager::loadData(uint8_t portNumber)
 AbstractProcessingElement::AbstractProcessingElement()
 {
     portsMngr.associate(ports);
+    status.id = 0;
+    status.state = 0;
+    status.exception = 0;
 }
 
 AbstractProcessingElement::~AbstractProcessingElement()
@@ -166,6 +169,8 @@ int AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t time, ui
                 i++;
             }
             portsMngr.init(this->numPorts);
+            status.id = this->id;
+            qAPE->push(status);
         }
         catch (const std::bad_alloc &e)
         {
@@ -247,9 +252,11 @@ void AbstractProcessingElement::run()
     delete [] argArray.outPorts;
 }
 
-void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock)
+void AbstractProcessingElement::associate(rvm_dataPathConfigurationBlock &cfgnBlock, rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement>& qAPE)
 {
     this->cfgnBlock = &cfgnBlock;
+    this->qAPE = &qAPE;
+
 }
 
 void AbstractProcessingElement::dataEnable(uint8_t portNumber, uint8_t dEnable)

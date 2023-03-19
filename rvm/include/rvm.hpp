@@ -38,7 +38,7 @@ public:
 
 private:
 
-    ControlUnit controlUnit;                /* Control Unit Block */
+    rvm_ControlUnit controlUnit;                /* Control Unit Block */
     rvm_ProgramMemory programMemory;        /* Program Memory Block */
     rvm_BasicOperations basicOperations;    /* Basic Operations Block */
     rvm_DataPath dataPath;                  /* Data Path */

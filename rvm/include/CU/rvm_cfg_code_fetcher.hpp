@@ -48,6 +48,7 @@ struct ParseCfgCodeFlags_s
             uint8_t DO_ID = RESET_FLAG;         /* Parsing the DO config DO_ID field */
             uint8_t size = RESET_FLAG;          /* Parsing the DO config size field */
             uint8_t access_time = RESET_FLAG;   /* Parsing the DO config access_time field */
+            uint8_t external = RESET_FLAG;      /* Parsing the DO config external field */
             uint8_t length = RESET_FLAG;        /* Parsing the DO config length field */
             uint8_t data = RESET_FLAG;          /* Parsing the DO config data field */
             uint8_t byteCnt = RESET_FLAG;       /* Counter of processed bytes */

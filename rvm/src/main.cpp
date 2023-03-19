@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
         parseArg(argc, argv);
 
         std::vector<std::string> cfgFileNames;
-        cfgFileNames.push_back("./config_codes/cfgcode1.bin");
-        cfgFileNames.push_back("./config_codes/cfgcode2.bin");
-        cfgFileNames.push_back("./config_codes/cfgcode3.bin");
+        // cfgFileNames.push_back("./config_codes/cfgcode1.bin");
+        cfgFileNames.push_back("./config_codes/cc1/AlgScalar2.xml.bin");
+        // cfgFileNames.push_back("./config_codes/cfgcode3.bin");
         Rvm rvm1(cfgFileNames);
         rvm1.run();
     }

@@ -14,6 +14,8 @@
 #include "CU/rvm_cfg_code_fetcher.hpp"
 #include "CU/rvm_data_path_configuration_block.hpp"
 #include "CU/rvm_operation_fetcher.hpp"
+#include "CU/rvm_threadsafe_queue.hpp"
+#include "rvm_structs.h"
 
 class rvm_ProgramMemory;    /* Forward declaration of rvm_ProgramMemory class */
 class rvm_BasicOperations;  /* Forward declaration of rvm_BasicOperations class */
@@ -23,14 +25,14 @@ using rvm_DataPath = struct rvm_DataPath_s;
 /**
  * @brief Control Unit class implementation
  */
-class ControlUnit
+class rvm_ControlUnit
 {
 public:
 
     /**
      * @brief Destroys the Control Unit object
      */
-    ~ControlUnit();
+    ~rvm_ControlUnit();
 
     /**
      * @brief Launches the Control Unit for main work
@@ -46,12 +48,16 @@ public:
      */
     void associate(rvm_ProgramMemory &programMemory, rvm_BasicOperations &basicOperations, rvm_DataPath & dataPath);
 
+    void handleQueueDO(bool &terminateSignal);
+    void handleQueueAPE(bool &terminateSignal);
 private:
 
     uint32_t cfgCounter = 0;                    /* Config code counter */
     rvm_cfgCodeFetcher cfgFetcher;              /* Config code Fetcher Block */
     rvm_dataPathConfigurationBlock cfgnBlock;   /* Data Path Configuration Block */
     rvm_operationFetcher opFetcher;             /* Operation Fetcher Block */
+    rvm_ThreadsafeQueue<StatusFromDataObject> qDO;  /* Queue for receive statuses from DOs */
+    rvm_ThreadsafeQueue<StatusFromAbstractProcessingElement> qAPE;  /* Queue for receive statuses from APEs */
 
     /* External Relations */
     rvm_ProgramMemory * programMemory  = nullptr;       /* Externally related Program memory */
