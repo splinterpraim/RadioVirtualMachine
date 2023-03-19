@@ -16,6 +16,6 @@ fc_glob_t fc_glob;
 void fc_glob_set()
 {
     fc_glob.endian = endianIsLittle() ? CMN_LITTLE_ENDIAN : CMN_BIG_ENDIAN;
-    fc_glob.file_nameSWIR = "./XML_files/AlgScalar2.xml";
-    fc_glob.file_nameBin = "./config_codes/cfgcode1.bin";
+    fc_glob.file_nameSWIR = "./XML_files";
+    fc_glob.file_nameBin = "./config_codes";
 }
