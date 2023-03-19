@@ -27,6 +27,7 @@
 #include "config_code_structure.hpp"
 #include "fc_glob.hpp"
 #include "fc_parser.hpp"
+#include "fc.hpp"
 
 RadioLibrary radioLib;
 
@@ -80,9 +81,8 @@ int main(int argc, char *argv[])
 
         parseArg(argc, argv);
 
-        fc_Parser parcer;
-        parcer.parse(fc_glob.file_nameSWIR, fc_glob.file_nameBin);
-
+        Fc compiler(fc_glob.file_nameSWIR, fc_glob.file_nameBin);
+        compiler.compile();
     }
     catch (const std::exception &e)
     {
