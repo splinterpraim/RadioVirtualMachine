@@ -12,36 +12,11 @@
 #include <iostream>
 #include <vector>
 
+#include "ASF/rvm_abstract_switch_fabric_struct.hpp"
 class DataObject;                   /* Forward declaration of DataObject class */
 class AbstractProcessingElement;    /* Forward declaration of AbstractProcessingElement class */
 
-/**
- * @brief Abstract Switch Fabric data port description
- */
-typedef struct DataPort_s
-{
-    DataObject *relatedDO = nullptr; /* Realted Data Object */
-} DataPort;
 
-/**
- * @brief Abstract Switch Fabric processing port description
- */
-typedef struct ProcessingPort_s
-{
-    AbstractProcessingElement *relatedAPE = nullptr;    /* Realted Abstract Processing Element */
-    uint8_t port_number = 0;                            /* Port number */
-} ProcessingPort;
-
-/**
- * @brief Abstract Switch Fabric connector description
- */
-typedef struct Connector_s
-{
-    uint8_t dataPortId = 0;         /* Data port ID */
-    uint32_t processingPortId = 0;  /* Processing port ID */
-    uint8_t dir : 1;                /* Direction of data port to processing port: LINK_INPUT - from data port to processing port, LINK_OUTPUT - from processing port to data port */
-    uint8_t set = 0;                /* Flag set or not set connector */
-} Connector;
 
 /**
  * @brief Abstract Switch Fabric class implementation
