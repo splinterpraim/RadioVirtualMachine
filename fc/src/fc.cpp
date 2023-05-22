@@ -6,7 +6,7 @@
 
 #include "fc_parser.hpp"
 #include "common.hpp"
-
+ 
 Fc::Fc(const std::string &dirXML, const std::string &dirCC)
 {
     settigBlock.setDirXML(dirXML);
