@@ -9,9 +9,13 @@
 #ifndef FC_CLASS
 #define FC_CLASS
 
-#include "fc_setting_block.hpp"
-
 #include <string>
+#include <vector>
+
+#include "fc_setting_block.hpp"
+#include "fc_scheduler.hpp"
+#include "fc_parser.hpp"
+
 
 class Fc
 {
@@ -24,9 +28,11 @@ public:
      */
     Fc(const std::string &dirXML, const std::string &dirCC);
 
-    void compile();
+    void compile(std::string inputTaskFileName);
 private:
     fc_SettingBlock settigBlock;
+    fc_Scheduler scheduler;
+    std::vector<fc_Parser> parsers;
 };
 
 #endif // FC_CLASS

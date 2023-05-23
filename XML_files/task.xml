@@ -1,0 +1,13 @@
+
+<task>
+    <program name="p1" path="to_task/p1.xml"/>
+    <program name="p2" path="">
+        <operator id="add1" type="Terminal" opcode="1">
+            <data id="d1" path="" connect_type="input" order="1" access_time="11" value="2"/>
+            <data id="d2" path="" connect_type="input" order="2" access_time="11" value="3"/>
+            <data id="d3" path="" connect_type="output" order="1" access_time="11" value=""/>
+        </operator>
+    </program>
+    <program name="p3" path="to_task/p3.xml"/>
+    <program name="p4" path=""/>
+</task>

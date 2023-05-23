@@ -43,6 +43,7 @@ public:
 
 private:
     fc_SettingBlock& settingBlock;
+    std::string inputProgramFilePath;
     std::string targetDir; /* Directory where the program configcode file is located */
     IrObjects IrObj;
     fc_Parser* insideParsers;

@@ -50,12 +50,12 @@ void parseArg(int argc, char *argv[])
         break;
     /* Change name for XML file */
     case 2:
-        fc_glob.file_nameSWIR = argv[1];
+        fc_glob.dirOfSWIR = argv[1];
         break;
     /* Change names for XML and result configcode files */
     case 3:
-        fc_glob.file_nameSWIR = argv[1];
-        fc_glob.file_nameBin = argv[2];
+        fc_glob.dirOfSWIR = argv[1];
+        fc_glob.dirOfConfigCode = argv[2];
         break;
     default:
         throw std::runtime_error(FC_ERR_STR("invalid program argument"));
@@ -81,8 +81,8 @@ int main(int argc, char *argv[])
 
         parseArg(argc, argv);
 
-        Fc compiler(fc_glob.file_nameSWIR, fc_glob.file_nameBin);
-        compiler.compile();
+        Fc compiler(fc_glob.dirOfSWIR, fc_glob.dirOfConfigCode);
+        compiler.compile("task.xml");
     }
     catch (const std::exception &e)
     {

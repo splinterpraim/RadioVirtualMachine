@@ -9,6 +9,8 @@
 #ifndef SYSTEM_FUNC_HPP
 #define SYSTEM_FUNC_HPP
 
+#include <string>
+
 /**
  * @brief Checks whether the endian in the system is little
  * 
@@ -24,5 +26,7 @@ bool endianIsLittle();
  * @return Reversed value
  */
 int reverseEndian(int val);
+
+void createDir(std::string dir);
 
 #endif // SYSTEM_FUNC_HPP

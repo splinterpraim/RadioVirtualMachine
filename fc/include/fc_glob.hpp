@@ -18,8 +18,8 @@
 struct fc_glob_s
 {
     uint8_t endian;             /* Current order of bytes in the system */
-    std::string file_nameSWIR;  /* Input file for XML algorithm */
-    std::string file_nameBin;   /* Output file for created configcode */
+    std::string dirOfSWIR;  /* Input file for XML algorithm */
+    std::string dirOfConfigCode;   /* Output file for created configcode */
 };
 
 using fc_glob_t = struct fc_glob_s;
