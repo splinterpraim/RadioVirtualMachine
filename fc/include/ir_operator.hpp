@@ -98,12 +98,29 @@ public:
 	 * @retval std::string subpath of IR Operator object
 	 */
 	std::string getSubpath();
+
+	/**
+	 * @brief Sets the subprogram of IR Operator object
+	 *
+	 * @param[in] subprogram Subprogram of IR Operator object
+	 */
+	void setSubprogram(const std::string &subprogram);
+
+	/**
+	 * @brief Gets the subprogram of IR Operator object
+	 *
+	 * @retval std::string subprogram of IR Operator object
+	 */
+	std::string getSubprogram();
+
 private:
-	std::string id = "";	  /* Unique IR Operator identifier */
-	std::string type = "";	  /* Complex or Terminal type of IR Operator */
-	std::string opcode = "";  /* Opcode of IR Operator object */
-	std::string subname = ""; /* Name of subprogram for complex operator */
-	std::string subpath = ""; /* Path of subprogram for complex operator*/
+	std::string id = "";	  		/* Unique IR Operator identifier */
+	std::string type = "";	  		/* Complex or Terminal type of IR Operator */
+	std::string opcode = "";  		/* Opcode of IR Operator object */
+	std::string subname = ""; 		/* Name of subprogram for complex operator */
+	std::string subpath = ""; 		/* Path of subprogram for complex operator*/
+	std::string subprogram = ""; 	/* Subprogram for complex operator*/
+
 };
 
 #endif //  IR_OPERATOR_H

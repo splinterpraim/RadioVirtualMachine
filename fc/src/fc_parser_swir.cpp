@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
+#include <sstream>
 
 #include "radio_library.hpp"
 #include "common.hpp"
@@ -159,14 +160,33 @@ IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
+    op.setOpcode(op_xml.attribute("opcode").value());
     if (op.getType().compare("Complex") == 0)
     {
-        pugi::xml_node subprog_xml;
-        subprog_xml = op_xml.child("subprogram");
-        op.setSubname(subprog_xml.attribute("name").value());
-        op.setSubpath(subprog_xml.attribute("path").value());
+        pugi::xml_node subprog_xml = op_xml.child("program");
+        std::string subprog_str;
+        std::string name = subprog_xml.attribute("name").value();
+        std::string path = subprog_xml.attribute("path").value();
+
+        op.setSubname(name);
+        op.setSubpath(path);
+        /* Load program from current document */
+        if (subprog_xml.first_child())
+        {
+            loadProgramFromNode2Str__(subprog_xml, subprog_str);
+        }
+        /* Load program from child document */
+        else if(path.compare("") != 0)
+        {
+            loadProgramFromFile2Str__(path, subprog_str);
+        }
+        else
+        {
+            std::string errMsg = std::string("No program'") + name + ("'found") ;
+            throw std::runtime_error(errMsg);
+        }
+        op.setSubprogram(subprog_str);
     }
-    op.setOpcode(op_xml.attribute("opcode").value());
 
     return op;
 }
@@ -181,14 +201,10 @@ void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::m
 
 /* Public */
 
-IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
+IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
 {
     /* Declaration IrObjects */
     IrObjects irObjects;
-
-    /* Load xml file */
-    pugi::xml_document doc;
-    doc.load_file(fileNameSWIR.c_str());
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
@@ -244,4 +260,58 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
         curOperator = curOperator.next_sibling("operator");
     }
     return irObjects;
+}
+
+
+void fc_ParserSWIR::loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc)
+{
+    pugi::xml_parse_result ret = progDoc.load_file(progPath.c_str());
+    if(!ret)
+    {
+        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
+        throw std::runtime_error(errMsg);
+    }
+}
+void fc_ParserSWIR::loadProgramFromNode__(const pugi::xml_node &programNode, pugi::xml_document &progDoc)
+{
+    std::stringstream ss;
+    std::string xmlDoc;
+    programNode.print(ss);
+    xmlDoc = ss.str();
+    pugi::xml_parse_result ret = progDoc.load_string(xmlDoc.c_str());
+    if(!ret)
+    {
+        std::cout << ret.description() << std::endl;
+        throw std::runtime_error(ret.description());
+    }
+}
+
+void fc_ParserSWIR::loadProgramFromStr__(const std::string& progStr, pugi::xml_document &programDoc)
+{
+    pugi::xml_parse_result ret = programDoc.load_string(progStr.c_str());
+    if(!ret)
+    {
+        std::cout << ret.description() << std::endl;
+        throw std::runtime_error(ret.description());
+    }
+}
+
+void fc_ParserSWIR::loadProgramFromFile2Str__(const std::string& progPath, std::string &progStr)
+{
+    pugi::xml_document doc;
+    pugi::xml_parse_result ret = doc.load_file(progPath.c_str());
+    if(!ret)
+    {
+        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
+        throw std::runtime_error(errMsg);
+    }
+    loadProgramFromNode2Str__(doc, progStr);
+}
+
+void fc_ParserSWIR::loadProgramFromNode2Str__(const pugi::xml_node &programNode, std::string &progStr)
+{
+    std::stringstream ss;
+    std::string xmlDoc;
+    programNode.print(ss);
+    progStr = ss.str();
 }

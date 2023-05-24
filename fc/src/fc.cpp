@@ -28,6 +28,7 @@ void Fc::compile(std::string inputTaskFileName)
     for(auto & p : parsers)
     {
         p.showDoc();
+        p.parse();
         // p.parse("");
     }
 

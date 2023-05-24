@@ -29,7 +29,17 @@ public:
      *
      * @retval IrObjects IR objects
      */
-    IrObjects parse(const std::string &fileNameSWIR);
+    IrObjects parse(const pugi::xml_document &doc);
+
+    void loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc);
+
+    void loadProgramFromNode__(const pugi::xml_node &programNode, pugi::xml_document &progDoc);
+
+    void loadProgramFromStr__(const std::string& progStr, pugi::xml_document &programDoc);
+
+    void loadProgramFromFile2Str__(const std::string& progPath, std::string &progStr);
+
+    void loadProgramFromNode2Str__(const pugi::xml_node &programNode, std::string &progStr);
 
 private:
     /**

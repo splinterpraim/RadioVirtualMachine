@@ -34,12 +34,13 @@ public:
      */
     fc_Parser(const std::string& targetDir, bool noChangeTargetDirectory);
 
+    fc_Parser(const fc_Parser& obj);
+
+
     /**
      * @brief Parses XML program file and generates configcode file
-     * 
-     * @param progFileName Input XML program file
      */
-    void parse(std::string progFileName);
+    void parse();
 
     /**
      * @brief Parses XML program file for complex operator and generates configcode file
@@ -52,17 +53,22 @@ public:
 
     void setTargetDir(const std::string& targetDir);
 
+    void setProgramName(const std::string& programName);
+
     void loadProgramFromFile(const std::string& progPath);
 
     void loadProgramFromNode(const pugi::xml_node &programNode);
 
+    void loadProgramFromStr(const std::string& progStr);
+
     void showDoc();
 
 private:
-    fc_SettingBlock* settingBlock;
+    fc_SettingBlock* settingBlock {nullptr};
     std::string inputProgramFilePath;
+    std::string targetDir;      /* Directory where the program configcode file is located */
+    std::string programName; 
     pugi::xml_document programDoc;
-    std::string targetDir; /* Directory where the program configcode file is located */
     IrObjects IrObj;
     fc_Parser* insideParsers;
     fc_ParserSWIR parserSWIR;
@@ -78,6 +84,7 @@ private:
      * @param[in] fileNameBin File name where will be binary config code
      */
     void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin);
+
 };
 
 #endif // FC_PARSER_CLASS

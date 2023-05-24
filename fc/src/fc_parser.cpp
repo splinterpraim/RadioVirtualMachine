@@ -55,7 +55,9 @@ void fc_Parser::processComplexOperator(IrObjects &irObj)
 
             fc_Parser parserComplex(targetComplexDir, true);
             parserComplex.setSettingBlock(*settingBlock);
-            parserComplex.parse(op.getSubpath());
+            parserComplex.setProgramName(op.getSubname());
+            parserComplex.loadProgramFromStr(op.getSubprogram());
+            parserComplex.parse();
         }
     }
 }
@@ -147,6 +149,9 @@ void fc_Parser::createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileN
     cfgF.close();
 }
 
+
+
+
 /* Public */
 
 fc_Parser::fc_Parser()
@@ -157,19 +162,23 @@ fc_Parser::fc_Parser()
 fc_Parser::fc_Parser( const std::string &targetDir, bool noChangeTargetDirectory)
     : targetDir(targetDir), noChangeTargetDirectory(noChangeTargetDirectory) {}
 
-void fc_Parser::parse(std::string progFileName)
+fc_Parser::fc_Parser(const fc_Parser& obj)
 {
-    std::string fullProgramFilePath = settingBlock->getDirXML() + "/" + progFileName;
-    std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
-    std::string mapFilePath = targetDir + "/" + progFileName + ".map";
+    this->programDoc.reset(obj.programDoc);
+}
 
-    struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
+void fc_Parser::parse()
+{
+    std::string fullFilePathCC = targetDir + "/" + programName + ".bin";
+    std::string mapFilePath = targetDir + "/" + programName + ".map";
+
+    struct IrObjects irObjects = parserSWIR.parse(programDoc);
     processComplexOperator(irObjects);
     converterIR.setIdMapFile(mapFilePath);
     ConfigObjects configObjects = converterIR.convert(irObjects);
     createRVMcfgcode(configObjects, fullFilePathCC);
 
-    FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
+    FC_LOG(GN << "> " << RT << "Parse '" << programName );
     FC_LOG("----- IR objects");
     showIrObjects(irObjects);
     FC_LOG("----- CC objects");
@@ -211,31 +220,26 @@ void fc_Parser::setTargetDir(const std::string& targetDir)
     this->targetDir = targetDir;
 }
 
+void fc_Parser::setProgramName(const std::string& programName)
+{
+    this->programName = programName;
+}
+
+
 
 void fc_Parser::loadProgramFromFile(const std::string& progPath)
 {
-    pugi::xml_parse_result ret = programDoc.load_file(progPath.c_str());
-    if(!ret)
-    {
-        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
-        throw std::runtime_error(errMsg);
-    }
+    parserSWIR.loadProgramFromFile__(progPath, programDoc);
 }
 
 void fc_Parser::loadProgramFromNode(const pugi::xml_node &programNode)
 {
-    std::stringstream ss;
-    std::string xmlDoc;
-    programNode.print(ss);
-    xmlDoc = ss.str();
-    pugi::xml_parse_result ret = programDoc.load_string(xmlDoc.c_str());
-    if(!ret)
-    {
-        std::cout << ret.description() << std::endl;
-        throw std::runtime_error(ret.description());
-    }
+    parserSWIR.loadProgramFromNode__(programNode, programDoc);
 }
-
+void fc_Parser::loadProgramFromStr(const std::string& progStr)
+{
+    parserSWIR.loadProgramFromStr__(progStr, programDoc);
+}
 
 void fc_Parser::showDoc()
 {

@@ -19,24 +19,26 @@ bool fc_Scheduler::loadProgram2Parser(pugi::xml_node programNode,std::vector<fc_
     /* Load program from current document */
     if (programNode.first_child())
     {
+        std::string targetDir = settingBlock->getDirCC() + std::string("/") + name;
+        createDir(targetDir);
         auto position = parsers.size();
         parsers.resize(position+1);
         parsers[position].setSettingBlock(*settingBlock);
-        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
-        createDir(targetDir);
+        parsers[position].setProgramName(name);
         parsers[position].setTargetDir(targetDir);
         parsers[position].loadProgramFromNode(programNode);
     }
     /* Load program from child document */
     else if(path.compare("") != 0)
     {
+        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
+        std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
+        createDir(targetDir);
         auto position = parsers.size();
         parsers.resize(position+1);
         parsers[position].setSettingBlock(*settingBlock);
-        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
-        createDir(targetDir);
+        parsers[position].setProgramName(name);
         parsers[position].setTargetDir(targetDir);
-        std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
         parsers[position].loadProgramFromFile(progPath);
     }
     else
@@ -55,7 +57,6 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
     {
         throw std::runtime_error(ret.description());
     }
-    doc.print(cout);
 
     /* Take task tag */
     pugi::xml_node task = doc.child("task"); 
@@ -74,61 +75,7 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
                               std::string("' not found in file: ") + inputTaskFilePath;
             throw std::runtime_error(err);
         }
-        
-        // fc_Parser p(name, path, );
     }
-    // auto inputDataExternal = takeIrDataInputExternal(program);
-    // auto outputDataExternal = takeIrDataOutputExternal(program);
-
-    // addIrDataToVector(irObjects.data, inputDataExternal);
-    // addIrDataToVector(irObjects.data, outputDataExternal);
-
-    // createLinksFromVectorData(irObjects.links, inputDataExternal, "", LINK_INPUT);
-    // createLinksFromVectorData(irObjects.links, outputDataExternal, "", LINK_OUTPUT);
-
-    // pugi::xml_node curOperator = program.child("operator");
-
-    // /* Parse tag inside */
-    // while (true)
-    // {
-    //     IrOperator currOp = convertToIrOperator(curOperator);
-
-    //     /* Take input/output data from operator tag */
-    //     auto inputData = takeIrDataInput(curOperator);
-    //     auto outputData = takeIrDataOutput(curOperator);
-
-    //     /* Add input/output Ir data in Ir objects  */
-    //     addIrDataToVector(irObjects.data, inputData);
-    //     addIrDataToVector(irObjects.data, outputData);
-
-    //     /* Add current operator in Ir vector */
-    //     irObjects.operators.push_back(currOp);
-
-    //     /* Create link objects from input/output IR data and IR operator */
-    //     createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), LINK_INPUT);
-    //     createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), LINK_OUTPUT);
-
-    //     auto xmlNodeType = curOperator.next_sibling("operator").type();
-
-    //     /* Check end of sibling operator list */
-    //     if (xmlNodeType == pugi::node_null)
-    //     {
-    //         curOperator = curOperator.parent();
-    //         std::string xmlNodeName = curOperator.name();
-
-    //         /* Check end of xml operator list */
-    //         if (xmlNodeName.compare("program") == 0)
-    //         {
-    //             break;
-    //         }
-    //         else
-    //         {
-    //             throw std::runtime_error(FC_ERR_STR("unknown tag during XML parsing"));
-    //         }
-    //     }
-    //     curOperator = curOperator.next_sibling("operator");
-    // }
-    // return irObjects;
 }
 
 void fc_Scheduler::setSettingBlock(fc_SettingBlock& settingBlock)
