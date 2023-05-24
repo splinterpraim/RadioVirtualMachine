@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include "pugixml/pugixml.hpp"
 
 // #include "fc_setting_block.hpp"
 #include "fc_parser.hpp"
@@ -21,8 +22,12 @@ public:
     // fc_Scheduler(fc_SettingBlock& settingBlock);
 
     void schedule(std::string inputTaskFilePath, std::vector<fc_Parser>& parsers);
+
+    void setSettingBlock(fc_SettingBlock& settingBlock);
 private:
-    // fc_SettingBlock& settingBlock;
+    fc_SettingBlock* settingBlock;
+
+    bool loadProgram2Parser(pugi::xml_node programNode,std::vector<fc_Parser>& parsers);
 
 };
 

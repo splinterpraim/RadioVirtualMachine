@@ -14,6 +14,7 @@ Fc::Fc(const std::string &dirXML, const std::string &dirCC)
 {
     settigBlock.setDirXML(dirXML);
     settigBlock.setDirCC(dirCC);
+    scheduler.setSettingBlock(settigBlock);
 }
 
 void Fc::compile(std::string inputTaskFileName)
@@ -26,7 +27,8 @@ void Fc::compile(std::string inputTaskFileName)
 
     for(auto & p : parsers)
     {
-        p.parse("");
+        p.showDoc();
+        // p.parse("");
     }
 
     // fc_Parser parser(settigBlock, settigBlock.getDirCC() + "/cc1", false);

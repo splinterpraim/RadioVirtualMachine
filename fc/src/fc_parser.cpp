@@ -1,6 +1,7 @@
 #include "fc_parser.hpp"
 
 #include <fstream>
+#include <sstream>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -52,7 +53,8 @@ void fc_Parser::processComplexOperator(IrObjects &irObj)
             }
             // create complex dir first
 
-            fc_Parser parserComplex(settingBlock, targetComplexDir, true);
+            fc_Parser parserComplex(targetComplexDir, true);
+            parserComplex.setSettingBlock(*settingBlock);
             parserComplex.parse(op.getSubpath());
         }
     }
@@ -146,12 +148,18 @@ void fc_Parser::createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileN
 }
 
 /* Public */
-fc_Parser::fc_Parser(fc_SettingBlock &settingBlock, const std::string &targetDir, bool noChangeTargetDirectory)
-    : settingBlock(settingBlock), targetDir(targetDir), noChangeTargetDirectory(noChangeTargetDirectory) {}
+
+fc_Parser::fc_Parser()
+{
+
+}
+
+fc_Parser::fc_Parser( const std::string &targetDir, bool noChangeTargetDirectory)
+    : targetDir(targetDir), noChangeTargetDirectory(noChangeTargetDirectory) {}
 
 void fc_Parser::parse(std::string progFileName)
 {
-    std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
+    std::string fullProgramFilePath = settingBlock->getDirXML() + "/" + progFileName;
     std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
     std::string mapFilePath = targetDir + "/" + progFileName + ".map";
 
@@ -171,24 +179,65 @@ void fc_Parser::parse(std::string progFileName)
     clearConfigObjects(configObjects);
 }
 
-void fc_Parser::parseComplex(std::string progFileName)
+// void fc_Parser::parseComplex(std::string progFileName)
+// {
+//     std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
+//     std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
+//     std::string mapFilePath = targetDir + "/" + progFileName + ".map";
+
+//     struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
+//     processComplexOperator(irObjects);
+//     converterIR.setIdMapFile(mapFilePath);
+//     ConfigObjects configObjects = converterIR.convert(irObjects);
+//     createRVMcfgcode(configObjects, fullFilePathCC);
+
+//     FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
+//     FC_LOG("----- IR objects");
+//     showIrObjects(irObjects);
+//     FC_LOG("----- CC objects");
+//     showConfigObjects(configObjects);
+//     FC_LOG("CC written in " << fullFilePathCC << std::endl);
+
+//     clearConfigObjects(configObjects);
+// }
+
+void fc_Parser::setSettingBlock(fc_SettingBlock& settingBlock)
 {
-    std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
-    std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
-    std::string mapFilePath = targetDir + "/" + progFileName + ".map";
+    this->settingBlock = &settingBlock;
+}
 
-    struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
-    processComplexOperator(irObjects);
-    converterIR.setIdMapFile(mapFilePath);
-    ConfigObjects configObjects = converterIR.convert(irObjects);
-    createRVMcfgcode(configObjects, fullFilePathCC);
+void fc_Parser::setTargetDir(const std::string& targetDir)
+{
+    this->targetDir = targetDir;
+}
 
-    FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
-    FC_LOG("----- IR objects");
-    showIrObjects(irObjects);
-    FC_LOG("----- CC objects");
-    showConfigObjects(configObjects);
-    FC_LOG("CC written in " << fullFilePathCC << std::endl);
 
-    clearConfigObjects(configObjects);
+void fc_Parser::loadProgramFromFile(const std::string& progPath)
+{
+    pugi::xml_parse_result ret = programDoc.load_file(progPath.c_str());
+    if(!ret)
+    {
+        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
+        throw std::runtime_error(errMsg);
+    }
+}
+
+void fc_Parser::loadProgramFromNode(const pugi::xml_node &programNode)
+{
+    std::stringstream ss;
+    std::string xmlDoc;
+    programNode.print(ss);
+    xmlDoc = ss.str();
+    pugi::xml_parse_result ret = programDoc.load_string(xmlDoc.c_str());
+    if(!ret)
+    {
+        std::cout << ret.description() << std::endl;
+        throw std::runtime_error(ret.description());
+    }
+}
+
+
+void fc_Parser::showDoc()
+{
+    programDoc.print(std::cout);
 }

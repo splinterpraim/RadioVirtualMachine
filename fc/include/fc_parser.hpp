@@ -10,6 +10,8 @@
 #define FC_PARSER_CLASS
 
 #include <string>
+#include "pugixml/pugixml.hpp"
+
 #include "ir_objects.hpp"
 #include "config_code_structure.hpp"
 #include "fc_parser_swir.hpp"
@@ -23,9 +25,14 @@ class fc_Parser
 {
 public:
     /**
-     * @brief Constructs a new fc Parser object with parametr
+     * @brief Construct a new fc Parser object
      */
-    fc_Parser(fc_SettingBlock& settingBlock, const std::string& targetDir, bool noChangeTargetDirectory);
+    fc_Parser();
+
+    /**
+     * @brief Constructs a new fc Parser object with parameter
+     */
+    fc_Parser(const std::string& targetDir, bool noChangeTargetDirectory);
 
     /**
      * @brief Parses XML program file and generates configcode file
@@ -39,11 +46,22 @@ public:
      * 
      * @param progFileName Input XML program file of complex operator
      */
-    void parseComplex(std::string progFileName);
+    // void parseComplex(std::string progFileName);
+
+    void setSettingBlock(fc_SettingBlock& settingBlock);
+
+    void setTargetDir(const std::string& targetDir);
+
+    void loadProgramFromFile(const std::string& progPath);
+
+    void loadProgramFromNode(const pugi::xml_node &programNode);
+
+    void showDoc();
 
 private:
-    fc_SettingBlock& settingBlock;
+    fc_SettingBlock* settingBlock;
     std::string inputProgramFilePath;
+    pugi::xml_document programDoc;
     std::string targetDir; /* Directory where the program configcode file is located */
     IrObjects IrObj;
     fc_Parser* insideParsers;

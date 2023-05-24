@@ -2,11 +2,49 @@
 
 #include "pugixml/pugixml.hpp"
 
+#include "system_func.hpp"
+
+
 // fc_Scheduler::fc_Scheduler(fc_SettingBlock& settingBlock): settingBlock(settingBlock)
 // {
 
 // }
+/* Private */
+bool fc_Scheduler::loadProgram2Parser(pugi::xml_node programNode,std::vector<fc_Parser>& parsers)
+{
+    std::cout << programNode.attribute("name").as_string() << std::endl;
+    std::string name = programNode.attribute("name").as_string();
+    std::string path = programNode.attribute("path").as_string();
 
+    /* Load program from current document */
+    if (programNode.first_child())
+    {
+        auto position = parsers.size();
+        parsers.resize(position+1);
+        parsers[position].setSettingBlock(*settingBlock);
+        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
+        createDir(targetDir);
+        parsers[position].setTargetDir(targetDir);
+        parsers[position].loadProgramFromNode(programNode);
+    }
+    /* Load program from child document */
+    else if(path.compare("") != 0)
+    {
+        auto position = parsers.size();
+        parsers.resize(position+1);
+        parsers[position].setSettingBlock(*settingBlock);
+        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
+        createDir(targetDir);
+        parsers[position].setTargetDir(targetDir);
+        std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
+        parsers[position].loadProgramFromFile(progPath);
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
 
 void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser>& parsers)
 {
@@ -17,6 +55,7 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
     {
         throw std::runtime_error(ret.description());
     }
+    doc.print(cout);
 
     /* Take task tag */
     pugi::xml_node task = doc.child("task"); 
@@ -29,28 +68,13 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
     /* Iterate over program tag */
     for(pugi::xml_node program : task.children("program"))
     {
-        std::cout << program.attribute("name").as_string() << std::endl;
-        std::string name = program.attribute("name").as_string();
-        std::string path = program.attribute("path").as_string();
-
-        /* Load program from current document */
-        if (program.first_child())
+        if (!loadProgram2Parser(program, parsers))
         {
-
-        }
-        /* Load program from child document */
-        else if(path.compare("") != 0)
-        {
-
-        }
-        /* Program body not found */
-        else
-        {
-            std::string err = std::string("body for program '") + name + std::string("' not found in file: ") + inputTaskFilePath;
+            std::string err = std::string("body for program '") + program.attribute("name").as_string() + 
+                              std::string("' not found in file: ") + inputTaskFilePath;
             throw std::runtime_error(err);
         }
         
-
         // fc_Parser p(name, path, );
     }
     // auto inputDataExternal = takeIrDataInputExternal(program);
@@ -105,4 +129,9 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
     //     curOperator = curOperator.next_sibling("operator");
     // }
     // return irObjects;
+}
+
+void fc_Scheduler::setSettingBlock(fc_SettingBlock& settingBlock)
+{
+    this->settingBlock = &settingBlock;
 }
