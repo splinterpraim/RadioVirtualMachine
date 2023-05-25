@@ -15,7 +15,7 @@ fc_glob_t fc_glob;
 
 void fc_glob_set()
 {
-    fc_glob.endian = endianIsLittle() ? CMN_LITTLE_ENDIAN : CMN_BIG_ENDIAN;
     fc_glob.dirOfSWIR = "./XML_files";
     fc_glob.dirOfConfigCode = "./config_codes";
+    fc_glob.fileOfSWIR = "./task.xml";
 }

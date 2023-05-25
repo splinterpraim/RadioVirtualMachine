@@ -1,7 +1,7 @@
 /**
  * @file main.cpp
  * @author Elena Potapova (krylelena99@yandex.ru)
- * @brief Main
+ * @brief A program to compile a single task
  * @version 0.1
  * @copyright Copyright (c) 2023
  */
@@ -39,23 +39,29 @@ RadioLibrary radioLib;
  */
 void parseArg(int argc, char *argv[])
 {
-    if (argc > 3)
+    if (argc > 4)
     {
         throw std::runtime_error(FC_ERR_STR("invalid program argument"));
     }
     switch (argc)
     {
-    /* Using default names of files */    
+    /* Using default names of directorys and file */    
     case 1: 
         break;
-    /* Change name for XML file */
+    /* Change name for file of SWIR */
     case 2:
-        fc_glob.dirOfSWIR = argv[1];
+        fc_glob.fileOfSWIR = argv[1];
         break;
-    /* Change names for XML and result configcode files */
+    /* Change names for file of SWIR and input directory of SWIR */
     case 3:
-        fc_glob.dirOfSWIR = argv[1];
-        fc_glob.dirOfConfigCode = argv[2];
+        fc_glob.fileOfSWIR = argv[1];
+        fc_glob.dirOfSWIR = argv[2];
+        break;
+    /* Change names for file of SWIR and input directory of SWIR and result configcode files */
+    case 4:
+        fc_glob.fileOfSWIR = argv[1];
+        fc_glob.dirOfSWIR = argv[2];
+        fc_glob.dirOfConfigCode = argv[3];
         break;
     default:
         throw std::runtime_error(FC_ERR_STR("invalid program argument"));
@@ -82,11 +88,20 @@ int main(int argc, char *argv[])
         parseArg(argc, argv);
 
         Fc compiler(fc_glob.dirOfSWIR, fc_glob.dirOfConfigCode);
-        compiler.compile("task.xml");
+        compiler.compile(fc_glob.fileOfSWIR);
+        std::cout << "Сompilation was " << GN <<"successful" << RT << std::endl;
+        std::cout << "- Input file of SWIR: " << fc_glob.fileOfSWIR << std::endl;
+        std::cout << "- Input directory of SWIR: " << fc_glob.dirOfSWIR << std::endl;
+        std::cout << "- Output directory for configcodes: " << fc_glob.dirOfConfigCode << std::endl;
+
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
+        std::cout << "Сompilation " << RD <<"failed" << RT << std::endl;
+        std::cout << "- Input file of SWIR: " << fc_glob.fileOfSWIR << std::endl;
+        std::cout << "- Input directory of SWIR: " << fc_glob.dirOfSWIR << std::endl;
+        std::cout << "- Output directory for configcodes: " << fc_glob.dirOfConfigCode << std::endl;
     }
 
     return 0;
