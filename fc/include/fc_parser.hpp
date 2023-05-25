@@ -67,10 +67,9 @@ private:
     fc_SettingBlock* settingBlock {nullptr};
     std::string inputProgramFilePath;
     std::string targetDir;      /* Directory where the program configcode file is located */
-    std::string programName; 
+    std::string programName;
     pugi::xml_document programDoc;
     IrObjects IrObj;
-    fc_Parser* insideParsers;
     fc_ParserSWIR parserSWIR;
     fc_ConverterIR converterIR;
     bool noChangeTargetDirectory {false};

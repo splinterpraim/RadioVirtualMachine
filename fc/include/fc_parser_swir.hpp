@@ -18,6 +18,8 @@
 #include "ir_data.hpp"
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
+#include "fc_setting_block.hpp"
+
 
 class fc_ParserSWIR
 {
@@ -31,6 +33,10 @@ public:
      */
     IrObjects parse(const pugi::xml_document &doc);
 
+    void setSettingBlock(fc_SettingBlock& settingBlock);
+
+    fc_SettingBlock& getSettingBlock() const;
+
     void loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc);
 
     void loadProgramFromNode__(const pugi::xml_node &programNode, pugi::xml_document &progDoc);
@@ -42,6 +48,7 @@ public:
     void loadProgramFromNode2Str__(const pugi::xml_node &programNode, std::string &progStr);
 
 private:
+    fc_SettingBlock* settingBlock {nullptr};
     /**
      * Takes all data connected with specific operator and has input connect type.
      * Converts data to key-value array where the key is order and value is IR data.

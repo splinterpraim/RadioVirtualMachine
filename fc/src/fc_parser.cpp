@@ -1,3 +1,11 @@
+/**
+ * @file fc_parser.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of FC Parser.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_parser.hpp"
 
 #include <fstream>
@@ -6,7 +14,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "fc_config.hpp"
 #include "common.hpp"
+#include "system_func.hpp"
+
 
 #define MASK_1_BYTE 0xff /* 1111 1111 */
 
@@ -38,20 +49,10 @@ void fc_Parser::processComplexOperator(IrObjects &irObj)
                 else
                 {
                     targetComplexDir = targetDir + "/" + "complex";
-                    // create targetDir + "/" + "complex"
-                    if (mkdir(targetComplexDir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP) != 0)
-                    {   
-                        int e = errno;
-                        if (e != EEXIST)
-                        {
-                            std::string errMsg = std::string("Cann't create directory") + std::string("'") + targetComplexDir + std::string("'");
-                            throw std::runtime_error(errMsg.c_str());
-                        }
-                    }
+                    createDir(targetComplexDir);
                 }
                 flagFirstEnter = 1;
             }
-            // create complex dir first
 
             fc_Parser parserComplex(targetComplexDir, true);
             parserComplex.setSettingBlock(*settingBlock);
@@ -164,6 +165,14 @@ fc_Parser::fc_Parser( const std::string &targetDir, bool noChangeTargetDirectory
 
 fc_Parser::fc_Parser(const fc_Parser& obj)
 {
+    this->settingBlock = obj.settingBlock;
+    this->inputProgramFilePath = obj.inputProgramFilePath;
+    this->targetDir = obj.targetDir;
+    this->programName = obj.programName; 
+    this->IrObj = obj.IrObj;
+    this->parserSWIR.setSettingBlock(obj.parserSWIR.getSettingBlock());
+    this->converterIR.setIdMapFile(obj.converterIR.getIdMapFile());
+    this->noChangeTargetDirectory = obj.noChangeTargetDirectory;
     this->programDoc.reset(obj.programDoc);
 }
 
@@ -178,41 +187,24 @@ void fc_Parser::parse()
     ConfigObjects configObjects = converterIR.convert(irObjects);
     createRVMcfgcode(configObjects, fullFilePathCC);
 
-    FC_LOG(GN << "> " << RT << "Parse '" << programName );
+
+#ifdef FC_LOG_ENABLE
+    FC_LOG(GN << "> " << RT << "Parse program '" << programName << "'");
+    FC_LOG("----- SWIR file");
+    showDoc();
     FC_LOG("----- IR objects");
     showIrObjects(irObjects);
     FC_LOG("----- CC objects");
     showConfigObjects(configObjects);
-    FC_LOG("CC written in " << fullFilePathCC << std::endl);
-
+    FC_LOG(std::endl << "CC written in " << fullFilePathCC << std::endl);
+#endif
     clearConfigObjects(configObjects);
 }
-
-// void fc_Parser::parseComplex(std::string progFileName)
-// {
-//     std::string fullProgramFilePath = settingBlock.getDirXML() + "/" + progFileName;
-//     std::string fullFilePathCC = targetDir + "/" + progFileName + ".bin";
-//     std::string mapFilePath = targetDir + "/" + progFileName + ".map";
-
-//     struct IrObjects irObjects = parserSWIR.parse(fullProgramFilePath);
-//     processComplexOperator(irObjects);
-//     converterIR.setIdMapFile(mapFilePath);
-//     ConfigObjects configObjects = converterIR.convert(irObjects);
-//     createRVMcfgcode(configObjects, fullFilePathCC);
-
-//     FC_LOG(GN << "> " << RT << "Parse '" << fullProgramFilePath << "' in '" << fullFilePathCC << "'");
-//     FC_LOG("----- IR objects");
-//     showIrObjects(irObjects);
-//     FC_LOG("----- CC objects");
-//     showConfigObjects(configObjects);
-//     FC_LOG("CC written in " << fullFilePathCC << std::endl);
-
-//     clearConfigObjects(configObjects);
-// }
 
 void fc_Parser::setSettingBlock(fc_SettingBlock& settingBlock)
 {
     this->settingBlock = &settingBlock;
+    parserSWIR.setSettingBlock(settingBlock);
 }
 
 void fc_Parser::setTargetDir(const std::string& targetDir)

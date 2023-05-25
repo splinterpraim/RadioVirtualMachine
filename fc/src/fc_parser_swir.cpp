@@ -1,3 +1,11 @@
+/**
+ * @file fc_parser_swir.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of FC SWIR Parser.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_parser_swir.hpp"
 
 #include <algorithm>
@@ -167,9 +175,9 @@ IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
         std::string subprog_str;
         std::string name = subprog_xml.attribute("name").value();
         std::string path = subprog_xml.attribute("path").value();
-
+        std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
         op.setSubname(name);
-        op.setSubpath(path);
+        op.setSubpath(progPath);
         /* Load program from current document */
         if (subprog_xml.first_child())
         {
@@ -178,11 +186,11 @@ IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
         /* Load program from child document */
         else if(path.compare("") != 0)
         {
-            loadProgramFromFile2Str__(path, subprog_str);
+            loadProgramFromFile2Str__(progPath, subprog_str);
         }
         else
         {
-            std::string errMsg = std::string("No program'") + name + ("'found") ;
+            std::string errMsg = std::string("No program '") + name + ("' found") ;
             throw std::runtime_error(errMsg);
         }
         op.setSubprogram(subprog_str);
@@ -218,6 +226,10 @@ IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
     createLinksFromVectorData(irObjects.links, outputDataExternal, "", LINK_OUTPUT);
 
     pugi::xml_node curOperator = program.child("operator");
+    if(!curOperator)
+    {
+        throw std::runtime_error(std::string("No operators found, program is empty"));
+    }
 
     /* Parse tag inside */
     while (true)
@@ -262,13 +274,22 @@ IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
     return irObjects;
 }
 
+void fc_ParserSWIR::setSettingBlock(fc_SettingBlock& settingBlock)
+{
+    this->settingBlock = &settingBlock;
+}
+
+fc_SettingBlock& fc_ParserSWIR::getSettingBlock() const
+{
+    return *settingBlock;
+}
 
 void fc_ParserSWIR::loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc)
 {
     pugi::xml_parse_result ret = progDoc.load_file(progPath.c_str());
     if(!ret)
     {
-        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
+        std::string errMsg = std::string("Failed to load xml file: ") + progPath + std::string(" (description: ") + ret.description() + std::string(")");
         throw std::runtime_error(errMsg);
     }
 }
@@ -302,7 +323,7 @@ void fc_ParserSWIR::loadProgramFromFile2Str__(const std::string& progPath, std::
     pugi::xml_parse_result ret = doc.load_file(progPath.c_str());
     if(!ret)
     {
-        std::string errMsg = std::string("Can't load program file: '") + progPath + std::string("'. ") + ret.description();
+        std::string errMsg = std::string("Failed to load xml file: ") + progPath + std::string(" (description: ") + ret.description() + std::string(")");
         throw std::runtime_error(errMsg);
     }
     loadProgramFromNode2Str__(doc, progStr);

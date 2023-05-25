@@ -1,3 +1,11 @@
+/**
+ * @file fc_scheduler.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of FC Scheduler
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_scheduler.hpp"
 
 #include "pugixml/pugixml.hpp"
@@ -5,23 +13,18 @@
 #include "system_func.hpp"
 
 
-// fc_Scheduler::fc_Scheduler(fc_SettingBlock& settingBlock): settingBlock(settingBlock)
-// {
-
-// }
 /* Private */
-bool fc_Scheduler::loadProgram2Parser(pugi::xml_node programNode,std::vector<fc_Parser>& parsers)
+bool fc_Scheduler::loadProgram2Parser(pugi::xml_node programNode, std::vector<fc_Parser>& parsers)
 {
-    std::cout << programNode.attribute("name").as_string() << std::endl;
     std::string name = programNode.attribute("name").as_string();
     std::string path = programNode.attribute("path").as_string();
 
     /* Load program from current document */
     if (programNode.first_child())
     {
-        std::string targetDir = settingBlock->getDirCC() + std::string("/") + name;
-        createDir(targetDir);
         auto position = parsers.size();
+        std::string targetDir = settingBlock->getDirCC() + std::string("/cc") + std::to_string(position);
+        createDir(targetDir);
         parsers.resize(position+1);
         parsers[position].setSettingBlock(*settingBlock);
         parsers[position].setProgramName(name);
@@ -31,10 +34,10 @@ bool fc_Scheduler::loadProgram2Parser(pugi::xml_node programNode,std::vector<fc_
     /* Load program from child document */
     else if(path.compare("") != 0)
     {
-        std::string targetDir = settingBlock->getDirCC() + std::string("/") +name;
+        auto position = parsers.size();
+        std::string targetDir = settingBlock->getDirCC() + std::string("/cc") + std::to_string(position);
         std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
         createDir(targetDir);
-        auto position = parsers.size();
         parsers.resize(position+1);
         parsers[position].setSettingBlock(*settingBlock);
         parsers[position].setProgramName(name);
@@ -55,7 +58,8 @@ void fc_Scheduler::schedule(std::string inputTaskFilePath, std::vector<fc_Parser
     pugi::xml_parse_result ret = doc.load_file(inputTaskFilePath.c_str());
     if(!ret)
     {
-        throw std::runtime_error(ret.description());
+        std::string errMsg = std::string("Failed to load xml file: ") + inputTaskFilePath + std::string(" (description: ") + ret.description() + std::string(")");
+        throw std::runtime_error(errMsg);
     }
 
     /* Take task tag */
