@@ -49,9 +49,6 @@ std::string IrOperator::getOpcode()
 
 void IrOperator::setSubname(const std::string &subname)
 {
-    if (subname == "")
-        throw std::invalid_argument("setSubname function failed, argument 'subname' is empty");
-
     this->subname = subname;
 }
 
@@ -62,9 +59,6 @@ std::string IrOperator::getSubname()
 
 void IrOperator::setSubpath(const std::string &subpath)
 {
-    if (subpath == "")
-        throw std::invalid_argument("setSubpath function failed, argument 'subpath' is empty");
-
     this->subpath = subpath;
 }
 

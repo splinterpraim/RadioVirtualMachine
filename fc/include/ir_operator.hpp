@@ -118,7 +118,7 @@ private:
 	std::string type = "";	  		/* Complex or Terminal type of IR Operator */
 	std::string opcode = "";  		/* Opcode of IR Operator object */
 	std::string subname = ""; 		/* Name of subprogram for complex operator */
-	std::string subpath = ""; 		/* Path of subprogram for complex operator*/
+	std::string subpath = ""; 		/* (unused) Path of subprogram for complex operator */
 	std::string subprogram = ""; 	/* Subprogram for complex operator*/
 
 };

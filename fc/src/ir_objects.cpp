@@ -30,6 +30,7 @@ void showIrData(const std::vector<IrData> &data)
         // std::cout << "type = " << el.getType() << ", ";
         std::cout << "path = " << el.getPath() << ", ";
         std::cout << "access_time = " << el.getAccessTime() << ", ";
+        std::cout << "external = " << el.getExternal() << ", ";
         std::cout << "value = " << el.getValue() << std::endl;
     }
 }
