@@ -1,6 +1,12 @@
+/**
+ * @file fc.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of Front-end Compiler.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc.hpp"
-
-
 
 #include "fc_parser.hpp"
 #include "common.hpp"
@@ -27,12 +33,6 @@ void Fc::compile(std::string inputTaskFileName)
 
     for(auto & p : parsers)
     {
-        p.showDoc();
         p.parse();
-        // p.parse("");
     }
-
-    // fc_Parser parser(settigBlock, settigBlock.getDirCC() + "/cc1", false);
-    // parser.parse("Adder.xml");
-    
 }

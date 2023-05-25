@@ -32,6 +32,11 @@ public:
      */
     void setIdMapFile(const std::string &fileName);
 
+    /**
+     * @brief Sets the Id Map File 
+     */
+    std::string getIdMapFile() const;
+
 private:
     std::string idMapFile;
     /**

@@ -1,3 +1,11 @@
+/**
+ * @file fc_converter_ir.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of the FC converter IR.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_converter_ir.hpp"
 
 #include <fstream>
@@ -184,7 +192,7 @@ uint8_t* fc_ConverterIR::getDoConfig_data(IrData &irData, uint8_t len)
             {
                 throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
             }
-            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
+            if (endianIsLittle() == CMN_LITTLE_ENDIAN)
             {
                 intVal = reverseEndian(intVal);
             }
@@ -208,7 +216,7 @@ uint8_t* fc_ConverterIR::getDoConfig_data(IrData &irData, uint8_t len)
             {
                 throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
             }
-            if (fc_glob.endian == CMN_LITTLE_ENDIAN)
+            if (endianIsLittle() == CMN_LITTLE_ENDIAN)
             {
                 fltVal = reverseEndian(fltVal);
             }
@@ -481,4 +489,9 @@ ConfigObjects fc_ConverterIR::convert(IrObjects &irObjects)
 void fc_ConverterIR::setIdMapFile(const std::string &fileName)
 {
     idMapFile = fileName;
+}
+
+std::string fc_ConverterIR::getIdMapFile() const
+{
+    return idMapFile;
 }

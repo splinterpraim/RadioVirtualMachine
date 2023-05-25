@@ -1,3 +1,11 @@
+/**
+ * @file ir_objects.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Functions for IR objects.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "ir_objects.hpp"
 
 /* Private */
