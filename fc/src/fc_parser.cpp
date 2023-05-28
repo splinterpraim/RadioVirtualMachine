@@ -16,12 +16,12 @@
 
 #include "fc_config.hpp"
 #include "common.hpp"
+#include "fc_logger.hpp"
 #include "system_func.hpp"
 
 
 #define MASK_1_BYTE 0xff /* 1111 1111 */
 
-#define FC_LOG(s) std::cout << s << std::endl
 
 #define CFG_WRITE(v)                                                \
     for (int coefShift = sizeof(v); coefShift > 0; coefShift--)     \
@@ -189,14 +189,14 @@ void fc_Parser::parse()
 
 
 #ifdef FC_LOG_ENABLE
-    FC_LOG(GN << "> " << RT << "Parse program '" << programName << "'");
-    FC_LOG("----- SWIR file");
+    FC_LOG("%s>%s Parse program '%s'\n", GN, RT, programName.c_str());
+    FC_LOG("----- SWIR file\n");
     showDoc();
-    FC_LOG("----- IR objects");
+    FC_LOG("----- IR objects\n");
     showIrObjects(irObjects);
-    FC_LOG("----- CC objects");
+    FC_LOG("----- CC objects\n");
     showConfigObjects(configObjects);
-    FC_LOG(std::endl << "CC written in " << fullFilePathCC << std::endl);
+    FC_LOG("\nCC written in %s\n", fullFilePathCC.c_str());
 #endif
     clearConfigObjects(configObjects);
 }
