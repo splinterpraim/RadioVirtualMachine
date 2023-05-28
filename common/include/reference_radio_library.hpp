@@ -60,6 +60,12 @@ enum RL_OPCODES
     rl_opcode_21,
     rl_opcode_22,
     rl_opcode_23,
+    rl_opcode_24,
+    rl_opcode_25,
+    rl_opcode_26,
+    rl_opcode_27,
+    rl_opcode_28,
+    rl_opcode_29,
 
     RL_OPCODES_SIZE
 };

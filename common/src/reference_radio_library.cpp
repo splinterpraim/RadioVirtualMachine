@@ -180,7 +180,50 @@ radioLibrary_el const referenceRadioLibrary[RL_SIZE] = {
         }
     },
     /* Copy */
+    { "copy_32i", rl_opcode_24, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+    /* Delay */
+    { "z_32i", rl_opcode_25, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
     /* Move */
+    { "move_32i", rl_opcode_26, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+
+    { "moveGenSig_32i", rl_opcode_27, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+
+    { "moveOnSig_32i", rl_opcode_28, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+
+    { "FIR_order_2_32i", rl_opcode_29, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
 };
 
 radioLibrary_el const* rl_getOperator(uint32_t opcode)

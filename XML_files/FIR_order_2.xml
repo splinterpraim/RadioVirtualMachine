@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<program name="FIR_order_2" path="FIR_order_2.xml">
+    <data id="x" path="" connect_type="input" order="1" access_time="10" value="" />
+    <data id="y" path="" connect_type="output" order="1" access_time="10" value="" />
+
+    <operator id="copy1" type="Terminal" opcode="24">
+        <data id="x" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_m1" path="" connect_type="output" order="1" access_time="10" value="" />
+        <data id="x_z1" path="" connect_type="output" order="2" access_time="10" value="" />
+    </operator>
+
+    <operator id="mult1" type="Terminal" opcode="15">
+        <data id="x_m1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="b0" path="" connect_type="input" order="2" access_time="10" value="20" />
+        <data id="x_s1" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="z1" type="Complex" opcode="25">
+        <data id="x_z1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_cp1" path="" connect_type="output" order="1" access_time="10" value="" />
+        <program name="delay" path="delay.xml"/>
+    </operator>
+
+    <operator id="copy2" type="Terminal" opcode="24">
+        <data id="x_cp1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_m2" path="" connect_type="output" order="1" access_time="10" value="" />
+        <data id="x_z2" path="" connect_type="output" order="2" access_time="10" value="" />
+    </operator>
+
+    <operator id="mult2" type="Terminal" opcode="15">
+        <data id="x_m2" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="b1" path="" connect_type="input" order="2" access_time="10" value="30" />
+        <data id="x_s2" path="" connect_type="output" order="1" access_time="10" value="0" />
+    </operator>
+
+    <operator id="z2" type="Complex" opcode="25">
+        <data id="x_z2" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_m3" path="" connect_type="output" order="1" access_time="10" value="" />
+        <program name="delay" path="delay.xml"/>
+    </operator>
+
+    <operator id="mult3" type="Terminal" opcode="15">
+        <data id="x_m3" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="b2" path="" connect_type="input" order="2" access_time="10" value="40" />
+        <data id="x_s3" path="" connect_type="output" order="1" access_time="10" value="0" />
+    </operator>
+
+    <operator id="add1" type="Terminal" opcode="4">
+        <data id="x_s1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_s2" path="" connect_type="input" order="2" access_time="10" value="0" />
+        <data id="s1" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+    <operator id="add2" type="Terminal" opcode="4">
+        <data id="s1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_s3" path="" connect_type="input" order="2" access_time="10" value="0" />
+        <data id="y" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+</program>

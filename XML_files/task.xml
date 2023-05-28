@@ -1,20 +1,11 @@
 
 <task>
-    <program name="p1" path="to_task/p1.xml"/>
-    <program name="p2" path="">
-        <operator id="add1" type="Terminal" opcode="11">
-            <data id="d1" path="" connect_type="input" order="1" access_time="11" value="1.532"/>
-            <data id="d2" path="" connect_type="input" order="2" access_time="11" value=""/>
-            <data id="d3" path="" connect_type="output" order="1" access_time="11" value=""/>
+    <program name="p1" path="FIR_order_2.xml">
+        
+        <operator id="FIR" type="Complex" opcode="29">
+            <data id="x" path="" connect_type="input" order="1" access_time="11" value="3"/>
+            <data id="y" path="" connect_type="output" order="1" access_time="11" value=""/>
+            <program name="FIR_order_2" path="FIR_order_2.xml"/>
         </operator>
     </program>
-    <program name="p3" path="to_task/p3.xml"/>
-    <program name="p4" path="">
-        <operator id="add1" type="Terminal" opcode="5">
-            <data id="d1" path="" connect_type="input" order="1" access_time="11" value="2"/>
-            <data id="d2" path="" connect_type="input" order="2" access_time="11" value="3"/>
-            <data id="d3" path="" connect_type="output" order="1" access_time="11" value=""/>
-        </operator>
-    </program>
-    
 </task>

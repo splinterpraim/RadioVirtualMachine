@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<program name="delay" path="delay.xml">
+    <data id="x" path="" connect_type="input" order="1" access_time="10" value="" />
+    <data id="y" path="" connect_type="output" order="1" access_time="10" value="" />
+
+    <operator id="moveGenSig" type="Terminal" opcode="27">
+        <data id="x" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="sig1" path="" connect_type="output" order="1" access_time="10" value="" />
+        <data id="x_in" path="" connect_type="output" order="2" access_time="10" value="" />
+    </operator>
+
+    <operator id="move" type="Terminal" opcode="26">
+        <data id="x_in" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_out" path="" connect_type="output" order="1" access_time="10" value="0" />
+    </operator>
+
+    <operator id="moveOnSig" type="Terminal" opcode="28">
+        <data id="sig1" path="" connect_type="input" order="1" access_time="10" value="" />
+        <data id="x_out" path="" connect_type="input" order="2" access_time="10" value="0" />
+        <data id="y" path="" connect_type="output" order="1" access_time="10" value="" />
+    </operator>
+
+</program>
