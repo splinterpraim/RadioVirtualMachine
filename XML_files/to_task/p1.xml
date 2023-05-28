@@ -1,11 +1,11 @@
 <program name="p1" path="">
-    <operator id="add1" type="Terminal" opcode="1">
+    <operator id="add1" type="Terminal" opcode="5">
         <data id="d1" path="" connect_type="input" order="1" access_time="11" value="11"/>
         <data id="d2" path="" connect_type="input" order="2" access_time="11" value="22"/>
         <data id="d3" path="" connect_type="output" order="1" access_time="11" value=""/>
     </operator>
 
-    <operator id="ADD2" type="Complex" opcode="5">
+    <operator id="ADD2" type="Complex" opcode="23">
         <data id="d1" path="" connect_type="input" order="1" access_time="11" value="11"/>
         <data id="d2" path="" connect_type="input" order="2" access_time="11" value="22"/>
         <data id="d3" path="" connect_type="input" order="3" access_time="11" value=""/>
@@ -15,12 +15,12 @@
             <data id="i2" path="" connect_type="input" order="2" access_time="11" value=""/>
             <data id="i3" path="" connect_type="input" order="3" access_time="11" value=""/>
             <data id="o4" path="" connect_type="output" order="1" access_time="11" value=""/>
-            <operator id="add1" type="Terminal" opcode="1">
+            <operator id="add1" type="Terminal" opcode="4">
                 <data id="i1" path="" connect_type="input" order="1" access_time="11" value=""/>
                 <data id="i2" path="" connect_type="input" order="2" access_time="11" value=""/>
                 <data id="tmp1" path="" connect_type="output" order="1" access_time="11" value=""/>
             </operator>
-            <operator id="add2" type="Terminal" opcode="1">
+            <operator id="add2" type="Terminal" opcode="4">
                 <data id="i3" path="" connect_type="input" order="1" access_time="11" value=""/>
                 <data id="tmp1" path="" connect_type="input" order="2" access_time="11" value=""/>
                 <data id="o4" path="" connect_type="output" order="1" access_time="11" value=""/>
@@ -28,7 +28,7 @@
         </program>
     </operator>
 
-    <operator id="ADD3" type="Complex" opcode="5">
+    <operator id="ADD3" type="Complex" opcode="23">
         <data id="d1" path="" connect_type="input" order="1" access_time="11" value="11"/>
         <data id="d2" path="" connect_type="input" order="2" access_time="11" value="22"/>
         <data id="d4" path="" connect_type="output" order="1" access_time="11" value=""/>
