@@ -40,7 +40,9 @@ void showDO_Config(DO_Config &doCfg, uint8_t N_DO)
     DO_Config *ptrDoCfg = &doCfg;
     for (uint8_t i = 0; i < N_DO; i++)
     {
-        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length << ", data: ";
+        std::cout << space4 << "DO_ID: " << (int)ptrDoCfg[i].DO_ID << ", size: " << (int)ptrDoCfg[i].size << 
+                            ", access_time: " << (int)ptrDoCfg[i].access_time << ", length: " << (int)ptrDoCfg[i].length << 
+                            ", external: " << (int)ptrDoCfg[i].external << ", data: ";
         for (size_t j = 0; j < ptrDoCfg[i].length; ++j)
             std::cout << std::hex << (int)ptrDoCfg[i].data[j] << " ";
         std::cout << std::dec;

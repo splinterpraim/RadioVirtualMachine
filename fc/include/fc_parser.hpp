@@ -10,6 +10,8 @@
 #define FC_PARSER_CLASS
 
 #include <string>
+#include "pugixml/pugixml.hpp"
+
 #include "ir_objects.hpp"
 #include "config_code_structure.hpp"
 #include "fc_parser_swir.hpp"
@@ -23,29 +25,51 @@ class fc_Parser
 {
 public:
     /**
-     * @brief Constructs a new fc Parser object with parametr
+     * @brief Construct a new fc Parser object
      */
-    fc_Parser(fc_SettingBlock& settingBlock, const std::string& targetDir, bool noChangeTargetDirectory);
+    fc_Parser();
+
+    /**
+     * @brief Constructs a new fc Parser object with parameter
+     */
+    fc_Parser(const std::string& targetDir, bool noChangeTargetDirectory);
+
+    fc_Parser(const fc_Parser& obj);
+
 
     /**
      * @brief Parses XML program file and generates configcode file
-     * 
-     * @param progFileName Input XML program file
      */
-    void parse(std::string progFileName);
+    void parse();
 
     /**
      * @brief Parses XML program file for complex operator and generates configcode file
      * 
      * @param progFileName Input XML program file of complex operator
      */
-    void parseComplex(std::string progFileName);
+    // void parseComplex(std::string progFileName);
+
+    void setSettingBlock(fc_SettingBlock& settingBlock);
+
+    void setTargetDir(const std::string& targetDir);
+
+    void setProgramName(const std::string& programName);
+
+    void loadProgramFromFile(const std::string& progPath);
+
+    void loadProgramFromNode(const pugi::xml_node &programNode);
+
+    void loadProgramFromStr(const std::string& progStr);
+
+    void showDoc();
 
 private:
-    fc_SettingBlock& settingBlock;
-    std::string targetDir; /* Directory where the program configcode file is located */
+    fc_SettingBlock* settingBlock {nullptr};
+    std::string inputProgramFilePath;
+    std::string targetDir;      /* Directory where the program configcode file is located */
+    std::string programName;
+    pugi::xml_document programDoc;
     IrObjects IrObj;
-    fc_Parser* insideParsers;
     fc_ParserSWIR parserSWIR;
     fc_ConverterIR converterIR;
     bool noChangeTargetDirectory {false};
@@ -59,6 +83,7 @@ private:
      * @param[in] fileNameBin File name where will be binary config code
      */
     void createRVMcfgcode(ConfigObjects &cfgObj, const std::string &fileNameBin);
+
 };
 
 #endif // FC_PARSER_CLASS

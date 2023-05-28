@@ -11,9 +11,7 @@
 
 #include <iostream>
 #include <string>
-
-#define LINK_INPUT 0 
-#define LINK_OUTPUT 1
+#include "reference_radio_library.hpp"
 
 /**
  * @brief Class for describing of Intermediate representation links
@@ -106,7 +104,7 @@ private:
     int dataOrder; 			/* Order of the data in relation to the operator */
 	std::string operatorId; /* IR Operator ID */
 	int dir;				/* Direction from data to operator.
-				   			   LINK_INPUT - from data to operator (input)
-				   			   LINK_OUTPUT - from operator to data (output) */
+				   			   RL_INPUT_PORT - from data to operator (input)
+				   			   RL_INPUT_PORT - from operator to data (output) */
 };
 #endif // IR_LINK_H

@@ -1,3 +1,11 @@
+/**
+ * @file ir_objects.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Functions for IR objects.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "ir_objects.hpp"
 
 /* Private */
@@ -30,6 +38,7 @@ void showIrData(const std::vector<IrData> &data)
         // std::cout << "type = " << el.getType() << ", ";
         std::cout << "path = " << el.getPath() << ", ";
         std::cout << "access_time = " << el.getAccessTime() << ", ";
+        std::cout << "external = " << el.getExternal() << ", ";
         std::cout << "value = " << el.getValue() << std::endl;
     }
 }

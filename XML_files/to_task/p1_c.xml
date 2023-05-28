@@ -1,0 +1,10 @@
+<program name="ADD3" path="">
+    <data id="i1" path="" connect_type="input" order="1" access_time="11" value=""/>
+    <data id="i2" path="" connect_type="input" order="2" access_time="11" value=""/>
+    <data id="o3" path="" connect_type="output" order="1" access_time="11" value=""/>
+    <operator id="add1" type="Terminal" opcode="1">
+        <data id="i1" path="" connect_type="input" order="1" access_time="11" value=""/>
+        <data id="i2" path="" connect_type="input" order="2" access_time="11" value=""/>
+        <data id="o3" path="" connect_type="output" order="1" access_time="11" value=""/>
+    </operator>
+</program>

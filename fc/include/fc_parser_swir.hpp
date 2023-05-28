@@ -18,6 +18,8 @@
 #include "ir_data.hpp"
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
+#include "fc_setting_block.hpp"
+
 
 class fc_ParserSWIR
 {
@@ -29,9 +31,24 @@ public:
      *
      * @retval IrObjects IR objects
      */
-    IrObjects parse(const std::string &fileNameSWIR);
+    IrObjects parse(const pugi::xml_document &doc);
+
+    void setSettingBlock(fc_SettingBlock& settingBlock);
+
+    fc_SettingBlock& getSettingBlock() const;
+
+    void loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc);
+
+    void loadProgramFromNode__(const pugi::xml_node &programNode, pugi::xml_document &progDoc);
+
+    void loadProgramFromStr__(const std::string& progStr, pugi::xml_document &programDoc);
+
+    void loadProgramFromFile2Str__(const std::string& progPath, std::string &progStr);
+
+    void loadProgramFromNode2Str__(const pugi::xml_node &programNode, std::string &progStr);
 
 private:
+    fc_SettingBlock* settingBlock {nullptr};
     /**
      * Takes all data connected with specific operator and has input connect type.
      * Converts data to key-value array where the key is order and value is IR data.
@@ -107,7 +124,7 @@ private:
      * @param[in] opId IR operator ID
      * @param[in] dir Direction of data to operator
      */
-    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir);
+    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, bool dir);
 };
 
 #endif // FC_PARSER_SWIR_CLASS

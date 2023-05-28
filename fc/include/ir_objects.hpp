@@ -1,7 +1,7 @@
 /**
  * @file ir_objects.hpp
  * @author Elena Potapova (krylelena99@yandex.ru)
- * @brief Intermediate representation Objects
+ * @brief Intermediate representation Objects (IR Objects)
  * @version 0.1
  * @copyright Copyright (c) 2023
  */

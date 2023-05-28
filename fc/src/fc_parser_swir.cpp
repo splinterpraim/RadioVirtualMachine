@@ -1,13 +1,23 @@
+/**
+ * @file fc_parser_swir.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of FC SWIR Parser.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_parser_swir.hpp"
 
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
+#include <sstream>
 
-#include "radio_library.hpp"
 #include "common.hpp"
+#include "fc_logger.hpp"
+#include "reference_radio_library.hpp"
 
-extern RadioLibrary radioLib;
+
 
 /* Private */
 
@@ -17,11 +27,14 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataInput(pugi::xml_node &op_xml)
 
     /* Gets description of operator in Radio lib */
     int opcode = op_xml.attribute("opcode").as_int();
-    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    std::string name = op_xml.attribute("id").as_string();
+    const radioLibrary_el * op_rl = rl_getOperator(opcode);
+    uint8_t inputCnt = rl_getInputPortCnt(opcode);
+
     /* If opcode doesn't found */
-    if (op_rl.name.length() == 0)
+    if (!op_rl)
     {
-        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode '%d' for operator '%s'", opcode, name.c_str()));
     }
 
     /* Loop for finding and converting Data from xml to IR */
@@ -36,13 +49,17 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataInput(pugi::xml_node &op_xml)
             int order = data.attribute("order").as_int();
             int dataType = -1;
 
-            if (op_rl.ports.fInfinityInPorts == RL_YES)
+            if (op_rl->flags.infinityInPorts == RL_ENABLE)
             {
-                dataType = op_rl.ports.in[0].type; // todo: fix, because not work for undefined num of inputs
+                dataType = op_rl->flags.typeOfInData;
             }
             else
             {
-                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
+                if (order > inputCnt)
+                {
+                    throw std::runtime_error(std::string("Too many inputs for operator '") + name + std::string("'"));
+                }
+                dataType = op_rl->ports[order - 1].typeOfData;
             }
             currData.setType(dataType);
             dataResult[order] = currData;
@@ -57,11 +74,15 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataOutput(pugi::xml_node &op_xml)
 
     /* Gets description of operator in Radio lib */
     int opcode = op_xml.attribute("opcode").as_int();
-    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    std::string name = op_xml.attribute("id").as_string();
+    const radioLibrary_el * op_rl = rl_getOperator(opcode);
+    uint8_t inputCnt = rl_getInputPortCnt(opcode);
+    uint8_t outputCnt = rl_getOutputPortCnt(opcode);
+
     /* If opcode doesn't found */
-    if (op_rl.name.length() == 0)
+    if (!op_rl)
     {
-        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode '%d' for operator '%s'", opcode, name.c_str()));
     }
 
     /* Loop for finding and converting Data from xml to IR */
@@ -76,7 +97,19 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataOutput(pugi::xml_node &op_xml)
             int order = data.attribute("order").as_int();
             int dataType = -1;
 
-            dataType = op_rl.ports.out[order - 1].type;
+            if (op_rl->flags.infinityOutPorts == RL_ENABLE)
+            {
+                dataType = op_rl->flags.typeOfOutData;
+            }
+            else
+            {
+                if (order > outputCnt)
+                {
+                    throw std::runtime_error(std::string("Too many outputs for operator '") + name + std::string("'"));
+                }
+                int index = order + inputCnt - 1; 
+                dataType = op_rl->ports[index].typeOfData;
+            }
 
             currData.setType(dataType);
             dataResult[order] = currData;
@@ -159,19 +192,38 @@ IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
     IrOperator op;
     op.setId(op_xml.attribute("id").value());
     op.setType(op_xml.attribute("type").value());
+    op.setOpcode(op_xml.attribute("opcode").value());
     if (op.getType().compare("Complex") == 0)
     {
-        pugi::xml_node subprog_xml;
-        subprog_xml = op_xml.child("subprogram");
-        op.setSubname(subprog_xml.attribute("name").value());
-        op.setSubpath(subprog_xml.attribute("path").value());
+        pugi::xml_node subprog_xml = op_xml.child("program");
+        std::string subprog_str;
+        std::string name = subprog_xml.attribute("name").value();
+        std::string path = subprog_xml.attribute("path").value();
+        std::string progPath = settingBlock->getDirXML() + std::string("/") + path;
+        op.setSubname(name);
+        op.setSubpath(progPath);
+        /* Load program from current document */
+        if (subprog_xml.first_child())
+        {
+            loadProgramFromNode2Str__(subprog_xml, subprog_str);
+        }
+        /* Load program from child document */
+        else if(path.compare("") != 0)
+        {
+            loadProgramFromFile2Str__(progPath, subprog_str);
+        }
+        else
+        {
+            std::string errMsg = std::string("No program '") + name + ("' found") ;
+            throw std::runtime_error(errMsg);
+        }
+        op.setSubprogram(subprog_str);
     }
-    op.setOpcode(op_xml.attribute("opcode").value());
 
     return op;
 }
 
-void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir)
+void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, bool dir)
 {
     for (auto el : data)
     {
@@ -181,14 +233,10 @@ void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::m
 
 /* Public */
 
-IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
+IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
 {
     /* Declaration IrObjects */
     IrObjects irObjects;
-
-    /* Load xml file */
-    pugi::xml_document doc;
-    doc.load_file(fileNameSWIR.c_str());
 
     /* Take top tag */
     pugi::xml_node program = doc.child("program");
@@ -198,10 +246,14 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
     addIrDataToVector(irObjects.data, inputDataExternal);
     addIrDataToVector(irObjects.data, outputDataExternal);
 
-    createLinksFromVectorData(irObjects.links, inputDataExternal, "", LINK_INPUT);
-    createLinksFromVectorData(irObjects.links, outputDataExternal, "", LINK_OUTPUT);
+    createLinksFromVectorData(irObjects.links, inputDataExternal, "", RL_INPUT_PORT);
+    createLinksFromVectorData(irObjects.links, outputDataExternal, "", RL_OUTPUT_PORT);
 
     pugi::xml_node curOperator = program.child("operator");
+    if(!curOperator)
+    {
+        throw std::runtime_error(std::string("No operators found, program is empty"));
+    }
 
     /* Parse tag inside */
     while (true)
@@ -220,8 +272,8 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
         irObjects.operators.push_back(currOp);
 
         /* Create link objects from input/output IR data and IR operator */
-        createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), LINK_INPUT);
-        createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), LINK_OUTPUT);
+        createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), RL_INPUT_PORT);
+        createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), RL_OUTPUT_PORT);
 
         auto xmlNodeType = curOperator.next_sibling("operator").type();
 
@@ -244,4 +296,67 @@ IrObjects fc_ParserSWIR::parse(const std::string &fileNameSWIR)
         curOperator = curOperator.next_sibling("operator");
     }
     return irObjects;
+}
+
+void fc_ParserSWIR::setSettingBlock(fc_SettingBlock& settingBlock)
+{
+    this->settingBlock = &settingBlock;
+}
+
+fc_SettingBlock& fc_ParserSWIR::getSettingBlock() const
+{
+    return *settingBlock;
+}
+
+void fc_ParserSWIR::loadProgramFromFile__(const std::string& progPath, pugi::xml_document &progDoc)
+{
+    pugi::xml_parse_result ret = progDoc.load_file(progPath.c_str());
+    if(!ret)
+    {
+        std::string errMsg = std::string("Failed to load xml file: ") + progPath + std::string(" (description: ") + ret.description() + std::string(")");
+        throw std::runtime_error(errMsg);
+    }
+}
+void fc_ParserSWIR::loadProgramFromNode__(const pugi::xml_node &programNode, pugi::xml_document &progDoc)
+{
+    std::stringstream ss;
+    std::string xmlDoc;
+    programNode.print(ss);
+    xmlDoc = ss.str();
+    pugi::xml_parse_result ret = progDoc.load_string(xmlDoc.c_str());
+    if(!ret)
+    {
+        std::cout << ret.description() << std::endl;
+        throw std::runtime_error(ret.description());
+    }
+}
+
+void fc_ParserSWIR::loadProgramFromStr__(const std::string& progStr, pugi::xml_document &programDoc)
+{
+    pugi::xml_parse_result ret = programDoc.load_string(progStr.c_str());
+    if(!ret)
+    {
+        std::cout << ret.description() << std::endl;
+        throw std::runtime_error(ret.description());
+    }
+}
+
+void fc_ParserSWIR::loadProgramFromFile2Str__(const std::string& progPath, std::string &progStr)
+{
+    pugi::xml_document doc;
+    pugi::xml_parse_result ret = doc.load_file(progPath.c_str());
+    if(!ret)
+    {
+        std::string errMsg = std::string("Failed to load xml file: ") + progPath + std::string(" (description: ") + ret.description() + std::string(")");
+        throw std::runtime_error(errMsg);
+    }
+    loadProgramFromNode2Str__(doc, progStr);
+}
+
+void fc_ParserSWIR::loadProgramFromNode2Str__(const pugi::xml_node &programNode, std::string &progStr)
+{
+    std::stringstream ss;
+    std::string xmlDoc;
+    programNode.print(ss);
+    progStr = ss.str();
 }

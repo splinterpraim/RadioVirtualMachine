@@ -1,42 +1,38 @@
-#include "fc.hpp"
+/**
+ * @file fc.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of Front-end Compiler.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
+#include "fc.hpp"
 
 #include "fc_parser.hpp"
 #include "common.hpp"
+#include "system_func.hpp"
 
+/* Private */
+
+
+/* Public */
 Fc::Fc(const std::string &dirXML, const std::string &dirCC)
 {
     settigBlock.setDirXML(dirXML);
     settigBlock.setDirCC(dirCC);
+    scheduler.setSettingBlock(settigBlock);
 }
 
-void Fc::compile()
+void Fc::compile(std::string inputTaskFileName)
 {
-    // create DirCC & DirCC/cc1
-    std::string ccDir = settigBlock.getDirCC();
-    std::string cc1Dir = ccDir + std::string("/cc1");
-    if (mkdir(ccDir.c_str(), S_IRWXU|S_IRGRP|S_IXGRP) != 0)
+    /* Create output configcode directory */
+    createDir(settigBlock.getDirCC());
+
+    std::string inputTaskFilePath = settigBlock.getDirXML() + std::string("/") + inputTaskFileName;
+    scheduler.schedule(inputTaskFilePath, parsers);
+
+    for(auto & p : parsers)
     {
-        int e = errno;
-        if (e != EEXIST)
-        {
-            std::string errMsg = std::string("Cann't create directory") + std::string("'") + ccDir + std::string("'");
-            throw std::runtime_error(errMsg.c_str());
-        }
+        p.parse();
     }
-    if (mkdir(cc1Dir.c_str(), S_IRWXU|S_IRGRP|S_IXGRP) != 0)
-    {
-        int e = errno;
-        if (e != EEXIST)
-        {
-            std::string errMsg = std::string("Cann't create directory") + std::string("'") + cc1Dir.c_str() + std::string("'");
-            throw std::runtime_error(errMsg.c_str());
-        }
-    }
-    fc_Parser parser(settigBlock, settigBlock.getDirCC() + "/cc1", false);
-    parser.parse("Adder.xml");
-    
 }

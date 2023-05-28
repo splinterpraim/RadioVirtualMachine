@@ -1,0 +1,28 @@
+<program name="Iterator" path="">
+
+    <data id="sig_next" path="" connect_type="input" order="1" access_time="11" value=""/>
+    <data id="start_val" path="" connect_type="input" order="2" access_time="11" value=""/>
+    <data id="sig_continue" path="" connect_type="output" order="1" access_time="11" value=""/>
+    <data id="sig_end" path="" connect_type="output" order="2" access_time="11" value=""/>
+
+    <operator id="copy_on_sig" type="Terminal" opcode="30">
+        <data id="sig_next" path="" connect_type="input" order="1" access_time="11" value=""/>
+        <data id="start_val" path="" connect_type="input" order="2" access_time="11" value=""/>
+        <data id="v1" path="" connect_type="output" order="1" access_time="11" value=""/>
+        <data id="v2" path="" connect_type="output" order="2" access_time="11" value=""/>
+    </operator>
+
+    <operator id="add" type="Terminal" opcode="4">
+        <data id="v2" path="" connect_type="input" order="1" access_time="11" value=""/>
+        <data id="v_inc" path="" connect_type="input" order="2" access_time="11" value="1"/>
+        <data id="start_val" path="" connect_type="output" order="1" access_time="11" value=""/>
+    </operator>
+
+    <operator id="compare" type="Terminal" opcode="31">
+        <data id="v1" path="" connect_type="input" order="1" access_time="11" value=""/>
+        <data id="v0_cmp" path="" connect_type="input" order="2" access_time="11" value="0"/>
+        <data id="sig_continue" path="" connect_type="output" order="1" access_time="11" value=""/>
+        <data id="sig_end" path="" connect_type="output" order="2" access_time="11" value=""/>
+    </operator>
+
+</program>

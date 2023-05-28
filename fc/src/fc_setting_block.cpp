@@ -1,3 +1,11 @@
+/**
+ * @file fc_setting_block.cpp
+ * @author Elena Potapova (krylelena99@yandex.ru)
+ * @brief Implementation of FC Setting Block.
+ * @version 0.1
+ * @copyright Copyright (c) 2023
+ */
+
 #include "fc_setting_block.hpp"
 
 void fc_SettingBlock::setDirXML(const std::string &dirXML)
