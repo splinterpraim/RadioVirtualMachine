@@ -25,7 +25,19 @@ bool endianIsLittle();
  * @param val Input value
  * @return Reversed value
  */
-int reverseEndian(int val);
+template<typename T>
+T reverseEndian(T val, uint8_t size)
+{
+    T res = 0;
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        res = (res << 8) | ((val >> 8 * i) & 0xFF);
+    }
+    return res;
+}
+
+float reverseEndianFloat(float val, uint8_t size);
+double reverseEndianDouble(double val, uint8_t size);
 
 void createDir(std::string dir);
 

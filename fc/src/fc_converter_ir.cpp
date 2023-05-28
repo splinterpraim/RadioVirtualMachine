@@ -10,16 +10,19 @@
 
 #include <fstream>
 #include <cstring>
+#include <cstdio>
+#include <cstdint>
+#include <cinttypes>
 
 #include "common.hpp"
 #include "system_func.hpp"
 #include "fc_glob.hpp"
-#include "radio_library.hpp"
+#include "fc_logger.hpp"
+#include "reference_radio_library.hpp"
 
 #define PROGRAM_ID 0
 #define APE_ID_START 1
 
-extern RadioLibrary radioLib;
 
 /* Private */
 void fc_ConverterIR::fillControlSection(ConfigObjects &configObjects, IrObjects &irObjects)
@@ -65,28 +68,54 @@ DO_Config* fc_ConverterIR::getDoConfig(IrObjects &irObjects)
 uint32_t fc_ConverterIR::getDoConfig_size(IrData &irData)
 {
     uint32_t res = 0;
-    if (irData.getType() == RL_TYPE_INT)
+    int type = irData.getType();
+    const char* name = irData.getId().c_str();
+    switch (type)
     {
-        res = sizeof(int);
+        case rlt_bool:
+            res = sizeof(bool);
+            break;
+        case rlt_int8:
+            res = sizeof(int8_t);
+            break;
+        case rlt_int16:
+            res = sizeof(int16_t);
+            break;
+        case rlt_int32:
+            res = sizeof(int32_t);
+            break;
+        case rlt_int64:
+            res = sizeof(int64_t);
+            break;
+        case rlt_uint8:
+            res = sizeof(uint8_t);
+            break;
+        case rlt_uint16:
+            res = sizeof(uint16_t);
+            break;
+        case rlt_uint32:
+            res = sizeof(uint32_t);
+            break;
+        case rlt_uint64:
+            res = sizeof(uint64_t);
+            break;
+        case rlt_float:
+            res = sizeof(float);
+            break;
+        case rlt_double:
+            res = sizeof(double);
+            break;
+        default:
+            std::string msg = FC_ERR_STR("Unsupported data type in '%s'", name);
+            throw std::runtime_error(msg);
     }
-    else if (irData.getType() == RL_TYPE_FLOAT)
-    {
-        res = sizeof(float);
-    }
-    else if (irData.getType() == RL_TYPE_STRING)
-    {
-        res = irData.getValue().size();
-    }
-    else
-    {
-        std::cout << FC_ERR_STR("Error: Mismatch of type!") << std::endl;
-    }
+
     return res;
 }
 
 uint8_t fc_ConverterIR::getDoConfig_length(IrData &irData, uint32_t size)
 {
-    uint8_t res = 0;
+    uint8_t resLen = 0;
     std::string doVal = irData.getValue();
     std::string doPath = irData.getPath();
 
@@ -100,50 +129,152 @@ uint8_t fc_ConverterIR::getDoConfig_length(IrData &irData, uint32_t size)
     if (doVal.length() != 0)
     {
         int dataType = irData.getType();
-        size_t dataValSize = irData.getValue().size();
-
-        //TODO: normal length count 
-        res = detectSize(dataType, dataValSize);
+        std::string dataVal = irData.getValue();
+        resLen = detectSize(dataVal, dataType);
     }
     /* Filled path */
     else if (doPath.length() != 0)
     {
-        res = getFileLen(doPath);
+        resLen = getFileLen(doPath);
     }
 
     /* Overflow type check */
-    if (res > size)
-    {
-        std::cout << FC_WARN_STR("Length in file more then size. Data was readed partly.") << std::endl;
-        int dataType = irData.getType();
-        size_t dataValSize = irData.getValue().size();
+    // if (resLen > size)
+    // {
+    //     std::cout << FC_WARN_STR("Length in file more then size. Data was readed partly.") << std::endl;
+    //     int dataType = irData.getType();
+    //     std::string dataVal = irData.getValue();
 
-        res = detectSize(dataType, dataValSize);
-    }
-    return res;
+    //     resLen = detectSize(dataVal, dataType);
+    // }
+    return resLen;
 }
 
-uint32_t fc_ConverterIR::detectSize(int dataType, size_t dataValSize)
+uint8_t fc_ConverterIR::detectSize(std::string dataVal, int dataType)
 {
-    uint32_t res;
 
-    if (dataType == RL_TYPE_INT)
+#define str2digit_withCheck(str,dvar,dtype,dspec,dcast)  \
+{                                    \
+    int n;                                  \
+    int ret;                                \
+    ret = std::sscanf(str, dspec "%n", (dcast*)&dvar, &n);  \
+    if((ret != 1) || (std::strlen(str)!= (size_t)n))    \
+    {                                                       \
+        throw std::runtime_error(FC_ERR_STR("Can't convert value '%s' to type '%s'",str, #dtype));      \
+    }   \
+    char buffer[FC_STR_VALUE_MAX_SIZE]; \
+    std::snprintf(buffer, sizeof(buffer),dspec,dvar);   \
+    if (! ((std::strncmp(#dtype,"float",sizeof(#dtype)) == 0) ||  \
+           (std::strncmp(#dtype,"double",sizeof(#dtype)) == 0)) )  \
+    {                                                    \
+        if (std::strncmp(buffer, str, sizeof(buffer))!= 0)  \
+        {                                                    \
+            throw std::runtime_error(FC_ERR_STR("Type '%s' overflow for value '%s'", #dtype, str));      \
+                                            \
+        }                                   \
+    }   \
+}
+#define findHighBitNumber(dvar,dtype,bytes)   \
+{                                               \
+    uint64_t bitMask = UINT64_MAX;           \
+    uint8_t type = sizeof(dtype);           \
+    bytes = 0;                                   \
+    for( size_t i = 0; i < sizeof(uint64_t); i++ ) \
+    {                                           \
+        bytes++;                              \
+        bitMask = bitMask << 8; \
+        if(!(dvar & bitMask))    {break;}               \
+        if (bytes >= type) {break;} \
+    }                           \
+}
+
+    uint8_t res = 0;
+    const char* str = dataVal.c_str();
+    switch (dataType)
     {
-        res = sizeof(int);
+        case rlt_bool:
+            res = sizeof(bool);
+            break;
+        case rlt_int8:
+        {
+            int8_t num;
+            str2digit_withCheck(str, num, int8_t, "%" PRId8, int)
+            findHighBitNumber(num,int8_t,res);
+            break;
+        }
+        case rlt_int16:
+        {
+            int16_t num;
+            str2digit_withCheck(str, num, int16_t, "%" PRId16, int)
+            findHighBitNumber(num,int16_t,res);
+            break;
+        }
+        case rlt_int32:
+        {
+            int32_t num;
+            str2digit_withCheck(str, num, int32_t, "%" PRId32, int)
+            findHighBitNumber(num,int32_t,res);
+            break;
+        }
+        case rlt_int64:
+        {
+            int64_t num;
+            str2digit_withCheck(str, num, int64_t, "%" PRId64, long)
+            findHighBitNumber(num,int64_t,res);
+            break;
+        }
+        case rlt_uint8:
+        {
+            uint8_t num;
+            str2digit_withCheck(str, num, uint8_t, "%" PRIu8, unsigned int)
+            findHighBitNumber(num,uint8_t,res);
+            break;
+        }
+        case rlt_uint16:
+        {
+            uint16_t num;
+            str2digit_withCheck(str, num, uint16_t, "%" PRIu16, unsigned int)
+            findHighBitNumber(num,uint16_t,res);
+            break;
+        }
+        case rlt_uint32:
+        {
+            uint32_t num;
+            str2digit_withCheck(str, num, uint32_t, "%" PRIu32, unsigned int)
+            findHighBitNumber(num,uint32_t,res);
+            break;
+        }
+        case rlt_uint64:
+        {
+            uint64_t num;
+            str2digit_withCheck(str, num, uint64_t, "%" PRIu64, unsigned long)
+            findHighBitNumber(num,uint64_t,res);
+            break;
+        }
+        case rlt_float:
+        {
+            float num;
+            str2digit_withCheck(str, num, float, "%f" , float)
+            res = sizeof(float);
+            break;
+        }
+        case rlt_double:
+        {
+            double num;
+            str2digit_withCheck(str, num, double, "%lf" , double)
+            res = sizeof(double);
+            break;
+        }
+        default:
+        {
+            std::string msg = FC_ERR_STR("Unsupported data type '%d'", dataType);
+            throw std::runtime_error(msg);
+        }
     }
-    else if (dataType == RL_TYPE_FLOAT)
-    {
-        res = sizeof(float);
-    }
-    else if (dataType == RL_TYPE_STRING)
-    {
-        res = dataValSize;
-    }
-    else
-    {
-        throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
-    }
+
     return res;
+#undef str2digit_withCheck
+#undef findHighBitNumber
 }
 
 size_t fc_ConverterIR::getFileLen(std::string fileName)
@@ -153,12 +284,13 @@ size_t fc_ConverterIR::getFileLen(std::string fileName)
     dataFile.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
     if (!dataFile.is_open())
     {
-        throw std::runtime_error(FC_ERR_STR("File " + fileName + " does not open"));
+        throw std::runtime_error(FC_ERR_STR("File '%s' does not open", fileName.c_str()));
     }
     res = dataFile.tellg();
 
     return res;
 }
+
 
 uint8_t* fc_ConverterIR::getDoConfig_data(IrData &irData, uint8_t len)
 {
@@ -173,74 +305,177 @@ uint8_t* fc_ConverterIR::getDoConfig_data(IrData &irData, uint8_t len)
         throw std::runtime_error(FC_ERR_STR("Filled both value and path!"));
     }
 
-    //! segf
+#define str2digit_withCheck(str,dvar,dtype,dspec,dcast,destruct)  \
+{                                    \
+    int n;                                  \
+    int ret;                                \
+    ret = std::sscanf(str, dspec "%n", (dcast*)&dvar, &n);  \
+    if((ret != 1) || (std::strlen(str)!= (size_t)n))    \
+    {                                                       \
+        destruct;                          \
+        throw std::runtime_error(FC_ERR_STR("Can't convert value '%s' to type '%s'",str, #dtype));      \
+    }   \
+    char buffer[FC_STR_VALUE_MAX_SIZE]; \
+    std::snprintf(buffer, sizeof(buffer),dspec,dvar);   \
+    if (! ((std::strncmp(#dtype,"float",sizeof(#dtype)) == 0) ||  \
+           (std::strncmp(#dtype,"double",sizeof(#dtype)) == 0)) )  \
+    {                                                    \
+        if (std::strncmp(buffer, str, sizeof(buffer))!= 0)  \
+        {                                                    \
+            destruct;                    \
+            throw std::runtime_error(FC_ERR_STR("Type '%s' overflow for value '%s'", #dtype, str));      \
+                                            \
+        }                                   \
+    }   \
+}
+
     /* Filled value */
+    const char* str = doVal.c_str();
+    res = new uint8_t[len];
     if (doVal.length() != 0)
     {
-        if (dataType == RL_TYPE_INT)
+            switch (dataType)
         {
-            size_t procSymbCnt = 0;
-            for (auto sym : doVal)
+            case rlt_bool:
             {
-                if (sym == ' ')
+                if(doVal.compare("true") == 0)
                 {
-                    throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+                    *res = 1;
                 }
-            }
-            int intVal = std::stoi(doVal, &procSymbCnt);
-            if (procSymbCnt != doVal.size())
-            {
-                throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
-            }
-            if (endianIsLittle() == CMN_LITTLE_ENDIAN)
-            {
-                intVal = reverseEndian(intVal);
-            }
-
-            res = new uint8_t[len];
-            std::memcpy((void *)res, (const void *)&intVal, len);
-        }
-        else if (dataType == RL_TYPE_FLOAT)
-        {
-            size_t procSymbCnt = 0;
-            for (auto sym : doVal)
-            {
-                if (sym == ' ')
+                else if(doVal.compare("false") == 0)
                 {
-                    throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+                    *res = 0;
                 }
+                else
+                {
+                    delete[] res;
+                    throw std::runtime_error(FC_ERR_STR("Can't convert value '%s' to type '%s'",str, "bool"));
+                }
+                break;
             }
-
-            float fltVal = std::stof(doVal, &procSymbCnt);
-            if (procSymbCnt != doVal.size())
+            case rlt_int8:
             {
-                throw std::runtime_error(FC_ERR_STR("Incorrect value!"));
+                int8_t num;
+                str2digit_withCheck(str, num, int8_t, "%" PRId8, int, delete[] res)
+                *res = num;
+                break;
             }
-            if (endianIsLittle() == CMN_LITTLE_ENDIAN)
+            case rlt_int16:
             {
-                fltVal = reverseEndian(fltVal);
+                int16_t num;
+                str2digit_withCheck(str, num, int16_t, "%" PRId16, int, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
             }
-
-            res = new uint8_t[len];
-            std::memcpy((void *)res, (const void *)&fltVal, len);
-        }
-        else if (dataType == RL_TYPE_STRING)
-        {
-            // todo: get data for string
-            // res = irData.getValue().size();
-        }
-        else
-        {
-            throw std::runtime_error(FC_ERR_STR("Mismatch of type!"));
+            case rlt_int32:
+            {
+                int32_t num;
+                str2digit_withCheck(str, num, int32_t, "%" PRId32, int, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_int64:
+            {
+                int64_t num;
+                str2digit_withCheck(str, num, int64_t, "%" PRId64, long, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_uint8:
+            {
+                uint8_t num;
+                str2digit_withCheck(str, num, uint8_t, "%" PRIu8, unsigned int, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_uint16:
+            {
+                uint16_t num;
+                str2digit_withCheck(str, num, uint16_t, "%" PRIu16, unsigned int, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_uint32:
+            {
+                uint32_t num;
+                str2digit_withCheck(str, num, uint32_t, "%" PRIu32, unsigned int, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_uint64:
+            {
+                uint64_t num;
+                str2digit_withCheck(str, num, uint64_t, "%" PRIu64, unsigned long, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndian(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_float:
+            {
+                float num;
+                str2digit_withCheck(str, num, float, "%f" , float, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndianFloat(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            case rlt_double:
+            {
+                double num;
+                str2digit_withCheck(str, num, double, "%lf" , double, delete[] res)
+                if (endianIsLittle())
+                {
+                    num = reverseEndianDouble(num, len);
+                    num = reverseEndianDouble(num, len);
+                }
+                std::memcpy((void *)res, (const void *)&num, len);
+                break;
+            }
+            default:
+            {
+                delete[] res;
+                std::string msg = FC_ERR_STR("Unsupported data type '%d'", dataType);
+                throw std::runtime_error(msg);
+            }
         }
     }
-    /* Filled path */
+    /* Filled path (!no type specified) */
     else if (doPath.length() != 0)
     {
         res = getFileData(doPath);
     }
 
     return res;
+#undef str2digit_withCheck
 }
 
 uint8_t* fc_ConverterIR::getFileData(std::string fileName)
@@ -252,7 +487,7 @@ uint8_t* fc_ConverterIR::getFileData(std::string fileName)
     dataFile.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
     if (!dataFile.is_open())
     {
-        throw std::runtime_error(FC_ERR_STR("File " + fileName + " does not open"));
+        throw std::runtime_error(FC_ERR_STR("File '%s' does not open", fileName));
     }
 
     fSize = dataFile.tellg();
@@ -352,9 +587,9 @@ uint8_t fc_ConverterIR::getApeIdForCfgCode(std::string apeId, std::vector<IrOper
     return apeOrderNum;
 }
 
-int fc_ConverterIR::getNumInputLink(std::string opId, std::vector<IrLink> &links)
+uint8_t fc_ConverterIR::getNumInputLink(std::string opId, std::vector<IrLink> &links)
 {
-    int res = 0;
+    uint8_t res = 0;
 
     for (auto &elem : links)
     {
@@ -377,9 +612,9 @@ APE_Config* fc_ConverterIR::getApeConfig(IrObjects &irObjects)
     int i = 0;
     for (auto &op : irObjects.operators)
     {
-        if (!checkNumPorts(op, irObjects))
+        if (!checkNumPortsInRadioLib(op, irObjects))
         {
-            throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in XML and radiolib!"));
+            throw std::runtime_error(FC_ERR_STR("Mismatch number of in/out ports in IR operator %s and radiolib!", op.getId().c_str()));
         }
         apeConfigRes[i].APE_ID = getApeIdForCfgCode(op.getId(), irObjects.operators);
         apeConfigRes[i].op_code = std::stoul(op.getOpcode());
@@ -393,23 +628,31 @@ APE_Config* fc_ConverterIR::getApeConfig(IrObjects &irObjects)
     return apeConfigRes;
 }
 
-bool fc_ConverterIR::checkNumPorts(IrOperator &irOperator, IrObjects &irObjects)
+bool fc_ConverterIR::checkNumPortsInRadioLib(IrOperator &irOperator, IrObjects &irObjects)
 {
-    int numInputLink = getNumInputLink(irOperator.getId(), irObjects.links);
-    int numOutputLink = getNumOutputLink(irOperator.getId(), irObjects.links);
+    uint8_t numInputLink = getNumInputLink(irOperator.getId(), irObjects.links);
+    uint8_t numOutputLink = getNumOutputLink(irOperator.getId(), irObjects.links);
+    uint32_t opcode = std::stoul(irOperator.getOpcode());
+    const radioLibrary_el * op = rl_getOperator(opcode);
+    uint8_t inputCnt = rl_getInputPortCnt(opcode);
+    uint8_t outputCnt = rl_getOutputPortCnt(opcode);
+    uint8_t iDiff = inputCnt - numInputLink;
+    uint8_t oDiff = outputCnt - numOutputLink;
 
-    IOPortsCnt numIOPortsLib = radioLib.getIOPortsCnt(std::stoul(irOperator.getOpcode()));
-
-    if ((numIOPortsLib.input == RL_PORTS_INF) && (numOutputLink == numIOPortsLib.output))
+    if ((op->flags.infinityInPorts == RL_ENABLE) && (op->flags.infinityOutPorts == RL_ENABLE))
     {
         return true;
     }
-    else if ((numInputLink == numIOPortsLib.input) && (numOutputLink == numIOPortsLib.output))
+    else if (op->flags.infinityInPorts == RL_ENABLE)
     {
-        return true;
+        return !oDiff;
+    }
+    else if (op->flags.infinityOutPorts == RL_ENABLE)
+    {
+        return !iDiff;
     }
 
-    return false;
+    return !(iDiff || oDiff);
 }
 
 uint8_t fc_ConverterIR::getApeNumPorts(std::string opId, IrObjects &irObjects)
@@ -430,9 +673,9 @@ uint8_t fc_ConverterIR::getApeNumPorts(std::string opId, IrObjects &irObjects)
     return apeNumPorts;
 }
 
-int fc_ConverterIR::getNumOutputLink(std::string opId, std::vector<IrLink> &links)
+uint8_t fc_ConverterIR::getNumOutputLink(std::string opId, std::vector<IrLink> &links)
 {
-    int res = 0;
+    uint8_t res = 0;
 
     for (auto &elem : links)
     {

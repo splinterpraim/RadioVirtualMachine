@@ -86,11 +86,12 @@ private:
     /**
      * @brief Gets size of data depending on type
      *
+     * @param[in] dataVal Data value
      * @param[in] dataType Type of data
-     * @param[in] dataValSize Number of characters. Additional argument of type string.
-     * @retval uint32_t Size of data
+     *
+     * @retval uint8_t Size of data
      */
-    uint32_t detectSize(int dataType, size_t dataValSize);
+    uint8_t detectSize(std::string dataVal, int dataType);
 
     /**
      * @brief Gets the file length
@@ -168,7 +169,7 @@ private:
      *
      * @retval int Amount of input links
      */
-    int getNumInputLink(std::string opId, std::vector<IrLink> &links);
+    uint8_t getNumInputLink(std::string opId, std::vector<IrLink> &links);
 
     /**
      * @brief Fills fields of APE Section for Config code objects
@@ -196,7 +197,7 @@ private:
      * @retval true Input/output ports are matched
      * @retval false Input/output ports don't match
      */
-    bool checkNumPorts(IrOperator &irOperator, IrObjects &irObjects);
+    bool checkNumPortsInRadioLib(IrOperator &irOperator, IrObjects &irObjects);
 
     /**
      * @brief Gets the number of data connections from APE
@@ -214,9 +215,9 @@ private:
      * @param[in] opId IR operator ID
      * @param[in] links Vector of IR links
      *
-     * @retval int Amount of output links
+     * @retval uint8_t Amount of output links
      */
-    int getNumOutputLink(std::string opId, std::vector<IrLink> &links);
+    uint8_t getNumOutputLink(std::string opId, std::vector<IrLink> &links);
 
     /**
      * @brief Creates the Access Type for ports of operator
