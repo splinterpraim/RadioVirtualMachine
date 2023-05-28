@@ -183,7 +183,7 @@ radioLibrary_el const referenceRadioLibrary[RL_SIZE] = {
     { "copy_32i", rl_opcode_24, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
         { 
             {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
-            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE },
             {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
         }
     },
