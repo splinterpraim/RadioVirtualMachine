@@ -6,7 +6,6 @@
  * @copyright Copyright (c) 2023
  */
 
-#define FC_LOG(s) std::cout << s << std::endl
 
 /* C++ headers */
 #include <iostream>
@@ -14,6 +13,7 @@
 #include <vector>
 #include <algorithm>
 #include <exception>
+#include <cstdio>
 
 /* XML lib headers*/
 #include "pugixml/pugixml.hpp"
@@ -23,13 +23,13 @@
 #include "ir_data.hpp"
 #include "ir_operator.hpp"
 #include "ir_link.hpp"
-#include "radio_library.hpp"
 #include "config_code_structure.hpp"
 #include "fc_glob.hpp"
 #include "fc_parser.hpp"
 #include "fc.hpp"
+#include "fc_logger.hpp"
+#include "reference_radio_library.hpp"
 
-RadioLibrary radioLib;
 
 /**
  * @brief Parses the command line arguments

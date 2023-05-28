@@ -124,7 +124,7 @@ private:
      * @param[in] opId IR operator ID
      * @param[in] dir Direction of data to operator
      */
-    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir);
+    void createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, bool dir);
 };
 
 #endif // FC_PARSER_SWIR_CLASS

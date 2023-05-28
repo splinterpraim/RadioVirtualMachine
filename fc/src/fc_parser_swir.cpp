@@ -13,10 +13,11 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "radio_library.hpp"
 #include "common.hpp"
+#include "fc_logger.hpp"
+#include "reference_radio_library.hpp"
 
-extern RadioLibrary radioLib;
+
 
 /* Private */
 
@@ -26,11 +27,14 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataInput(pugi::xml_node &op_xml)
 
     /* Gets description of operator in Radio lib */
     int opcode = op_xml.attribute("opcode").as_int();
-    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    std::string name = op_xml.attribute("id").as_string();
+    const radioLibrary_el * op_rl = rl_getOperator(opcode);
+    uint8_t inputCnt = rl_getInputPortCnt(opcode);
+
     /* If opcode doesn't found */
-    if (op_rl.name.length() == 0)
+    if (!op_rl)
     {
-        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode '%d' for operator '%s'", opcode, name.c_str()));
     }
 
     /* Loop for finding and converting Data from xml to IR */
@@ -45,13 +49,17 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataInput(pugi::xml_node &op_xml)
             int order = data.attribute("order").as_int();
             int dataType = -1;
 
-            if (op_rl.ports.fInfinityInPorts == RL_YES)
+            if (op_rl->flags.infinityInPorts == RL_ENABLE)
             {
-                dataType = op_rl.ports.in[0].type; // todo: fix, because not work for undefined num of inputs
+                dataType = op_rl->flags.typeOfInData;
             }
             else
             {
-                dataType = op_rl.ports.in[order - 1].type; // todo: fix, because not work for undefined num of inputs
+                if (order > inputCnt)
+                {
+                    throw std::runtime_error(std::string("Too many inputs for operator '") + name + std::string("'"));
+                }
+                dataType = op_rl->ports[order - 1].typeOfData;
             }
             currData.setType(dataType);
             dataResult[order] = currData;
@@ -66,11 +74,15 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataOutput(pugi::xml_node &op_xml)
 
     /* Gets description of operator in Radio lib */
     int opcode = op_xml.attribute("opcode").as_int();
-    rl_Operator op_rl = radioLib.findByOpCode(opcode);
+    std::string name = op_xml.attribute("id").as_string();
+    const radioLibrary_el * op_rl = rl_getOperator(opcode);
+    uint8_t inputCnt = rl_getInputPortCnt(opcode);
+    uint8_t outputCnt = rl_getOutputPortCnt(opcode);
+
     /* If opcode doesn't found */
-    if (op_rl.name.length() == 0)
+    if (!op_rl)
     {
-        throw std::runtime_error(std::string("Unknown opcode '") + std::to_string(opcode) + std::string("' for operator")); // todo: FC_ERR_STR
+        throw std::runtime_error(FC_ERR_STR("Unknown opcode '%d' for operator '%s'", opcode, name.c_str()));
     }
 
     /* Loop for finding and converting Data from xml to IR */
@@ -85,7 +97,19 @@ std::map<int, IrData> fc_ParserSWIR::takeIrDataOutput(pugi::xml_node &op_xml)
             int order = data.attribute("order").as_int();
             int dataType = -1;
 
-            dataType = op_rl.ports.out[order - 1].type;
+            if (op_rl->flags.infinityOutPorts == RL_ENABLE)
+            {
+                dataType = op_rl->flags.typeOfOutData;
+            }
+            else
+            {
+                if (order > outputCnt)
+                {
+                    throw std::runtime_error(std::string("Too many outputs for operator '") + name + std::string("'"));
+                }
+                int index = order + inputCnt - 1; 
+                dataType = op_rl->ports[index].typeOfData;
+            }
 
             currData.setType(dataType);
             dataResult[order] = currData;
@@ -199,7 +223,7 @@ IrOperator fc_ParserSWIR::convertToIrOperator(pugi::xml_node &op_xml)
     return op;
 }
 
-void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, int dir)
+void fc_ParserSWIR::createLinksFromVectorData(std::vector<IrLink> &links, std::map<int, IrData> &data, const std::string &opId, bool dir)
 {
     for (auto el : data)
     {
@@ -222,8 +246,8 @@ IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
     addIrDataToVector(irObjects.data, inputDataExternal);
     addIrDataToVector(irObjects.data, outputDataExternal);
 
-    createLinksFromVectorData(irObjects.links, inputDataExternal, "", LINK_INPUT);
-    createLinksFromVectorData(irObjects.links, outputDataExternal, "", LINK_OUTPUT);
+    createLinksFromVectorData(irObjects.links, inputDataExternal, "", RL_INPUT_PORT);
+    createLinksFromVectorData(irObjects.links, outputDataExternal, "", RL_OUTPUT_PORT);
 
     pugi::xml_node curOperator = program.child("operator");
     if(!curOperator)
@@ -248,8 +272,8 @@ IrObjects fc_ParserSWIR::parse(const pugi::xml_document &doc)
         irObjects.operators.push_back(currOp);
 
         /* Create link objects from input/output IR data and IR operator */
-        createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), LINK_INPUT);
-        createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), LINK_OUTPUT);
+        createLinksFromVectorData(irObjects.links, inputData, currOp.getId(), RL_INPUT_PORT);
+        createLinksFromVectorData(irObjects.links, outputData, currOp.getId(), RL_OUTPUT_PORT);
 
         auto xmlNodeType = curOperator.next_sibling("operator").type();
 
