@@ -187,6 +187,17 @@ radioLibrary_el const referenceRadioLibrary[RL_SIZE] = {
             {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
         }
     },
+
+    /* Copy on sig*/
+    { "copyOnSig_32i", rl_opcode_30, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_bool,  RL_ENABLE },
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+
     /* Delay */
     { "z_32i", rl_opcode_25, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
         { 
@@ -221,6 +232,38 @@ radioLibrary_el const referenceRadioLibrary[RL_SIZE] = {
     { "FIR_order_2_32i", rl_opcode_29, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
         { 
             {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
+        }
+    },
+
+    { "cmp_32i", rl_opcode_31, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_bool, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_bool, RL_ENABLE }
+        }
+    },
+
+    { "iterator_32i", rl_opcode_32, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_bool, RL_ENABLE },
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_bool, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_bool, RL_ENABLE }
+        }
+    },
+
+    { "sendSignal_32i", rl_opcode_33, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_int32, RL_ENABLE },
+            {RL_OUTPUT_PORT, rlt_bool, RL_ENABLE }
+        }
+    },
+
+    { "generatorRandom_32i", rl_opcode_34, 10, 10, {RL_DISABLE, RL_DISABLE, rlt_int32, rlt_int32},
+        { 
+            {RL_INPUT_PORT,  rlt_bool, RL_ENABLE },
             {RL_OUTPUT_PORT, rlt_int32, RL_ENABLE }
         }
     },

@@ -1,10 +1,28 @@
 
 <task>
     <program name="p1" path="">
+        <operator id="iterator" type="Complex" opcode="32">
+            <data id="sig_next" path="" connect_type="input" order="1" access_time="11" value="true"/>
+            <data id="start_val" path="" connect_type="input" order="2" access_time="11" value="6"/>
+            <data id="sig_continue" path="" connect_type="output" order="1" access_time="11" value=""/>
+            <data id="sig_end" path="" connect_type="output" order="2" access_time="11" value=""/>
+            <program name="Iterator" path="Iterator.xml"/>
+        </operator>
+
+        <operator id="Gen_random" type="Terminal" opcode="34">
+            <data id="sig_continue" path="" connect_type="input" order="1" access_time="11" value=""/>
+            <data id="x" path="" connect_type="output" order="1" access_time="11" value=""/>
+        </operator>
+
         <operator id="FIR" type="Complex" opcode="29">
-            <data id="x" path="" connect_type="input" order="1" access_time="11" value="3"/>
+            <data id="x" path="" connect_type="input" order="1" access_time="11" value=""/>
             <data id="y" path="" connect_type="output" order="1" access_time="11" value=""/>
             <program name="FIR_order_2" path="FIR_order_2.xml"/>
+        </operator>
+
+        <operator id="Send_sig" type="Terminal" opcode="33">
+            <data id="y" path="" connect_type="input" order="1" access_time="11" value=""/>
+            <data id="sig_next" path="" connect_type="output" order="1" access_time="11" value="true"/>
         </operator>
     </program>
 </task>
