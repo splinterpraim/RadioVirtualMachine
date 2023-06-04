@@ -19,6 +19,7 @@
 #define APE_PORT_BLOCKED 1
 #define APE_PORT_ALLOWED 0
 
+
 /* APEportManager */
 
 APEportManager::APEportManager() { }
@@ -112,6 +113,20 @@ uint8_t &APEportManager::loadData(uint8_t portNumber)
 }
 
 /* AbstractProcessingElement */
+std::string AbstractProcessingElement::to_strPorts()
+{
+    std::string result_str;
+    for (size_t i = 0; i < numPorts; i++)
+    {
+        result_str += "[" + std::to_string(i) + "] " +
+                        (ports[i].accessTypes == APE_ACCESS_TYPE_W ? 
+                            std::string("WRITE_TYPE") : std::string("READ_TYPE") );
+                            
+        result_str += (i+1  == numPorts) ? " ": ", ";
+    }
+    return result_str;
+}
+
 
 AbstractProcessingElement::AbstractProcessingElement()
 {
@@ -170,7 +185,9 @@ int AbstractProcessingElement::set(uint16_t id, uint16_t cost, uint16_t time, ui
             }
             portsMngr.init(this->numPorts);
             status.id = this->id;
+#ifdef UNCOMENT
             qAPE->push(status);
+#endif
         }
         catch (const std::bad_alloc &e)
         {
@@ -303,12 +320,13 @@ uint16_t AbstractProcessingElement::getId()
 
 std::string AbstractProcessingElement::to_str()
 {
-    std::string result_str = "id " + std::to_string(id) + ", cost " + std::to_string(cost) +
-                             ", time " + std::to_string(time) + ", opcode " + std::to_string(opcode) + "\n";
-    for (size_t i = 0; i < numPorts; i++)
-    {
-        result_str += "  " + std::to_string(i) + " port: " + std::to_string(ports[i].accessTypes) + "\n";
-    }
+    std::string result_str = "id " + std::to_string(id) + 
+                             ", cost " + std::to_string(cost) +
+                             ", time " + std::to_string(time) +
+                             ", opcode " + std::to_string(opcode) + "\n" +
+                             "\tstatus: " +status.to_str() + "\n" +
+                             "\tports: "+ to_strPorts();
+
 
     return result_str;
 }

@@ -16,6 +16,7 @@
 #include "rvm_program_memory.hpp"
 #include "rvm_basic_operations.hpp"
 #include "rvm_data_path.hpp"
+#include "common.hpp"
 
 /**
  * @brief Radio Virtual Machine class implementation
@@ -25,16 +26,24 @@ class Rvm
 public:
 
     /**
-     * @brief Constructs a new Rvm object and sets configcode files name
-     *
-     * @param[in]       cfgFileNames            Configcode files name
+     * @brief Constructs a new Rvm object
      */
-    Rvm(std::vector<std::string> &cfgFileNames);
+    Rvm();
+
+    void addRLOperator(uint32_t opcode, rl_operator_fn opFn);
+
+    void addRVMOperator(std::string opName,uint8_t* cc, size_t cc_size, const std::map<int, std::string> &map);
+
+    void addProgram(const uint8_t* cc, size_t cc_size);
+
 
     /**
      * @brief Launches the Radio Virtual Machine 
      */
     void run();
+    void run(const std::vector<array_t>& externalInputDO, const std::vector<array_t>& externalOutputDO);
+
+    void show();
 
 private:
 

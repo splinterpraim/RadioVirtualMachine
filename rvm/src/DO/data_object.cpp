@@ -28,11 +28,10 @@ std::string DataObject::to_strData()
 {
     std::stringstream resStream;
 
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = size; i != 0; i--)
     {
-        resStream << std::hex << (int)data[i] << std::dec << " ";
+        resStream << std::hex << (int)data[i-1] << std::dec << " ";
     }
-    resStream << std::endl;
     return resStream.str();
 }
 
@@ -151,10 +150,12 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
         {
             throw std::invalid_argument(RVM_ERR_STR("Initialization DataObject failed, argument length > allocated size!"));
         }
+#ifdef UNCOMENT
         if (cfgnBlock == nullptr)
         {
             throw std::runtime_error(RVM_ERR_STR("Initialization DataObject failed, Data Object is not related to  Control Unit's data path configuration block!"));
         }
+#endif
     }
 
     /* Exception Handle */
@@ -177,8 +178,11 @@ int DataObject::init(const uint8_t &initData, uint8_t length)
                     readDataFromMemory(initData, length);
                 }
                 status.state = full;
+                status.accessType = at::write;
             }
+#ifdef UNCOMENT
             qDO->push(status);
+#endif
         }
         catch (const std::exception &e)
         {
@@ -256,7 +260,7 @@ std::string DataObject::to_str()
     std::string result_str = "id " + std::to_string(id) + ", " +
                              "size " + std::to_string(size) + ", " +
                              "accessTime " + std::to_string(accessTime) + "\n" +
-                             "status: " + status.to_str() + "\n" +
-                             "data: " + to_strData();
+                             "\tstatus: " + status.to_str() + "\n" +
+                             "\tdata: " + (status.state? to_strData():std::string(""));
     return result_str;
 }

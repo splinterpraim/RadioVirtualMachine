@@ -1,6 +1,9 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
+#include <cstdio>
+#include <cstdint>
+
 /* Colors defines */
 #define RT "\033[0m"                  /* Reset */
 #define BK "\033[30m"                 /* Black */
@@ -56,6 +59,9 @@
 #define APE_ACCESS_TYPE_R 0
 #define APE_ACCESS_TYPE_W 1
 
+#define BIN_INPUT_ROW_SIZE 16
+
+
 /* Log levels  */
 enum class LogLevels
 {
@@ -63,4 +69,11 @@ enum class LogLevels
     FIRST = 1, /* Only important logs */
     SECOND = 2 /* All logs */
 };
+
+
+typedef struct
+{
+    size_t size;
+    uint8_t* arr;
+} array_t;
 #endif // COMMON_HPP

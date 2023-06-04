@@ -37,7 +37,7 @@ enum exDO
  */
 enum stAPE
 {
-    inactive,   /* Doesn't perform an operation */
+    inactive = 0,   /* Doesn't perform an operation */
     active      /* Performs an operation */
 };
 
@@ -75,7 +75,7 @@ struct StatusFromDataObject
     std::string to_str() const
     {
         std::string result_str = "id " + std::to_string(id) + ", " +
-                                 "state " + std::to_string(state) + ", " +
+                                 "state " + (state? std::string("FULL"):std::string("EMPTY")) + ", " +
                                  "accessType " + std::to_string(accessType) + ", " +
                                  "exception " + std::to_string(exception);
         return result_str;
@@ -99,7 +99,7 @@ struct StatusFromAbstractProcessingElement
     std::string to_str() const
     {
         std::string result_str = "id " + std::to_string(id) + ", " +
-                                 "state " + std::to_string(state) + ", " +
+                                 "state " + (state? std::string("ACTIVE"):std::string("INACTIVE")) + ", " +
                                  "exception " + std::to_string(exception);
         return result_str;
     }

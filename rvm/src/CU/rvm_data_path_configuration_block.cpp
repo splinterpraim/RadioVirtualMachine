@@ -41,7 +41,7 @@ void rvm_dataPathConfigurationBlock::configureDataObjects(ConfigObjects &cfgCode
                 int tmpData0 = 0;
                 std::memcpy((void *)&tmpData0, (const void *) doSec.DOs[i].data, sizeof(tmpData0));
 
-                int tmpData1= reverseEndian(tmpData0);
+                int tmpData1= reverseEndian(tmpData0, 4);
                 std::memcpy((void *)doSec.DOs[i].data, (const void *)&tmpData1, sizeof(tmpData1));
 
             }

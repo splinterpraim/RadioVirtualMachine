@@ -10,7 +10,7 @@
 #define SYSTEM_FUNC_HPP
 
 #include <string>
-
+#include <vector>
 /**
  * @brief Checks whether the endian in the system is little
  * 
@@ -40,5 +40,13 @@ float reverseEndianFloat(float val, uint8_t size);
 double reverseEndianDouble(double val, uint8_t size);
 
 void createDir(std::string dir);
+
+void getName(std::string fileName,  std::string& name);
+
+void getExt(std::string fileName, std::string& ext);
+
+void file2array(std::string filePath, uint8_t** cc, size_t &size);
+
+std::vector<std::string> file2strLine(std::string filePath);
 
 #endif // SYSTEM_FUNC_HPP

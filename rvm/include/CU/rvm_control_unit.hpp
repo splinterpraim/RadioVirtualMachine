@@ -16,6 +16,7 @@
 #include "CU/rvm_operation_fetcher.hpp"
 #include "CU/rvm_threadsafe_queue.hpp"
 #include "rvm_structs.h"
+#include"common.hpp"
 
 class rvm_ProgramMemory;    /* Forward declaration of rvm_ProgramMemory class */
 class rvm_BasicOperations;  /* Forward declaration of rvm_BasicOperations class */
@@ -33,6 +34,8 @@ public:
      * @brief Destroys the Control Unit object
      */
     ~rvm_ControlUnit();
+
+    void addExternals(const std::vector<array_t>& externalInputDO, const std::vector<array_t>& externalOutputDO);
 
     /**
      * @brief Launches the Control Unit for main work

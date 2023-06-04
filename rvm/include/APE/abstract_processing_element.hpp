@@ -17,7 +17,7 @@
 #include "rvm_structs.h"
 
 class rvm_dataPathConfigurationBlock;   /* Forward declaration of rvm_dataPathConfigurationBlock class */
-
+// class Rvm;
 /**
  * @brief Abstract Processing Element port description
  */
@@ -220,6 +220,9 @@ private:
     APEportManager portsMngr;                               /* Manager for port of APE */
     std::vector<PortAPE> ports;                             /* Ports of APE */
     uint8_t numPorts = 0;                                   /* Number of ports */
+    // Rvm * rvm_body { nullptr };
+
+    std::string to_strPorts();
 };
 
 #endif // RVM_ABSTRACT_PROCESSING_ELEMENT_CLASS

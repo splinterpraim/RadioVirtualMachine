@@ -21,7 +21,8 @@ class AbstractSwitchFabric;     /* Forward declaration of AbstractSwitchFabric c
  */
 struct rvm_DataPath_s
 {
-    std::vector<DataObject> dataObjs;               /* All Data Objects */
+    std::vector<DataObject> dataObjs;               /* Data Objects */
+    std::vector<DataObject> dataObjsExt;            /* External Data Objects */
     std::vector<AbstractProcessingElement>  apes;   /* All Abstract Processing Element */
     AbstractSwitchFabric * asf = nullptr;           /* Pointer on Abstract Switch Fabric */
 };

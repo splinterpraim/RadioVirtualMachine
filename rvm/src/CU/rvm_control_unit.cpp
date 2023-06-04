@@ -10,6 +10,8 @@
 
 #include <thread>
 #include <functional>
+#include <exception>
+#include <stdexcept>
 
 #include "config_code_structure.hpp"
 #include "rvm_glob_define.hpp"
@@ -18,6 +20,16 @@
 #include "rvm_data_path.hpp"
 
 rvm_ControlUnit::~rvm_ControlUnit() { }
+
+void rvm_ControlUnit::addExternals(const std::vector<array_t>& externalInputDO, const std::vector<array_t>& externalOutputDO)
+{
+    if(!dataPath)
+    {
+        throw std::runtime_error("Data path is not accossiate with Control Unit");
+    }
+    // dataPath->dataObjsExt();
+}
+
 
 void rvm_ControlUnit::work()
 {

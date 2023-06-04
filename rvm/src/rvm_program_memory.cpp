@@ -142,6 +142,14 @@ uint64_t rvm_ProgramMemory::load(std::string fileName)
     return cntByte;
 }
 
+uint64_t rvm_ProgramMemory::loadFromArray(const uint8_t* arr, size_t size)
+{
+    uint8_t *memPtr = getPtrOnFreeSpace(size);
+    std::memcpy(memPtr, arr, size);
+    return size;
+}
+
+
 uint8_t rvm_ProgramMemory::get(uint64_t addr)
 {
     /* Check out of range */

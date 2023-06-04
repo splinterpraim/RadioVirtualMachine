@@ -115,7 +115,7 @@ private:
     uint8_t *data = nullptr;        /* Pointer to start of data to Data Object */
     rvm_dataPathConfigurationBlock * cfgnBlock = nullptr; /* Externally related Data path congiguration block */
     rvm_ThreadsafeQueue<StatusFromDataObject>* qDO = nullptr;
-    StatusFromDataObject status = {};    /* Current status of Data Object */
+    StatusFromDataObject status = {0, stDO::empty, at::read, 0};    /* Current status of Data Object */
 
     /**
      * @brief Converts data of Data Object to string hex format

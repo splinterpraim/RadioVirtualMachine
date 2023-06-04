@@ -52,6 +52,8 @@ public:
      */
     uint64_t load(std::string fileName);
 
+    uint64_t loadFromArray(const uint8_t* arr, size_t size);
+
     /**
      * @brief Returns the value of byte at the specified address
      *
