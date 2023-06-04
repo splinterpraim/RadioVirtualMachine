@@ -35,7 +35,7 @@ void fc_ConverterIR::fillControlSection(ConfigObjects &configObjects, IrObjects 
     ctrlSec.Reference_ID = 1; // identifier of the reference Radio Library
     ctrlSec.Implementation_version = 1;
     ctrlSec.Developer_ID = 1;
-    ctrlSec.Creation_Date = 2022;
+    ctrlSec.Creation_Date = 2023;
 }
 
 void fc_ConverterIR::fillDoSection(ConfigObjects &configObjects, IrObjects &irObjects)
@@ -711,7 +711,15 @@ void fc_ConverterIR::generateIdMapFile(std::vector<IrOperator> &operators)
     fin.open(idMapFile,std::ios::out);
     for(auto & el : operators)
     {
-        std::string row = std::to_string(getApeIdForCfgCode(el.getId(),operators)) + "," + el.getId();
+        std::string row;
+        if (!el.getType().compare("Complex"))
+        {
+            row = std::to_string(getApeIdForCfgCode(el.getId(),operators)) + "," + el.getSubname();
+        }
+        else
+        {
+            row = std::to_string(getApeIdForCfgCode(el.getId(),operators)) + "," + el.getId();
+        }
         fin << row << std::endl;
     }
     fin.close();
