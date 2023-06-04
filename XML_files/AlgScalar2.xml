@@ -2,19 +2,19 @@
 
 <program name ="inner product Terminal">
 
-  <operator id="mult1" type ="Terminal" opcode = "3">
+  <operator id="mult1" type ="Terminal" opcode = "15">
     <data id="x1" path = "" connect_type ="input" order ="1" access_time ="10"  value = "121"/>
     <data id="y1" path = "" connect_type ="input" order ="2" access_time ="10"  value = "320"/>
     <data id="c1" path = "" connect_type ="output" order ="1" access_time ="10" value = ""/>
   </operator>
 
-  <operator id="mult2" type ="Terminal" opcode = "3">
+  <operator id="mult2" type ="Terminal" opcode = "15">
     <data id="x2" path = "" connect_type ="input" order ="1" access_time ="10"  value = "255"/>
     <data id="y2" path = "" connect_type ="input" order ="2" access_time ="10"  value = "87"/>
     <data id="c2" path = "" connect_type ="output" order ="1" access_time ="10" value = ""/>
   </operator>
 
-  <operator id="add" type ="Terminal" opcode = "1">
+  <operator id="add" type ="Terminal" opcode = "4">
     <data id="c1" path = "" connect_type ="input" order ="1" access_time ="10" value = ""/>
     <data id="c2" path = "" connect_type ="input" order ="2" access_time ="10" value = ""/>
     <data id="c" path = "" connect_type ="output" order ="1" access_time ="10" value = ""/>
