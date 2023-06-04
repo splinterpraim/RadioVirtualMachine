@@ -10,6 +10,7 @@
 #define REFERENCE_RADIO_LIBRARY_HPP
 
 #include <cstdint>
+#include <cstdarg>
 
 #define RL_MAX_PORT_SIZE 7
 #define RL_ENABLE true
@@ -76,6 +77,18 @@ enum RL_OPCODES
 };
 #define RL_SIZE RL_OPCODES_SIZE - 1
 
+/**
+ * @brief Description of Input/Output arguments of Radio Library functions
+ */
+typedef struct
+{
+    int inNum;              /* Number of input arguments */
+    int outNum;             /* Number of output arguments */
+    uint8_t ** inPorts;     /* Pointer on input arguments array */
+    uint8_t ** outPorts;    /* Pointer on output arguments array */
+} rl_ArgArray;
+
+typedef int (*rl_operator_fn)(rl_ArgArray &);
 
 struct radioLibrary_el
 {
@@ -90,6 +103,8 @@ struct radioLibrary_el
         uint8_t typeOfInData;
         uint8_t typeOfOutData;
     } flags;
+
+    rl_operator_fn fn;
 
     typedef struct {
         bool dir;
@@ -106,11 +121,12 @@ using radioLibrary_el = struct radioLibrary_el;
 extern radioLibrary_el const referenceRadioLibrary[RL_SIZE];
 
 
-
 radioLibrary_el const* rl_getOperator(uint32_t opcode);
 
 uint8_t rl_getInputPortCnt(uint32_t opcode);
 
 uint8_t rl_getOutputPortCnt(uint32_t opcode);
+
+
 
 #endif // REFERENCE_RADIO_LIBRARY_HPP
